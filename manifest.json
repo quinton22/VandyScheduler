@@ -1,0 +1,29 @@
+{
+   "manifest_version": 2,
+   "name": "Scheduling App",
+   "version": "1.0",
+   "description": "This takes classes and organizes them into a schedule.",
+   "icons": {
+      "16": "calendar-icon.png",
+      "48": "calendar-icon.png",
+      "128": "calendar-icon.png"
+   },
+   "browser_action": {
+      "default_icon": "calendar-icon.png"
+   },
+   "content_scripts": [
+      {
+         "matches": ["https://webapp.mis.vanderbilt.edu/more/SearchClasses*"],
+			"js": ["jquery-3.2.1.min.js", "content.js", "class.js", "schedule.js"],
+         "css": ["myButton.css", "modal.css"],
+			"all_frames": true
+      }
+   ],
+   "permissions": [
+      "tabs", "https://webapp.mis.vanderbilt.edu/more/SearchClasses*"
+   ],
+   "background": {
+   
+   }
+   
+}

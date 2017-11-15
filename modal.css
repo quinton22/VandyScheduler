@@ -1,0 +1,133 @@
+.modal {
+    display: none;
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0; 
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Header */
+.modal-header {
+    padding: 2px 16px;
+    margin: 20px auto;
+    background-color: #fefefe;
+    color: #000;
+}
+
+/* Modal Body */
+.modal-body {
+   padding: 2px 16px;
+}
+
+/* Modal Footer */
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #fefefe;
+}
+
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 0px; 
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top: -300px; opacity: 0} 
+    to {top: 0; opacity: 1}
+}
+
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 36px;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 16px;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.schedule-caption {
+   font-size: 20px;
+   font-weight: bold;
+}
+.schedule-table {
+  width: 100%;
+  border: 1px solid black;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.schedule-th {
+  border: 1px solid black;
+  border-collapse: collapse;
+  background-color: #8d8d8d;
+  text-align: center;
+}
+.schedule-td {
+  border: 1px dotted black;
+  border-collapse: collapse;
+}
+
+.schedule-th, .schedule-td {
+  padding: 10px;
+  width: 10%;
+}
+
+.schedule-tr {
+  height: 40px;
+}
+
+.schedule-div {
+  margin: auto;
+  padding: 5px;
+  width: 90%;
+}
+
+.c1 {
+   background-color: #8d8d8d;
+   border: 1px solid black;
+}
+
+.class {
+  width: 10%;
+  z-index: 2;
+  position: absolute;
+  background-color: #0514bc;
+  border: 1px solid #071cff;
+  border-radius: 4px;
+  text-align: center;
+  
+}
+
+.classText {
+  position: relative;
+  top: 25%;
+  color: white;    
+  font-size: 1vw;
+}
