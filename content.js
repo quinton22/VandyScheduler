@@ -94,30 +94,7 @@ function createModal() {
 
 function updateClassArr() {
 	classArr = [];
-//	classArr.forEach(function (c, idx) {
-//		for(var i = 0; i < c.getIsInCart().length; i++) {
-//			console.log("following should be the same");
-//			console.log(c);
-//			if (c.getIsInCart()[i]) {
-//				classArr.splice(idx, 1);
-//				console.log(c);
-//				if (c.getIsInCart().length > 1) {
-//					var newsections = c.getSections().splice(i, 1);
-//					var newprof = c.getProf().splice(i, 1);
-//					var newhours = c.getHour().splice(i, 1);
-//					var newdays = c.getDays().splice(i, 1);
-//					var newtimes = c.getTimes().splice(i, 1);
-//					var newaddToCartArr = c.getAddToCartArr().splice(i, 1);
-//					var _c = new Class_(c.getClassAbbr(), c.getClassDesc(), newsections, newprof, newhours, newdays, newtimes, newaddToCartArr);
-//					classArr.push(_c);
-//				}
-//			}
-//		}
-//	});
-//	
-//	console.log("before");
-//	console.log(classArr);
-//	
+	
 	// adds classes in cart to class arr
 	if (t) {
 		clearTimeout(t);
@@ -131,28 +108,6 @@ function updateClassArr() {
 		}
 		ready = true;
 	}, 100);
-//	
-//	
-//	// merges classes with the same class name
-//	classArr.forEach (function (c, idx) {
-//		classArr.forEach(function (c2, idx2) {
-//			if (idx !== idx2 && c.getClassAbbr() === c2.getClassAbbr()) {
-//					classArr.splice(idx, 1);
-//					classArr.splice(idx2, 1);
-//					
-//					var newsections = c.getSections().concat(c2.getSections());
-//					var newprof = c.getProf().concat(c2.getProf());
-//					var newhours = c.getHour().concat(c2.getHour());
-//					var newdays = c.getDays().concat(c2.getDays());
-//					var newtimes = c.getTimes().concat(c2.getTimes());
-//					var newaddToCartArr = c.getAddToCartArr().concat(c2.getAddToCartArr());
-//					
-//					var _c = new Class_(c.getClassAbbr(), c.getClassDesc(), newsections, newprof, newhours, newdays, newtimes, newaddToCartArr);
-//					classArr.push(_c);
-//			}
-//		});
-//	});
-//	
 }
 
 
@@ -202,7 +157,6 @@ function addBtn() {
 				var button = addClassButton.firstChild;
 				button.className = "myButton remove";
 				button.innerHTML = "Remove Class";
-				//console.log(addClassButton.id);
 				addELToButton(j);
 		
 				addClassButton = clone;
@@ -216,21 +170,6 @@ function addBtn() {
 *	Adds event listener to add class buttons
 */
 function addEL(button, classNumOnPage) {
-//	var isInSched = false;
-//	classArr.forEach(function (element) {
-//		if (_class.children[0].innerHTML.replace(/:/, "") === element.getClassAbbr()) {
-//			if(element.getSections().length === document.getElementsByClassName("classTable")[classNumOnPage].getElementsByClassName("classSection").length) {
-//				isInSched = true;
-//			}
-//		}
-//	});
-//	
-//	if (isInSched) {
-//		button.className = "myButton remove";
-//		button.innerHTML = "Remove Class";
-//	}
-	//button.setAttribute("onclick", "YAHOO.mis.student.Topics.addClassSectionToCart.fire({classNumber : '13638', termCode : '0900'})");
-
 	var addToCartList = document.getElementsByClassName("classTable")[classNumOnPage].getElementsByClassName("classActionButtons");
 	var str = "";
 	for (var i = 0; i < addToCartList.length; i++) {
@@ -238,30 +177,9 @@ function addEL(button, classNumOnPage) {
 			str += addToCartList[i].children[0].getAttribute('onclick') + "; ";
 		}
 	}
-	
-	// var addToCartScript = document.createElement("script");
-	// addToCartScript.innerHTML = str;
-
-	// button.addEventListener("click", function() {
-	// 	document.body.appendChild(addToCartScript);
-	// 	addToCartScript.parentNode.removeChild(addToCartScript);
-	// });
 
 	button.setAttribute("onclick", str);
-	
-	
-//	button.addEventListener("click", function() {
-//		if(button.className === "myButton") {
-//			addClass(_class, classNumOnPage);
-//			classAdded(button);
-////			console.log(classArr);
-////			console.log(scheduleArr);
-//		} else if (button.className === "myButton remove") {
-////			removeClass(button, _class);
-////			console.log(classArr);
-////			console.log(scheduleArr);
-//		}
-//	});
+
 }
 
 /*
@@ -302,68 +220,13 @@ function addClass(_class, classNumOnPage) {
 			id = id.substring(id.indexOf("Row_") + 4, id.indexOf("_remove"));
 			numOfClassPage[num] = ~~id;
 		}
-		
-//		var classNumber = sectionsList[num].id.replace("classNumber_", "");
-//		
-//		if (num < addToCartList.length && addToCartList[num].children.length !== 0) {
-//			var str = addToCartList[num].children[0].getAttribute('onclick');
-//			if (str !== null && str.includes(classNumber)) {
-//				addToCart[num] = str;
-//			} else {
-//				addToCart[num] = null;
-//			}
-//		}
 	}
 	
-	// checks if the new class contains a section not already in schedule
-//	var isInSched = [];
-//	for(var i = 0; i < sections.length; i++) {
-//		classArr.forEach(function (c) {
-//			if (classAbbr === c.getClassAbbr()) {
-//				if (c.getSections().indexOf(sections[i]) === - 1) {
-//					isInSched.push(false);
-//				} else {
-//					isInSched.push(true);
-//				}
-//			}
-//		});
-//	}
-//	if (isInSched.length === 0) {
-//		for (var i = 0; i < sections.length; i++) {
-//			isInSched.push(false);
-//		}
-//	}
-//	
-//	spliceIdx = isInSched.indexOf(true);
-//	while(spliceIdx !== -1) {
-//		sections.splice(spliceIdx, 1);
-//		profs.splice(spliceIdx, 1);
-//		hours.splice(spliceIdx, 1);
-//		days.splice(spliceIdx, 1);
-//		times.splice(spliceIdx, 1);
-//		addToCart.splice(spliceIdx, 1);
-//		isInSched.splice(spliceIdx, 1);
-//		spliceIdx = isInSched.indexOf(true);
-//	}
 	var newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times, location);
 	classArr.push(newClass);
 
 }
 
-/*
-*	Removes class from classList when remove button is clicked
-*/
-//function removeClass(button, _class) {//------------------------------------------------------------
-//	var classAbbr = _class.children[0].innerHTML.replace(/:/, "");
-//	classArr.forEach(function(element, idx) {
-//		if (element.getClassAbbr() === classAbbr) {
-//			classArr.splice(idx, 1);
-//			button.className = "myButton";
-//			button.innerHTML = "Add to Schedule";
-//		}
-//	});
-//	
-//}
 
 /*
 *	Adds class added img and adds a remove button
@@ -397,10 +260,8 @@ function makeScheduleButton(parent) {
 function makeSchedClicked() {
 	if (ready) {
 			var sched = new Schedule(classArr);
-			console.log(classArr);
 			sched.sortClasses();
 			scheduleArr = sched.getScheduleArr();
-			console.log(scheduleArr);
 			createViewableContent(scheduleArr);
 			
 			addELToButton();
@@ -419,8 +280,6 @@ function createViewableContent(arr) {
 				schedArr = convertToDetailed(arr);
 				var bigSchedDiv = document.createElement("div");
 			}
-
-			console.log(schedArr);
 			
 			schedArr.forEach(function (schedule, idx) {
 				if (q===0) {
@@ -458,10 +317,7 @@ function createViewableContent(arr) {
 											var p = classTab[i].getElementsByClassName("classRow")[k]
 												.getElementsByClassName("classActionButtons")[0];
 											var lId = p.children[0].id;
-											console.log(p.children[0]);
 											var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));
-											console.log("l");
-											console.log(l);
 											var newScript = document.createElement("script");
 											var script = p.getElementsByTagName("script");
 											var s = script[0].innerHTML;
@@ -485,8 +341,6 @@ function createViewableContent(arr) {
 
 
 						}
-						console.log("classArr");
-						console.log(classArr);
 						modal.style.display = "none";
 						document.getElementById("modalBody").innerHTML = "";
 
@@ -623,8 +477,6 @@ function convertToDetailed(arr) {
 		s = [];
 	});
 	
-	console.log("!!!!!!!!!!");
-	console.log(ss);
 	return ss;
 }
 
@@ -642,7 +494,6 @@ function getClass(classAbbr, section) {
 }
 
 function placeClass(classDiv, scheduleDiv, day, time) {
-	//console.log(scheduleDiv);
 	var divHeight = scheduleDiv.offsetHeight;
 	var divWidth = scheduleDiv.offsetWidth;
 	var tab = scheduleDiv.firstChild.getElementsByTagName("tr");
@@ -721,7 +572,6 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			if (scheduleDiv.id.includes(i+1)) {
 				for (var j = 0; j < schedArr[i].length; j++) {
 					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].getClassAbbr() + "-" + schedArr[i][j].getSections()[0])) {
-						console.log("/" +schedArr[i][j].getLocation()[0]+"/");
 						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + schedArr[i][j].getTimes()[0]
 							 + "&emsp;" + schedArr[i][j].getLocation()[0] + "<br/>" + schedArr[i][j].getProf()[0];
 					}
@@ -819,7 +669,6 @@ function replaceSpaces(str) {
 	return str;
 }
 
-//<a id="_addToCartLink" title="Add this class to your cart" href="#" onclick="YAHOO.mis.student.Topics.addClassSectionToCart.fire({classNumber : '13638', termCode : '0900'})"><img id="addClassSectionToCart_classSectionListRow_0_add_image" src="images/add16x16.gif"></a>
 
 function printAllClasses() {
 	var str = "";
@@ -860,7 +709,6 @@ function addELToButton(i) {
 				p[j].replaceChild(newScript, script[0]);
 				k++;
 			}
-			//StudentCartList_classSectionListRow_0_removeSavedClassSection
 			return false;
 		}
 	}
