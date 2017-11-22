@@ -1,7 +1,7 @@
 {
    "manifest_version": 2,
    "name": "Scheduling App",
-   "version": "1.0",
+   "version": "1.0.0",
    "description": "This takes classes and organizes them into a schedule.",
    "icons": {
       "16": "schedule-icon16.png",
