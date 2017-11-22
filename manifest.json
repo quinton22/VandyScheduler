@@ -4,12 +4,9 @@
    "version": "1.0",
    "description": "This takes classes and organizes them into a schedule.",
    "icons": {
-      "16": "schedule-icon.png",
-      "48": "schedule-icon.png",
-      "128": "schedule-icon.png"
-   },
-   "browser_action": {
-      "default_icon": "schedule-icon.png"
+      "16": "schedule-icon16.png",
+      "48": "schedule-icon48.png",
+      "128": "schedule-icon128.png"
    },
    "content_scripts": [
       {
