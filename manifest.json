@@ -1,8 +1,8 @@
 {
    "manifest_version": 2,
-   "name": "Scheduling App",
+   "name": "Vandy Scheduler",
    "version": "1.0.0",
-   "description": "This takes classes and organizes them into a schedule.",
+   "description": "Takes classes and organizes them into a schedule and puts classes into the class cart.",
    "icons": {
       "16": "schedule-icon16.png",
       "48": "schedule-icon48.png",
