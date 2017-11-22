@@ -1,6 +1,6 @@
 {
    "manifest_version": 2,
-   "name": "Vandy Scheduler",
+   "name": "Vandy Scheduler", 
    "version": "1.0.0",
    "description": "Takes classes and organizes them into a schedule and puts classes into the class cart.",
    "icons": {
@@ -19,9 +19,6 @@
    "permissions": [
       "tabs", "https://webapp.mis.vanderbilt.edu/more/SearchClasses*"
    ],
-   "background": {
-   
-   },
    "web_accessible_resources": ["comment-pic2.png", "comment-pic3.png"]
 
    

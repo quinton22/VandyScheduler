@@ -1,9 +1,10 @@
-var classArr = [];
-var scheduleArr = [];
+var classArr = [];		// contains classes to construct schedule with
+var scheduleArr = [];	// contains all the schedules
 var modal, modalChild;
-createModal();
-var ready = false;
+createModal();			// creates modal and appends to doc
+var ready = false;		// allows modal to load
 
+// creates button
 var addClassButton = document.createElement("span");
 addClassButton.setAttribute("width", "auto");
 var btn = document.createElement("button");
@@ -11,24 +12,27 @@ btn.setAttribute("class", "myButton");
 btn.innerHTML = "Add to Schedule";
 addClassButton.appendChild(btn);
 
+// sets parent node to course titles on either class search page or class cart page
 var parent = document.getElementById("classSearchResultsCarousel") !== null ? document.getElementById("classSearchResultsCarousel")
 						.getElementsByClassName("left") : null;
 var parent2 = document.getElementById("studentCart") !== null ? document.getElementById("studentCart")
 						.getElementsByClassName("left") : null;
 
+// necessary for timeout
 var timeout = null;
 var t = null;
-var t2 = null;
-var node = null;
+
+// gets current page
 var page = "";
 var focusPage = document.getElementsByClassName("yui-carousel-item yui-carousel-item-selected");
 if (focusPage.length !== 0) {
 	page = focusPage[0].getElementsByTagName("h1")[0].innerHTML;
 }
 
-
+// constant font
 var font = $(".classAbbreviation").css('font-family');
 
+// updates class and adds buttons if the DOM subtree is changed
 var observer = new MutationObserver(function () {
 	if(parent !== null && parent2 !== null) {
 			if (parent.length !== 0 || parent2.length !== 0) {
@@ -49,6 +53,9 @@ var observer = new MutationObserver(function () {
 observer.observe(document, {childList: true, subtree: true});
 
 
+/*
+*	Creates the modal with the default to display an error message
+*/
 function createModal() {
 	modal = document.createElement("div");
 	modal.className = "modal";
@@ -78,11 +85,15 @@ function createModal() {
 	modalfooter.className = "modal-footer";
 	modalChild.appendChild(modalfooter);
 	document.getElementsByTagName("body")[0].appendChild(modal);
+
+	// exit if clicked not on modal
 	window.onclick = function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
         modalBody.innerHTML = "";
     }
+
+    // exit if close button is clicked
     close.onclick = function() {
     	modal.style.display = "none";
         modalBody.innerHTML = "";
@@ -91,7 +102,9 @@ function createModal() {
 	
 }
 
-
+/*
+*	Clears class array and puts classes in cart in class arr
+*/
 function updateClassArr() {
 	classArr = [];
 	
@@ -142,10 +155,9 @@ function addBtn() {
 		}
 	}
 	
-	
+	// adds button to class cart page
 	for (var j = 0; j < parent2.length; j++) {
-	
-		
+
 		var children = parent2[j].children;
 		
 		// adds buttons to the page
@@ -158,7 +170,6 @@ function addBtn() {
 				button.className = "myButton remove";
 				button.innerHTML = "Remove Class";
 				addELToButton(j);
-		
 				addClassButton = clone;
 		}	
 	}
@@ -167,7 +178,8 @@ function addBtn() {
 
 
 /*
-*	Adds event listener to add class buttons
+*	Adds event listener to add class buttons so that when clicked
+*	all the sections of a class are added
 */
 function addEL(button, classNumOnPage) {
 	var addToCartList = document.getElementsByClassName("classTable")[classNumOnPage].getElementsByClassName("classActionButtons");
@@ -207,6 +219,7 @@ function addClass(_class, classNumOnPage) {
 	var times = [];
 	var location = [];
 	
+	// Refines content
 	for (var num = 0; num < sectionsList.length; num++) {
 		sections[num] = replaceSpaces(sectionsList[num].innerHTML);
 		profs[num] = replaceLeadingSpaces(profsList[num].innerHTML);
@@ -229,7 +242,7 @@ function addClass(_class, classNumOnPage) {
 
 
 /*
-*	Adds class added img and adds a remove button
+*	Adds class added img and adds a remove button -- currently unfunctional
 */
 function classAdded(button) {
 		button.setAttribute('class', 'myButton disabled');
@@ -239,6 +252,10 @@ function classAdded(button) {
 		}, 200);
 }
 
+
+/*
+*	Creates the make schedule button
+*/
 function makeScheduleButton(parent) {
 	if (parent.children[parent.children.length - 1].children.length === 0 || 
 		parent.children[parent.children.length - 1].children[0].id !== "makeSchedBtn") {	
@@ -257,21 +274,28 @@ function makeScheduleButton(parent) {
 	}
 }
 
+
+/*
+*	When make schedule button is clicked, creates a 
+*	schedule array using all the classes in the cart.
+*	Puts schedules into viewable modal
+*/
 function makeSchedClicked() {
 	if (ready) {
 			var sched = new Schedule(classArr);
 			sched.sortClasses();
 			scheduleArr = sched.getScheduleArr();
 			createViewableContent(scheduleArr);
-			
-			addELToButton();
+
 		} else {
 			setTimeout(makeSchedClicked, 50);
 		}
 }
 
 
-
+/*
+*	Creates modal with different schedules and tables
+*/
 function createViewableContent(arr) {
 	var scheduleDiv;
 	if (arr.length > 0) {
@@ -281,6 +305,7 @@ function createViewableContent(arr) {
 				var bigSchedDiv = document.createElement("div");
 			}
 			
+			// creates schedule table
 			schedArr.forEach(function (schedule, idx) {
 				if (q===0) {
 					scheduleDiv = document.createElement("div");
@@ -301,6 +326,8 @@ function createViewableContent(arr) {
 					capSpan.innerHTML = "Schedule #" + (idx + 1).toString();
 					pickSchedBtn.className = "myButton modalButton";
 					pickSchedBtn.innerHTML = "Pick Schedule";
+
+					// Remove classes not in schedule from cart
 					pickSchedBtn.addEventListener("click", function () {
 						var curSched = schedArr[(~~pickSchedBtn.parentNode.previousSibling.innerHTML
 								.substring(pickSchedBtn.parentNode.previousSibling.innerHTML.indexOf("#")+1)) - 1];
@@ -347,6 +374,7 @@ function createViewableContent(arr) {
 						scheduleArr = [];
 					});
 
+					// creates table
 					$(capSpan).css('font-family', font).addClass('schedule-caption');
 					scheduleDiv.id = caption.innerHTML;
 					var header = table.createTHead();
@@ -383,6 +411,8 @@ function createViewableContent(arr) {
 							
 						}
 					}
+
+					// creates times
 					var tBody = table.createTBody();
 					for (var i = 0; i < 13; i++) {
 						var row = tBody.insertRow(i);
@@ -406,6 +436,7 @@ function createViewableContent(arr) {
 				}
 				
 				if (q === 1) {
+					// Places class
 					scheduleDiv = document.getElementsByClassName("schedule-div")[idx];
 					schedule.forEach(function (c) {
 						if(c.getDays()[0] !== "TBA") {
@@ -456,6 +487,9 @@ function createViewableContent(arr) {
 }
 
 
+/*
+*	Creates detailed schedule array from the less detailed array
+*/
 function convertToDetailed(arr) {
 	var ss = [];
 	var s = [];
@@ -470,7 +504,7 @@ function convertToDetailed(arr) {
 			x = ind[0];
 			y = ind[1];
 			s.push(new Class_(x.getClassAbbr(), x.getClassDesc(), [x.getSections()[y]], x.getProf(), 
-					[x.getHour()[y]], [x.getDays()[y]], [x.getTimes()[y]], [x.getLocation()[y]]));//--------------------------------------
+					[x.getHour()[y]], [x.getDays()[y]], [x.getTimes()[y]], [x.getLocation()[y]]));
 				
 		});
 		ss.push(s);
@@ -480,6 +514,11 @@ function convertToDetailed(arr) {
 	return ss;
 }
 
+
+/*
+*	Gets the class with the class abbreviation and section from
+*	the class array. Returns class and index of section
+*/
 function getClass(classAbbr, section) {
 	for (var i = 0; i < classArr.length; i++) {
 		if (classAbbr === classArr[i].getClassAbbr()) {
@@ -493,6 +532,10 @@ function getClass(classAbbr, section) {
 	return null;
 }
 
+
+/*
+*	Places class on schedule based on time and day
+*/
 function placeClass(classDiv, scheduleDiv, day, time) {
 	var divHeight = scheduleDiv.offsetHeight;
 	var divWidth = scheduleDiv.offsetWidth;
@@ -546,6 +589,8 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		$(classDiv).css('top', y.toString() + "%");
 		$(classDiv).css('left', x.toString() + "%");
 
+
+		// adds detailed comment bubble on hover
 		var commentDiv = document.createElement("div");
 		commentDiv.className = "comment-div";
 		var commentImg = document.createElement("img");
@@ -579,6 +624,8 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			}
 		}
 
+
+		// displays when hovered over class div
 		classDiv.onmouseover = function (event) {
 			commentDiv.style.display = "block";
 			var curClassDiv;
@@ -592,7 +639,8 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			var topOfClass2 = parseFloat(topOfClass);
 			$(commentDiv).css('top', (topOfClass2 - commentDiv.offsetHeight-.5).toString() + "px");
 
-			var dist = Math.abs(parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2));
+			// minimizes comment and class placement to within .5px
+			var dist = parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2);
 			while (dist > .5) {
 				$(commentDiv).css('top', (parseFloat($(commentDiv).css('top')) - .1).toString() + "px");
 				dist = parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2);
@@ -613,15 +661,9 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 }
 
 
-// function wait(ms){
-//    var start = new Date().getTime();
-//    var end = start;
-//    while(end < start + ms) {
-//      end = new Date().getTime();
-//   }
-// }
-
-
+/*
+*	Replaces only the leading spaces in a string
+*/
 function replaceLeadingSpaces(str) {
 	var rateMyProf = "";
 	if (str.indexOf("-") !== -1) {
@@ -670,6 +712,9 @@ function replaceSpaces(str) {
 }
 
 
+/*
+*	Prints class array to console
+*/
 function printAllClasses() {
 	var str = "";
 	classArr.forEach(function(element) {
@@ -678,6 +723,11 @@ function printAllClasses() {
 	console.log(str);
 }
 
+
+/*
+*	Adds event listener to remove class button to remove
+*	all sections of a class
+*/
 function addELToButton(i) {
 	var k = 0;
 	var classTable = document.getElementById("studentCart").getElementsByClassName("classTable"); //one class containing multiple sections
