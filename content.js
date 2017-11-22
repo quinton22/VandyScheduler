@@ -280,14 +280,14 @@ function addClass(_class, classNumOnPage) {
 	var daysList = specificClass.getElementsByClassName("classMeetingDays");
 	var timesList = specificClass.getElementsByClassName("classMeetingTimes");
 	var numOfClassPageList = specificClass.getElementsByClassName("classActionButtons");
+	var classBuildingList = specificClass.getElementsByClassName("classBuilding");
 	var numOfClassPage = [];
 	var sections = [];
 	var profs = [];
 	var hours = [];
 	var days = [];
 	var times = [];
-	var addToCart = [];
-	var isInCart = [];
+	var location = [];
 	
 	for (var num = 0; num < sectionsList.length; num++) {
 		sections[num] = replaceSpaces(sectionsList[num].innerHTML);
@@ -295,6 +295,7 @@ function addClass(_class, classNumOnPage) {
 		hours[num] = replaceSpaces(hoursList[num].innerHTML);
 		days[num] = replaceSpaces(daysList[num].innerHTML);
 		times[num] = replaceSpaces(timesList[num].innerHTML);
+		location[num] = replaceLeadingSpaces(classBuildingList[num].innerHTML);
 		
 		if (numOfClassPageList[num].children[0] !== undefined) {
 			var id = numOfClassPageList[num].children[0].id;
@@ -344,7 +345,7 @@ function addClass(_class, classNumOnPage) {
 //		isInSched.splice(spliceIdx, 1);
 //		spliceIdx = isInSched.indexOf(true);
 //	}
-	var newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times);
+	var newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times, location);
 	classArr.push(newClass);
 
 }
@@ -615,7 +616,7 @@ function convertToDetailed(arr) {
 			x = ind[0];
 			y = ind[1];
 			s.push(new Class_(x.getClassAbbr(), x.getClassDesc(), [x.getSections()[y]], x.getProf(), 
-					[x.getHour()[y]], [x.getDays()[y]], [x.getTimes()[y]]));
+					[x.getHour()[y]], [x.getDays()[y]], [x.getTimes()[y]], [x.getLocation()[y]]));//--------------------------------------
 				
 		});
 		ss.push(s);
@@ -705,15 +706,10 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			$(commentImg).attr("src", iconUrl2);	
 		}
 		commentImg.className = "comment-img";
-		//$(commentDiv).css('top', (topOfClass2 - 15).toString() + "%");
 		$(commentDiv).css('left', x.toString() + "%");
 		commentDiv.appendChild(commentImg);
 		scheduleDiv.appendChild(commentDiv);
 
-
-
-		// $(commentDiv).on('load', function() {console.log("height: " + commentDiv.offsetHeight.toString());});
-		// console.log("height: " + commentDiv.offsetHeight.toString());
 
 		var upperLeftText = document.createElement("div");
 		upperLeftText.innerHTML = "Cannot display additional information."
@@ -725,8 +721,9 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			if (scheduleDiv.id.includes(i+1)) {
 				for (var j = 0; j < schedArr[i].length; j++) {
 					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].getClassAbbr() + "-" + schedArr[i][j].getSections()[0])) {
-						upperLeftText.innerHTML = "&emsp;" + classDiv.firstChild.innerHTML + "<br/>&emsp;" + schedArr[i][j].getTimes()[0]
-							 + "<br/>&emsp;" + schedArr[i][j].getProf()[0];
+						console.log("/" +schedArr[i][j].getLocation()[0]+"/");
+						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + schedArr[i][j].getTimes()[0]
+							 + "&emsp;" + schedArr[i][j].getLocation()[0] + "<br/>" + schedArr[i][j].getProf()[0];
 					}
 				}
 			}
@@ -743,7 +740,18 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			
 			var topOfClass = $(curClassDiv).css('top');
 			var topOfClass2 = parseFloat(topOfClass);
-			$(commentDiv).css('top', (topOfClass2 - commentDiv.offsetHeight).toString() + "px");
+			$(commentDiv).css('top', (topOfClass2 - commentDiv.offsetHeight-.5).toString() + "px");
+
+			var dist = Math.abs(parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2));
+			while (dist > .5) {
+				$(commentDiv).css('top', (parseFloat($(commentDiv).css('top')) - .1).toString() + "px");
+				dist = parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2);
+			}
+			while (dist < -.5) {
+				$(commentDiv).css('top', (parseFloat($(commentDiv).css('top')) + .1).toString() + "px");
+				dist = parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2);
+			}
+
 		};
 		classDiv.onmouseout = function () {
 			commentDiv.style.display = "none";
@@ -789,8 +797,13 @@ function replaceLeadingSpaces(str) {
 	}
 
 	str = str.replace(/\?/g, " ") + " " + rateMyProf;
+
+	if (str.indexOf("<br>") !== -1) {
+		str = str.substring(0, str.indexOf("<br>"));
+	}
 	return str;
 }
+
 
 /*
 *	Takes a string and removes all spaces and HTML elements

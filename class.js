@@ -1,6 +1,6 @@
 class Class_ {
 
-	constructor(classAbbr, classDesc, sections, prof, hours, days, times) {
+	constructor(classAbbr, classDesc, sections, prof, hours, days, times, location) {
 		// Class Abbreviation
 		// Type: String
 		//	Ex: "CS 1101"
@@ -32,6 +32,8 @@ class Class_ {
 		this.days = days;
 
 		this.prof = prof;
+
+		this.location = location;
 	}
 	
 	getClassAbbr() {
@@ -78,6 +80,10 @@ class Class_ {
 
 	getProf() {
 		return this.prof;
+	}
+
+	getLocation() {
+		return this.location;
 	}
 	
 	
