@@ -38,12 +38,9 @@ class Schedule {
 			if(!Schedule.checkOverlap(curClass, newSched)) {
 				if (subClassArr.length > 1) {
 					newSched.push(curClass);
-					console.log(newSched);
 					this.sortClassesSub(newSubClassArr, newSched);
 				} else {
 					newSched.push(curClass);
-					console.log("Schedule created");
-					console.log(newSched);
 					this.scheduleArr.push(newSched);
 				}
 			}
@@ -100,15 +97,7 @@ class Schedule {
 		for (var i = 0; i < schedule.length; i++) {
 			t = false;
 			d = false;
-			console.log(schedule[i][0]);
-			console.log(currentClass[0]);
 			if (schedule[i][0] !== currentClass[0]) {
-				console.log("---");
-				console.log(schedule[i][2]);
-				console.log(currentClass[2]);
-				console.log(schedule[i][3]);
-				console.log(currentClass[3]);
-				console.log("----");
 				if(!Class_.compareTimes(schedule[i][2], currentClass[2])) {
 					t = true;		// times are equal
 				}

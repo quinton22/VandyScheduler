@@ -1,6 +1,5 @@
 var classArr = [];
 var scheduleArr = [];
-var insertedSchedule = [];
 var modal, modalChild;
 createModal();
 var ready = false;
@@ -411,7 +410,6 @@ function makeSchedClicked() {
 
 
 
-//--------------------------------------------------------------------------
 function createViewableContent(arr) {
 	var scheduleDiv;
 	if (arr.length > 0) {
@@ -444,18 +442,11 @@ function createViewableContent(arr) {
 					pickSchedBtn.className = "myButton modalButton";
 					pickSchedBtn.innerHTML = "Pick Schedule";
 					pickSchedBtn.addEventListener("click", function () {
-						console.log("schedArr");
-						console.log((~~pickSchedBtn.parentNode.previousSibling.innerHTML
-								.substring(pickSchedBtn.parentNode.previousSibling.innerHTML.indexOf("#")+1)) - 1);
 						var curSched = schedArr[(~~pickSchedBtn.parentNode.previousSibling.innerHTML
 								.substring(pickSchedBtn.parentNode.previousSibling.innerHTML.indexOf("#")+1)) - 1];
 						var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
-						console.log(classTab);
 						for (var i = 0; i < parent2.length; i++) {
-							var children = parent2[i].children;	
-							// for (var j = 0; j < classTab[i].getElementsByClassName("classRow").length; j++) {
-
-							// }								 
+							var children = parent2[i].children;									 
 							for (var j = 0; j < curSched.length; j++) {
 								if (children[0].innerHTML.includes(curSched[j].getClassAbbr())) {
 									for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
@@ -467,7 +458,7 @@ function createViewableContent(arr) {
 												.getElementsByClassName("classActionButtons")[0];
 											var lId = p.children[0].id;
 											console.log(p.children[0]);
-											var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));//-------------------------------
+											var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));
 											console.log("l");
 											console.log(l);
 											var newScript = document.createElement("script");
@@ -490,14 +481,17 @@ function createViewableContent(arr) {
 									}
 								}
 							}
+
+
 						}
 						console.log("classArr");
 						console.log(classArr);
 						modal.style.display = "none";
-						$("#modal-body").innerHTML = "";
+						document.getElementById("modalBody").innerHTML = "";
 
-						//----------------------------------------------------------------------------------
+						scheduleArr = [];
 					});
+
 					$(capSpan).css('font-family', font).addClass('schedule-caption');
 					scheduleDiv.id = caption.innerHTML;
 					var header = table.createTHead();
