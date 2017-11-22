@@ -88,3 +88,7 @@
    margin: auto;
    float: none;
 }
+
+.myButton.modalButton {
+   padding:3px 6px !important;
+}

@@ -204,7 +204,6 @@ function addBtn() {
 				button.className = "myButton remove";
 				button.innerHTML = "Remove Class";
 				//console.log(addClassButton.id);
-				var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
 				addELToButton(j);
 		
 				addClassButton = clone;
@@ -241,6 +240,14 @@ function addEL(button, classNumOnPage) {
 		}
 	}
 	
+	// var addToCartScript = document.createElement("script");
+	// addToCartScript.innerHTML = str;
+
+	// button.addEventListener("click", function() {
+	// 	document.body.appendChild(addToCartScript);
+	// 	addToCartScript.parentNode.removeChild(addToCartScript);
+	// });
+
 	button.setAttribute("onclick", str);
 	
 	
@@ -267,7 +274,7 @@ function addClass(_class, classNumOnPage) {
 	var classAbbr = _class.children[0].innerHTML;
 	classAbbr = classAbbr.replace(/:/, "");
 	var classDesc = _class.children[1].innerHTML;
-	var specificClass = document.getElementsByClassName("classTable")[classNumOnPage];
+	var specificClass = document.getElementById("cartDiv").getElementsByClassName("classTable")[classNumOnPage];
 	var sectionsList = specificClass.getElementsByClassName("classSection");
 	var profsList = specificClass.getElementsByClassName("classInstructor");
 	var hoursList = specificClass.getElementsByClassName("classHours");
@@ -338,7 +345,7 @@ function addClass(_class, classNumOnPage) {
 //		isInSched.splice(spliceIdx, 1);
 //		spliceIdx = isInSched.indexOf(true);
 //	}
-	var newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times, numOfClassPage);
+	var newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times);
 	classArr.push(newClass);
 
 }
@@ -396,9 +403,6 @@ function makeSchedClicked() {
 			console.log(scheduleArr);
 			createViewableContent(scheduleArr);
 			
-
-			
-			
 			addELToButton();
 		} else {
 			setTimeout(makeSchedClicked, 50);
@@ -416,6 +420,8 @@ function createViewableContent(arr) {
 				schedArr = convertToDetailed(arr);
 				var bigSchedDiv = document.createElement("div");
 			}
+
+			console.log(schedArr);
 			
 			schedArr.forEach(function (schedule, idx) {
 				if (q===0) {
@@ -428,8 +434,72 @@ function createViewableContent(arr) {
 					$(table).addClass('schedule-table');
 					scheduleDiv.appendChild(table);
 					var caption = table.createCaption();
-					caption.innerHTML = "Schedule #" + (idx + 1).toString();
-					$(caption).css('font-family', font).addClass('schedule-caption');
+					var capSpan = document.createElement("span");
+					var capButtonSpan = document.createElement("span");
+					var pickSchedBtn = document.createElement("button");
+					caption.appendChild(capSpan);
+					caption.appendChild(capButtonSpan);
+					capButtonSpan.appendChild(pickSchedBtn);
+					capSpan.innerHTML = "Schedule #" + (idx + 1).toString();
+					pickSchedBtn.className = "myButton modalButton";
+					pickSchedBtn.innerHTML = "Pick Schedule";
+					pickSchedBtn.addEventListener("click", function () {
+						console.log("schedArr");
+						console.log((~~pickSchedBtn.parentNode.previousSibling.innerHTML
+								.substring(pickSchedBtn.parentNode.previousSibling.innerHTML.indexOf("#")+1)) - 1);
+						var curSched = schedArr[(~~pickSchedBtn.parentNode.previousSibling.innerHTML
+								.substring(pickSchedBtn.parentNode.previousSibling.innerHTML.indexOf("#")+1)) - 1];
+						var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
+						console.log(classTab);
+						for (var i = 0; i < parent2.length; i++) {
+							var children = parent2[i].children;	
+							// for (var j = 0; j < classTab[i].getElementsByClassName("classRow").length; j++) {
+
+							// }								 
+							for (var j = 0; j < curSched.length; j++) {
+								if (children[0].innerHTML.includes(curSched[j].getClassAbbr())) {
+									for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
+										var sectionNum = classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerHTML;
+										var sectionNumStr = replaceSpaces(sectionNum);
+										if(sectionNumStr !== curSched[j].getSections()[0]) {
+											// Remove class
+											var p = classTab[i].getElementsByClassName("classRow")[k]
+												.getElementsByClassName("classActionButtons")[0];
+											var lId = p.children[0].id;
+											console.log(p.children[0]);
+											var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));//-------------------------------
+											console.log("l");
+											console.log(l);
+											var newScript = document.createElement("script");
+											var script = p.getElementsByTagName("script");
+											var s = script[0].innerHTML;
+											var scriptToAdd = "\nStudentCartList_classSectionListRow_" + l +
+													"_removeSavedClassSection_onclick();\n";
+											var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_" 
+												+ l + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
+												 + l + "_removeSavedClassSection_onclick );";
+											var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
+													
+											newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length) 
+												+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
+												+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
+										
+											p.replaceChild(newScript, script[0]);
+										}
+
+									}
+								}
+							}
+						}
+						console.log("classArr");
+						console.log(classArr);
+						modal.style.display = "none";
+						$("#modal-body").innerHTML = "";
+
+						//----------------------------------------------------------------------------------
+					});
+					$(capSpan).css('font-family', font).addClass('schedule-caption');
+					scheduleDiv.id = caption.innerHTML;
 					var header = table.createTHead();
 					var hrow = header.insertRow(0);
 					for (var i = 0; i < 8; i++) {
@@ -487,6 +557,7 @@ function createViewableContent(arr) {
 				}
 				
 				if (q === 1) {
+					scheduleDiv = document.getElementsByClassName("schedule-div")[idx];
 					schedule.forEach(function (c) {
 						if(c.getDays()[0] !== "TBA") {
 							for (var k = 0; k < c.getDays()[0].length; k++) {
@@ -495,9 +566,8 @@ function createViewableContent(arr) {
 								classDiv.id = c.getClassAbbr() + "_" + k;
 								var classTextDiv = document.createElement("div");
 								classTextDiv.className = "classText";
-								classTextDiv.innerHTML = c.getClassAbbr();
+								classTextDiv.innerHTML = c.getClassAbbr() + "-" + c.getSections()[0];
 								classDiv.appendChild(classTextDiv);
-													//---------------------------------------check later
 								placeClass(classDiv, scheduleDiv, c.getDays()[0].charAt(k), c.getTimes()[0]);
 								var height = Class_.lengthOfClass(c.getTimes()[0]);
 								height *= scheduleDiv.getElementsByTagName("tr")[1].offsetHeight;
@@ -551,13 +621,15 @@ function convertToDetailed(arr) {
 			x = ind[0];
 			y = ind[1];
 			s.push(new Class_(x.getClassAbbr(), x.getClassDesc(), [x.getSections()[y]], x.getProf(), 
-					[x.getHour()[y]], [x.getDays()[y]], [x.getTimes()[y]],
-					[x.getNumOnCartPage()[y]]));
+					[x.getHour()[y]], [x.getDays()[y]], [x.getTimes()[y]]));
 				
 		});
 		ss.push(s);
+		s = [];
 	});
 	
+	console.log("!!!!!!!!!!");
+	console.log(ss);
 	return ss;
 }
 
@@ -574,7 +646,8 @@ function getClass(classAbbr, section) {
 	return null;
 }
 
-function placeClass(classDiv, scheduleDiv, day, time) { //-----------------------------------------
+function placeClass(classDiv, scheduleDiv, day, time) {
+	//console.log(scheduleDiv);
 	var divHeight = scheduleDiv.offsetHeight;
 	var divWidth = scheduleDiv.offsetWidth;
 	var tab = scheduleDiv.firstChild.getElementsByTagName("tr");
@@ -621,11 +694,66 @@ function placeClass(classDiv, scheduleDiv, day, time) { //----------------------
 		m = ~~time.substring(time.indexOf(":") + 1, time.indexOf(":") + 3);
 		m /= 60;
 		var yDisplace = (h + m) * rowHeight + firstRowHeight;
-		var x = ((xDisplace + tableX + 10) / divWidth) * 100;
+		var x = ((xDisplace + tableX + 7) / divWidth) * 100;
 		var y = ((yDisplace + tableY) / divHeight) * 100;
 		
 		$(classDiv).css('top', y.toString() + "%");
 		$(classDiv).css('left', x.toString() + "%");
+
+		var commentDiv = document.createElement("div");
+		commentDiv.className = "comment-div";
+		var commentImg = document.createElement("img");
+		var iconUrl2 = chrome.extension.getURL("comment-pic2.png");
+		var iconUrl3 = chrome.extension.getURL("comment-pic3.png");
+		if($(scheduleDiv).css('background-color').toString() === "rgb(222, 222, 222)") {
+			$(commentImg).attr("src", iconUrl3);
+		} else {
+			$(commentImg).attr("src", iconUrl2);	
+		}
+		commentImg.className = "comment-img";
+		//$(commentDiv).css('top', (topOfClass2 - 15).toString() + "%");
+		$(commentDiv).css('left', x.toString() + "%");
+		commentDiv.appendChild(commentImg);
+		scheduleDiv.appendChild(commentDiv);
+
+
+
+		// $(commentDiv).on('load', function() {console.log("height: " + commentDiv.offsetHeight.toString());});
+		// console.log("height: " + commentDiv.offsetHeight.toString());
+
+		var upperLeftText = document.createElement("div");
+		upperLeftText.innerHTML = "Cannot display additional information."
+		upperLeftText.className = "comment-text";
+		commentDiv.appendChild(upperLeftText);
+		$(upperLeftText).css('font-family', font);
+
+		for (var i = 0; i < schedArr.length; i++) {
+			if (scheduleDiv.id.includes(i+1)) {
+				for (var j = 0; j < schedArr[i].length; j++) {
+					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].getClassAbbr() + "-" + schedArr[i][j].getSections()[0])) {
+						upperLeftText.innerHTML = "&emsp;" + classDiv.firstChild.innerHTML + "<br/>&emsp;" + schedArr[i][j].getTimes()[0]
+							 + "<br/>&emsp;" + schedArr[i][j].getProf()[0];
+					}
+				}
+			}
+		}
+
+		classDiv.onmouseover = function (event) {
+			commentDiv.style.display = "block";
+			var curClassDiv;
+			if (event.target.className === "class") {
+				curClassDiv = event.target;
+			} else {
+				curClassDiv = event.target.parentNode;
+			}
+			
+			var topOfClass = $(curClassDiv).css('top');
+			var topOfClass2 = parseFloat(topOfClass);
+			$(commentDiv).css('top', (topOfClass2 - commentDiv.offsetHeight).toString() + "px");
+		};
+		classDiv.onmouseout = function () {
+			commentDiv.style.display = "none";
+		};
 		
 	}
 	scheduleDiv.appendChild(classDiv);
@@ -633,13 +761,13 @@ function placeClass(classDiv, scheduleDiv, day, time) { //----------------------
 }
 
 
-function wait(ms){
-   var start = new Date().getTime();
-   var end = start;
-   while(end < start + ms) {
-     end = new Date().getTime();
-  }
-}
+// function wait(ms){
+//    var start = new Date().getTime();
+//    var end = start;
+//    while(end < start + ms) {
+//      end = new Date().getTime();
+//   }
+// }
 
 
 function replaceLeadingSpaces(str) {
@@ -725,7 +853,7 @@ function addELToButton(i) {
 				p[j].replaceChild(newScript, script[0]);
 				k++;
 			}
-			StudentCartList_classSectionListRow_0_removeSavedClassSection
+			//StudentCartList_classSectionListRow_0_removeSavedClassSection
 			return false;
 		}
 	}

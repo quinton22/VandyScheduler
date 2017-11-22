@@ -24,6 +24,8 @@
    ],
    "background": {
    
-   }
+   },
+   "web_accessible_resources": ["comment-pic2.png", "comment-pic3.png"]
+
    
 }

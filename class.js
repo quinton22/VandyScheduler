@@ -1,6 +1,6 @@
 class Class_ {
 
-	constructor(classAbbr, classDesc, sections, prof, hours, days, times, numOnCartPage) {
+	constructor(classAbbr, classDesc, sections, prof, hours, days, times) {
 		// Class Abbreviation
 		// Type: String
 		//	Ex: "CS 1101"
@@ -30,8 +30,7 @@ class Class_ {
 		// Type: array of Strings
 		// Ex: ["MWF", "MWF", "TR"]
 		this.days = days;
-		
-		this.numOnCartPage = numOnCartPage;
+
 		this.prof = prof;
 	}
 	
@@ -74,10 +73,7 @@ class Class_ {
 	setDays(days) {
 		this.days = days;
 	}
-	
-	getNumOnCartPage() {
-		return this.numOnCartPage;
-	}
+
 	
 
 	getProf() {
