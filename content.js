@@ -541,7 +541,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		m /= 60;
 		var yDisplace = (h + m) * rowHeight + firstRowHeight;
 		var x = ((xDisplace + tableX + 7) / divWidth) * 100;
-		var y = ((yDisplace + tableY) / divHeight) * 100;
+		var y = ((yDisplace + tableY - 2) / divHeight) * 100;
 		
 		$(classDiv).css('top', y.toString() + "%");
 		$(classDiv).css('left', x.toString() + "%");
