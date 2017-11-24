@@ -1,22 +1,29 @@
 class Schedule {
 	constructor(classesArr) {
-		this.classesArr = classesArr;
-		this.scheduleArr = [];
+		this.classesArr = classesArr;		// all the classes to be put in schedule
+		this.scheduleArr = [];				// Array of schedules
 	}
-	
+
 	getScheduleArr() {
 		return this.scheduleArr;
 	}
-	
+
+	/*
+	*	Makes initial call to the recursive loop & sets the current schedule
+	*  to empty
+	*/
 	sortClasses() {
 		var schedule = [];
 		if(this.classesArr.length > 0) {
 			this.sortClassesSub(this.classesArr, schedule)
 		}
-		
+
 	}
-	
-	
+
+	/*
+	*	Recursive sorting method of classes that takes each class and compares
+	*	times and days to check overlap and places into a schedule
+	*/
  	sortClassesSub(subClassArr, schedule) {
  		if (subClassArr.length > 1) {
  			var newSubClassArr = [];
@@ -24,7 +31,7 @@ class Schedule {
  				newSubClassArr[j-1] = subClassArr[j];
  			}
  		}
- 		
+
  		var curClass = [];
  		for (var i = 0; i < subClassArr[0].getTimes().length; i++) {
  			curClass = [subClassArr[0].getClassAbbr(), subClassArr[0].getSections()[i],
@@ -46,8 +53,11 @@ class Schedule {
 			}
  		}
  	}
-	
-	
+
+
+	/*
+	*	Checks the overlap of a class with the schedule it is in
+	*/
 	static checkOverlap(currentClass, schedule) {
 		var t = false;
 		var d = false;
@@ -66,7 +76,7 @@ class Schedule {
 				}
 			}
 		}
-		
+
 		return false;		// no overlap
 	}
 
