@@ -123,7 +123,7 @@ class Class_ {
 		var t21 = t2.substring(0, t2.indexOf("-"));
 		var t22 = t2.substring(t2.indexOf("-") + 1);
 
-		if ((t21 >= t11 && t21 <= t12) || (t22 >= t11 && t22 <= t12)) {
+		if ((t21 >= t11 && t21 <= t12) || (t22 >= t11 && t22 <= t12) || (t11 >= t21 && t11 <= t22)) {
 			return false;
 		} else {
 			return true;

@@ -2,7 +2,7 @@
     display: none;
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
-    left: 0; 
+    left: 0;
     top: 0;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
@@ -18,6 +18,14 @@
     background-color: #fefefe;
     color: #000;
     font-size: 2vw;
+}
+
+/* Error Text */
+.errorText {
+   color: #000;
+   font-size: 1.5vw;
+   text-align: justify;
+   padding: 30px 16px 20px;
 }
 
 /* Modal Body */
@@ -37,7 +45,7 @@
     position: relative;
     background-color: #fefefe;
     margin: 15% auto;
-    padding: 0px; 
+    padding: 0px;
     border: 1px solid #888;
     width: 80%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
@@ -49,7 +57,7 @@
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
-    from {top: -300px; opacity: 0} 
+    from {top: -300px; opacity: 0}
     to {top: 0; opacity: 1}
 }
 
@@ -123,13 +131,13 @@
   border: 1px solid #071cff;
   border-radius: 4px;
   text-align: center;
-  
+
 }
 
 .classText {
   position: relative;
   top: 25%;
-  color: white;    
+  color: white;
   font-size: .95vw;
   font-family: Arial;
 }

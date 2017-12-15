@@ -1,3 +1,10 @@
+/*	To Do List:
+*	1. Edit error text
+*	2. Lunch break
+*	3. Sort schedule by preference
+*/
+
+
 var classArr = [];		// contains classes to construct schedule with
 var scheduleArr = [];	// contains all the schedules
 var modal, modalChild;
@@ -46,8 +53,8 @@ var observer = new MutationObserver(function () {
 		    	}
 
 		    	timeout = setTimeout(addBtn, 100);
-		    	
-		 	}	
+
+		 	}
 	}
 });
 observer.observe(document, {childList: true, subtree: true});
@@ -71,11 +78,11 @@ function createModal() {
 	close.innerHTML = "&times;";
 	modalHeader.appendChild(close);
 	var modalHeaderText = document.createElement("h2");
-	modalHeaderText.innerHTML = "Error in making schedule.";
+	modalHeaderText.innerHTML = "<p>Error in making schedule.<p>";
 	modalHeaderText.id = "modalHeaderText";
 	modalHeaderText.style = "color:red";
 	$(modalHeaderText).css({'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'});
-	modalHeader.appendChild(modalHeaderText); 
+	modalHeader.appendChild(modalHeaderText);
 	modal.appendChild(modalChild);
 	var modalBody = document.createElement("div");
 	modalBody.className = "modal-body";
@@ -99,7 +106,7 @@ function createModal() {
         modalBody.innerHTML = "";
     }
 }
-	
+
 }
 
 /*
@@ -107,7 +114,7 @@ function createModal() {
 */
 function updateClassArr() {
 	classArr = [];
-	
+
 	// adds classes in cart to class arr
 	if (t) {
 		clearTimeout(t);
@@ -129,21 +136,21 @@ function updateClassArr() {
 */
 function addBtn() {
 	font =  $(".classAbbreviation").css('font-family');
-	
+
 	if (page === "Class Cart") {
 		makeScheduleButton(focusPage[0].children[0]);
 	}
-	
+
 	btn.style.fontFamily = font;
 	$(".left").css("width", "100%");
-	
+
 	var clone = null;
 
 	// adds buttons to class search page
 	for (var i = 0; i < parent.length; i++) {
-		
+
 		var children = parent[i].children;
-		
+
 		// adds buttons to the page
 		if(children !== null && !children[children.length - 1].id.includes("Btn")){
 				clone = addClassButton.cloneNode(true);
@@ -154,15 +161,15 @@ function addBtn() {
 				addClassButton = clone;
 		}
 	}
-	
+
 	// adds button to class cart page
 	for (var j = 0; j < parent2.length; j++) {
 
 		var children = parent2[j].children;
-		
+
 		// adds buttons to the page
 		if(children !== null && !children[children.length - 1].id.includes("RemoveBtn")){
-				
+
 				clone = addClassButton.cloneNode(true);
 				addClassButton.setAttribute("id", "RemoveBtn" + j.toString());
 				parent2[j].appendChild(addClassButton);
@@ -171,7 +178,7 @@ function addBtn() {
 				button.innerHTML = "Remove Class";
 				addELToButton(j);
 				addClassButton = clone;
-		}	
+		}
 	}
 
 }
@@ -218,7 +225,7 @@ function addClass(_class, classNumOnPage) {
 	var days = [];
 	var times = [];
 	var location = [];
-	
+
 	// Refines content
 	for (var num = 0; num < sectionsList.length; num++) {
 		sections[num] = replaceSpaces(sectionsList[num].innerHTML);
@@ -227,14 +234,14 @@ function addClass(_class, classNumOnPage) {
 		days[num] = replaceSpaces(daysList[num].innerHTML);
 		times[num] = replaceSpaces(timesList[num].innerHTML);
 		location[num] = replaceLeadingSpaces(classBuildingList[num].innerHTML);
-		
+
 		if (numOfClassPageList[num].children[0] !== undefined) {
 			var id = numOfClassPageList[num].children[0].id;
 			id = id.substring(id.indexOf("Row_") + 4, id.indexOf("_remove"));
 			numOfClassPage[num] = ~~id;
 		}
 	}
-	
+
 	var newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times, location);
 	classArr.push(newClass);
 
@@ -257,12 +264,12 @@ function classAdded(button) {
 *	Creates the make schedule button
 */
 function makeScheduleButton(parent) {
-	if (parent.children[parent.children.length - 1].children.length === 0 || 
-		parent.children[parent.children.length - 1].children[0].id !== "makeSchedBtn") {	
+	if (parent.children[parent.children.length - 1].children.length === 0 ||
+		parent.children[parent.children.length - 1].children[0].id !== "makeSchedBtn") {
 
 		$('#yui-gen9').css('height', 'auto');
 		var div = document.createElement("div");
-		div.style.width = "100%";	
+		div.style.width = "100%";
 		var button = document.createElement("button");
 		div.appendChild(button);
 		button.setAttribute('id', 'makeSchedBtn')
@@ -276,7 +283,7 @@ function makeScheduleButton(parent) {
 
 
 /*
-*	When make schedule button is clicked, creates a 
+*	When make schedule button is clicked, creates a
 *	schedule array using all the classes in the cart.
 *	Puts schedules into viewable modal
 */
@@ -304,7 +311,7 @@ function createViewableContent(arr) {
 				schedArr = convertToDetailed(arr);
 				var bigSchedDiv = document.createElement("div");
 			}
-			
+
 			// creates schedule table
 			schedArr.forEach(function (schedule, idx) {
 				if (q===0) {
@@ -312,7 +319,7 @@ function createViewableContent(arr) {
 					idx % 2 === 0 ? $(scheduleDiv).addClass('schedule-div')
 					.css('background-color', '#fefefe') : $(scheduleDiv).addClass('schedule-div')
 					.css('background-color', '#dedede');
-					
+
 					var table = document.createElement("table");
 					$(table).addClass('schedule-table');
 					scheduleDiv.appendChild(table);
@@ -333,7 +340,7 @@ function createViewableContent(arr) {
 								.substring(pickSchedBtn.parentNode.previousSibling.innerHTML.indexOf("#")+1)) - 1];
 						var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
 						for (var i = 0; i < parent2.length; i++) {
-							var children = parent2[i].children;									 
+							var children = parent2[i].children;
 							for (var j = 0; j < curSched.length; j++) {
 								if (children[0].innerHTML.includes(curSched[j].getClassAbbr())) {
 									for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
@@ -350,15 +357,15 @@ function createViewableContent(arr) {
 											var s = script[0].innerHTML;
 											var scriptToAdd = "\nStudentCartList_classSectionListRow_" + l +
 													"_removeSavedClassSection_onclick();\n";
-											var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_" 
+											var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
 												+ l + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
 												 + l + "_removeSavedClassSection_onclick );";
 											var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
-													
-											newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length) 
+
+											newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
 												+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
 												+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
-										
+
 											p.replaceChild(newScript, script[0]);
 										}
 
@@ -408,7 +415,7 @@ function createViewableContent(arr) {
 							case 7:
 								hcell.innerHTML = "Sun";
 								break;
-							
+
 						}
 					}
 
@@ -434,7 +441,7 @@ function createViewableContent(arr) {
 						}
 					}
 				}
-				
+
 				if (q === 1) {
 					// Places class
 					scheduleDiv = document.getElementsByClassName("schedule-div")[idx];
@@ -452,11 +459,11 @@ function createViewableContent(arr) {
 								var height = Class_.lengthOfClass(c.getTimes()[0]);
 								height *= scheduleDiv.getElementsByTagName("tr")[1].offsetHeight;
 								$(classDiv).css('height', height);
-								
+
 							}
 						}
-						
-						
+
+
 					});
 				}
 				if (q === 0) {
@@ -464,7 +471,7 @@ function createViewableContent(arr) {
 					$(scheduleDiv).css({'position': 'relative'});
 				}
 			});
-			
+
 			if (q == 0) {
 				$("#modalBody").append(bigSchedDiv);
 				document.getElementsByClassName("modal-header")[0]
@@ -474,12 +481,12 @@ function createViewableContent(arr) {
 				$(".modal-content").css('font-family', font);
 				modal.style.display = "block";
 			}
-			
-		}	
+
+		}
 	} else {
 		document.getElementsByClassName("modal-header")[0]
 			.getElementsByTagName("h2")[0]
-			.innerHTML = "Error in creating schedule.";
+			.innerHTML = "<p>Error in creating schedule!</p><p class='errorText'>There was no possible schedule created from the classes in your cart. Try removing some classes that may overlap.</p>";
 		$("#modalHeaderText").css('color', 'red');
 		$(".modal-content").css('font-family', font);
 		modal.style.display = "block";
@@ -503,14 +510,14 @@ function convertToDetailed(arr) {
 			var ind = getClass(classAbbr, section);
 			x = ind[0];
 			y = ind[1];
-			s.push(new Class_(x.getClassAbbr(), x.getClassDesc(), [x.getSections()[y]], x.getProf(), 
+			s.push(new Class_(x.getClassAbbr(), x.getClassDesc(), [x.getSections()[y]], x.getProf(),
 					[x.getHour()[y]], [x.getDays()[y]], [x.getTimes()[y]], [x.getLocation()[y]]));
-				
+
 		});
 		ss.push(s);
 		s = [];
 	});
-	
+
 	return ss;
 }
 
@@ -585,7 +592,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		var yDisplace = (h + m) * rowHeight + firstRowHeight;
 		var x = ((xDisplace + tableX + 7) / divWidth) * 100;
 		var y = ((yDisplace + tableY - 2) / divHeight) * 100;
-		
+
 		$(classDiv).css('top', y.toString() + "%");
 		$(classDiv).css('left', x.toString() + "%");
 
@@ -599,7 +606,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		if($(scheduleDiv).css('background-color').toString() === "rgb(222, 222, 222)") {
 			$(commentImg).attr("src", iconUrl3);
 		} else {
-			$(commentImg).attr("src", iconUrl2);	
+			$(commentImg).attr("src", iconUrl2);
 		}
 		commentImg.className = "comment-img";
 		$(commentDiv).css('left', x.toString() + "%");
@@ -634,7 +641,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			} else {
 				curClassDiv = event.target.parentNode;
 			}
-			
+
 			var topOfClass = $(curClassDiv).css('top');
 			var topOfClass2 = parseFloat(topOfClass);
 			$(commentDiv).css('top', (topOfClass2 - commentDiv.offsetHeight-.5).toString() + "px");
@@ -654,10 +661,10 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		classDiv.onmouseout = function () {
 			commentDiv.style.display = "none";
 		};
-		
+
 	}
 	scheduleDiv.appendChild(classDiv);
-	
+
 }
 
 
@@ -670,20 +677,20 @@ function replaceLeadingSpaces(str) {
 		rateMyProf = str.substring(str.indexOf("-"));
 		str = str.substring(0, str.indexOf("-"));
 	}
-	
+
 	str = str.replace(/\n/g, "");
 	var i = str.indexOf(" ");
 	while(i === 0) {
 		str = str.substring(i+1);
 		i = str.indexOf(" ");
 	}
-	
-	
+
+
 	while (i !== -1 && str.charAt(i-1) !== " " && str.charAt(i+1) !== " ") {
 		str = str.substring(0, i) + "?" + str.substring(i+1);
 		i = str.indexOf(" ");
 	}
-	
+
 	if(i > 0) {
 		str = str.substring(0, i);
 	}
@@ -702,7 +709,7 @@ function replaceLeadingSpaces(str) {
 */
 function replaceSpaces(str) {
 	str = str.replace(/\s+/g, "");
-	
+
 	while (str.indexOf("<") != -1) {
 		var begIndex = str.indexOf("<");
 		var endIndex = str.indexOf(">");
@@ -732,14 +739,14 @@ function addELToButton(i) {
 	var k = 0;
 	var classTable = document.getElementById("studentCart").getElementsByClassName("classTable"); //one class containing multiple sections
 	if (classTable[i] !== undefined) {
-		var p = classTable[i].getElementsByClassName("classActionButtons"); // all 
-		
+		var p = classTable[i].getElementsByClassName("classActionButtons"); // all
+
 		for(var a = 0; a < i; a++) {
 			for(var b = 0; b < classTable[a].getElementsByClassName("classActionButtons").length; b++) {
 				k++;
 			}
 		}
-		
+
 		document.getElementById("RemoveBtn" + i.toString()).onclick = function () {
 			for (var j = 0; j < p.length; j++) {
 				var newScript = document.createElement("script");
@@ -747,15 +754,15 @@ function addELToButton(i) {
 				var s = script[0].innerHTML;
 				var scriptToAdd = "\nStudentCartList_classSectionListRow_" + k.toString() +
 						"_removeSavedClassSection_onclick();\n";
-				var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_" 
+				var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
 					+ k.toString() + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
 					 + k.toString() + "_removeSavedClassSection_onclick );";
 				var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
-						
-				newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length) 
+
+				newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
 					+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
 					+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
-			
+
 				p[j].replaceChild(newScript, script[0]);
 				k++;
 			}
