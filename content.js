@@ -1,7 +1,6 @@
 /*	To Do List:
-*	1. Edit error text
-*	2. Lunch break
-*	3. Sort schedule by preference
+*	1. Lunch break
+*	2. Sort schedule by preference
 */
 
 
