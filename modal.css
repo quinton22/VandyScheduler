@@ -11,6 +11,46 @@
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+.preference-modal {
+   width: 60% !important;
+   height: 70% !important;
+}
+
+.pref-modal-body {
+   width: 95%;
+   height: 100%;
+   margin: auto;
+   padding: 10px;
+   text-align: left;
+}
+
+.pref-modal-text {
+   font-size: 16px;
+}
+
+.break-select {
+   display: block;
+}
+
+.break-day {
+   display: inline-block;
+   margin: 5px 6px 7px 8px;
+}
+
+.break-day-title {
+
+}
+
+.one-chosen {
+     background-color: #0514bc;
+     color: #fefefe;
+}
+
+.all-chosen {
+   background-color: #20ad56;
+   color: #fefefe;
+}
+
 /* Modal Header */
 .modal-header {
     padding: 2px 16px;

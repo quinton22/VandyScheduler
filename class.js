@@ -42,55 +42,6 @@ class Class_ {
 		this.location = location;
 	}
 
-	getClassAbbr() {
-		return this.classAbbr;
-	}
-
-	getClassDesc() {
-		return this.classDesc;
-	}
-
-	getSections() {
-		return this.sections;
-	}
-
-	setSections(sections) {
-		this.sections = sections;
-	}
-
-	getHour() {
-		return this.hours;
-	}
-
-	setHour(hours) {
-		this.hours = hours;
-	}
-
-	getTimes() {
-		return this.times;
-	}
-
-	setTimes(times) {
-		this.times = times;
-	}
-
-	getDays() {
-		return this.days;
-	}
-
-	setDays(days) {
-		this.days = days;
-	}
-
-	getProf() {
-		return this.prof;
-	}
-
-	getLocation() {
-		return this.location;
-	}
-
-
 	/*
 	*	Compares 2 times to determine if they overlap. Returns false if overlap
 	*/
@@ -167,8 +118,6 @@ class Class_ {
 
 		var len = hour2 + minute2 - hour1 - minute1;
 		return len;
-
-
 	}
 
 

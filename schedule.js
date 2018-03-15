@@ -4,10 +4,6 @@ class Schedule {
 		this.scheduleArr = [];				// Array of schedules
 	}
 
-	getScheduleArr() {
-		return this.scheduleArr;
-	}
-
 	/*
 	*	Makes initial call to the recursive loop & sets the current schedule
 	*  to empty

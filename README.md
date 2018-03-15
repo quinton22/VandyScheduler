@@ -3,6 +3,8 @@ Vandy Scheduler is a Chrome Extension that allows you to easily choose classes t
 ## Chrome Web Store
 This extension can be downloaded at the Chrome Web Store [here](https://chrome.google.com/webstore/detail/vandy-scheduler/ofkamcklfkpakjddlappmemldnnapina?brand=CHBD&gclid=EAIaIQobChMI46ehtYrS1wIVirbACh19XA8iEAAYASABEgLat_D_BwE&gclsrc=aw.ds&dclid=CP6toraK0tcCFcVnAQodcRQNGA).
 ## Changelog
+- 1.0.4 - Add preferences to the popup and if no preferences are selected, then the a default preference of lunch from 12-1pm will be chosen
+- 1.0.3 - Edit error message
 - 1.0.2 - Edit error message and fix uncaught time overlap
 - 1.0.1 - Update description
 - 1.0.0 - Initial version

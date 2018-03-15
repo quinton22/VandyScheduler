@@ -7,6 +7,10 @@
 var classArr = [];		// contains classes to construct schedule with
 var scheduleArr = [];	// contains all the schedules
 var modal, modalChild;
+var preferences = {
+	breakTime: null,
+	noPrefMet: null
+}
 createModal();			// creates modal and appends to doc
 var ready = false;		// allows modal to load
 
@@ -90,21 +94,154 @@ function createModal() {
 	var modalfooter = document.createElement("div");
 	modalfooter.className = "modal-footer";
 	modalChild.appendChild(modalfooter);
-	document.getElementsByTagName("body")[0].appendChild(modal);
+	document.querySelector("body").appendChild(modal);
+
+
+
+	chrome.storage.sync.get("pref", function(p) {
+		preferences = p;
+	})
+
+
+	// creates preference modal
+	let prefModal = document.createElement("div");
+	prefModal.className = "modal";
+	prefModal.id = "pref-modal";
+	let divOuter = document.createElement("div");
+	divOuter.className = "modal-content preference-modal";
+	prefModal.appendChild(divOuter);
+	let div = document.createElement("div");
+	div.className = "pref-modal-body";
+	divOuter.appendChild(div);
+
+
+	let prefClose = document.createElement("span");
+	prefClose.className = "close";
+	prefClose.innerHTML = "&times;";
+	div.appendChild(prefClose);
+
+	let head = document.createElement("h1");
+	head.innerHTML = "Preferences";
+	div.appendChild(head);
+
+	let div2 = document.createElement("div");
+	div.appendChild(div2);
+	div2.style.width = "100%";
+	div2.style.height = "100%";
+
+	let p = document.createElement("p");
+	p.innerHTML = "Select your preferences below. The preferenced schedules will be placed at the top in order from most preferences met, to least preferences met. Lunch break defaults to 12 p.m. If you do not want this break click \"Clear\" then click \"Save Preferences.\"";
+	div2.appendChild(p);
+	div2.className = "pref-modal-text";
+	div2.style.fontFamily = font;
+
+	let breakCont = document.createElement("div");
+
+
+	// TODO make a good way to select items for MWF and TR
+
+	// settings:
+	let breakForm = document.createElement("div");
+	let breakDay = []; // [M, T, W, R, F, Sa, Su]
+	let dayVec = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+	let prefMat = [];
+	for(let i = 0; i < 7; ++i) {
+		breakDay[i] = document.createElement("div");
+		breakDay[i].className = "break-day"; // inline-block***
+
+		let day = document.createElement("div");
+		day.className = "break-day-title";
+		day.id = dayVec[i];
+		day.innerHTML = dayVec[i];
+		breakDay[i].appendChild(day);
+		
+		let selectAll = document.createElement("div");
+		selectAll.className = "break-select";
+		selectAll.id = "select-all";
+		selectAll.innerHTML = "Select All"
+		breakDay[i].appendChild(selectAll);
+		breakForm.appendChild(breakDay[i]);
+
+		let prefMatSub = [];
+
+		for(let j = 8; j <= 18; ++j) {
+			prefMatSub[j-8] = j === 12 ? true : false; // initially true for the 12pm time
+
+			let time = j % 12;
+			let timeStr = "";
+			if (time === 0) {
+				time = 12;
+			}
+			if (time >= 8 && time < 11) {
+				timeStr = time.toString() + "am - " + (time + 1).toString() + "am";
+			} else if (time === 11) {
+				timeStr = time.toString() + "am - " + (time + 1).toString() + "pm";
+			} else if (time === 12) {
+				timeStr = time.toString() + "pm - " + (1).toString() + "pm";
+			} else {
+				timeStr = time.toString() + "pm - " + (time + 1).toString() + "pm";
+			}
+
+			let breakSelect = document.createElement("div");
+			breakSelect.className = "break-select";
+			breakSelect.innerHTML = timeStr;
+			breakSelect.id = time.toString();
+			breakDay[i].appendChild(breakSelect);
+		}
+		prefMat.push(prefMatSub);
+		div2.appendChild(breakDay[i]);
+	}
+
+
+	let clearBtn = document.createElement("button");
+	clearBtn.className = "myButton modalButton";
+	clearBtn.innerHTML = "Clear";
+	breakForm.appendChild(clearBtn);
+	clearBtn.onclick = function() {
+		// TODO clear selections
+	};
+
+	document.querySelector("body").appendChild(prefModal);
+
+	let prefBtn = document.createElement("button");
+	prefBtn.className = "myButton modalButton";
+	prefBtn.innerHTML = "Save Preferences";
+
+	prefBtn.onclick = function() {
+		// TODO SAVE THE INFO
+
+		let pref = preferences;
+		chrome.storage.sync.set("pref", function() {
+			console.log("error", chrome.runtime.lastError);
+			if (chrome.runtime.lastError) {
+				chrome.storage.sync.set("pref");
+				console.error("Could not save preferences");
+				window.alert("Preferences not saved. Check internet connection.");
+			}
+		})
+
+	};
+
 
 	// exit if clicked not on modal
 	window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-        modalBody.innerHTML = "";
-    }
+		if (event.target == modal) {
+		  modal.style.display = "none";
+		  modalBody.innerHTML = "";
+		} else if (event.target == prefModal) {
+		 prefModal.style.display = "none";
+		}
+	};
 
-    // exit if close button is clicked
-    close.onclick = function() {
-    	modal.style.display = "none";
-        modalBody.innerHTML = "";
-    }
-}
+	 // exit if close button is clicked
+	close.onclick = function() {
+		modal.style.display = "none";
+	  	modalBody.innerHTML = "";
+	};
+
+	prefClose.onclick = function() {
+		prefModal.style.display = "none";
+	};
 
 }
 
@@ -263,19 +400,37 @@ function classAdded(button) {
 *	Creates the make schedule button
 */
 function makeScheduleButton(parent) {
-	if (parent.children[parent.children.length - 1].children.length === 0 ||
-		parent.children[parent.children.length - 1].children[0].id !== "makeSchedBtn") {
+		if (!parent.querySelector("button")) {
 
 		$('#yui-gen9').css('height', 'auto');
-		var div = document.createElement("div");
-		div.style.width = "100%";
+		var btnContainer = document.createElement("table");
+		var contR = document.createElement("tr");
+		var contD = [];
+		for (let i = 0; i < 3; ++i) {
+			contD[i] = document.createElement("td"); // 3 table cells
+			contR.appendChild(contD[i]);
+			contD[i].style.width = "33.333%"
+		}
+		btnContainer.appendChild(contR);
+		contR.style.width = "100%";
+		btnContainer.style.width = "97.5%";
 		var button = document.createElement("button");
-		div.appendChild(button);
+		contD[1].appendChild(button);
+
+		var prefBtn = document.createElement("button");
+		prefBtn.id = "preferenceBtn";
+		prefBtn.innerHTML = "Preferences";
+		prefBtn.className = "myButton myButton2";
+		prefBtn.setAttribute("style", "float: right");
+		prefBtn.addEventListener("click", showPreferences);
+		contD[contD.length - 1].appendChild(prefBtn);
+		prefBtn.style.fontFamily = font;
+
 		button.setAttribute('id', 'makeSchedBtn')
 		button.setAttribute('class', 'myButton myButton2');
 		button.style.fontFamily = font;
 		button.innerHTML = "Make Schedule";
-		parent.appendChild(div);
+		parent.appendChild(btnContainer);
 		button.addEventListener("click", makeSchedClicked);
 	}
 }
@@ -290,12 +445,30 @@ function makeSchedClicked() {
 	if (ready) {
 			var sched = new Schedule(classArr);
 			sched.sortClasses();
-			scheduleArr = sched.getScheduleArr();
+			scheduleArr = sched.scheduleArr;
+			scheduleArr = sortBasedOnPreferences(scheduleArr);
 			createViewableContent(scheduleArr);
 
 		} else {
 			setTimeout(makeSchedClicked, 50);
 		}
+}
+
+/*
+*	Shows the preferences for user to choose
+*/
+function showPreferences() {
+	// TODO display preferences
+	document.getElementById("pref-modal").style.display = "block";
+}
+
+
+/*
+*	Sorts the array based on the preferences and returns the array
+*/
+function sortBasedOnPreferences(arr) {
+	// TODO SORT THIS
+	return arr;
 }
 
 
@@ -341,11 +514,11 @@ function createViewableContent(arr) {
 						for (var i = 0; i < parent2.length; i++) {
 							var children = parent2[i].children;
 							for (var j = 0; j < curSched.length; j++) {
-								if (children[0].innerHTML.includes(curSched[j].getClassAbbr())) {
+								if (children[0].innerHTML.includes(curSched[j].classAbbr)) {
 									for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
 										var sectionNum = classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerHTML;
 										var sectionNumStr = replaceSpaces(sectionNum);
-										if(sectionNumStr !== curSched[j].getSections()[0]) {
+										if(sectionNumStr !== curSched[j].sections[0]) {
 											// Remove class
 											var p = classTab[i].getElementsByClassName("classRow")[k]
 												.getElementsByClassName("classActionButtons")[0];
@@ -445,17 +618,17 @@ function createViewableContent(arr) {
 					// Places class
 					scheduleDiv = document.getElementsByClassName("schedule-div")[idx];
 					schedule.forEach(function (c) {
-						if(c.getDays()[0] !== "TBA") {
-							for (var k = 0; k < c.getDays()[0].length; k++) {
+						if(c.days[0] !== "TBA") {
+							for (var k = 0; k < c.days[0].length; k++) {
 								var classDiv = document.createElement("div");
 								classDiv.className = "class";
-								classDiv.id = c.getClassAbbr() + "_" + k;
+								classDiv.id = c.classAbbr + "_" + k;
 								var classTextDiv = document.createElement("div");
 								classTextDiv.className = "classText";
-								classTextDiv.innerHTML = c.getClassAbbr() + "-" + c.getSections()[0];
+								classTextDiv.innerHTML = c.classAbbr + "-" + c.sections[0];
 								classDiv.appendChild(classTextDiv);
-								placeClass(classDiv, scheduleDiv, c.getDays()[0].charAt(k), c.getTimes()[0]);
-								var height = Class_.lengthOfClass(c.getTimes()[0]);
+								placeClass(classDiv, scheduleDiv, c.days[0].charAt(k), c.times[0]);
+								var height = Class_.lengthOfClass(c.times[0]);
 								height *= scheduleDiv.getElementsByTagName("tr")[1].offsetHeight;
 								$(classDiv).css('height', height);
 
@@ -509,8 +682,8 @@ function convertToDetailed(arr) {
 			var ind = getClass(classAbbr, section);
 			x = ind[0];
 			y = ind[1];
-			s.push(new Class_(x.getClassAbbr(), x.getClassDesc(), [x.getSections()[y]], x.getProf(),
-					[x.getHour()[y]], [x.getDays()[y]], [x.getTimes()[y]], [x.getLocation()[y]]));
+			s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], x.prof,
+					[x.hours[y]], [x.days[y]], [x.times[y]], [x.location[y]]));
 
 		});
 		ss.push(s);
@@ -527,9 +700,9 @@ function convertToDetailed(arr) {
 */
 function getClass(classAbbr, section) {
 	for (var i = 0; i < classArr.length; i++) {
-		if (classAbbr === classArr[i].getClassAbbr()) {
-			for (var j = 0; j < classArr[i].getSections().length; j++) {
-				if (classArr[i].getSections()[j] === section) {
+		if (classAbbr === classArr[i].classAbbr) {
+			for (var j = 0; j < classArr[i].sections.length; j++) {
+				if (classArr[i].sections[j] === section) {
 					return [classArr[i], j];
 				}
 			}
@@ -585,7 +758,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		} else {
 			h = ~~time.substring(0, 2);
 		}
-		h -= 7;
+		h -= 7; // 7am = 0
 		m = ~~time.substring(time.indexOf(":") + 1, time.indexOf(":") + 3);
 		m /= 60;
 		var yDisplace = (h + m) * rowHeight + firstRowHeight;
@@ -622,9 +795,9 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		for (var i = 0; i < schedArr.length; i++) {
 			if (scheduleDiv.id.includes(i+1)) {
 				for (var j = 0; j < schedArr[i].length; j++) {
-					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].getClassAbbr() + "-" + schedArr[i][j].getSections()[0])) {
-						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + schedArr[i][j].getTimes()[0]
-							 + "&emsp;" + schedArr[i][j].getLocation()[0] + "<br/>" + schedArr[i][j].getProf()[0];
+					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].classAbbr + "-" + schedArr[i][j].sections[0])) {
+						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + schedArr[i][j].times[0]
+							 + "&emsp;" + schedArr[i][j].location[0] + "<br/>" + schedArr[i][j].prof[0];
 					}
 				}
 			}
