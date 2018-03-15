@@ -29,9 +29,9 @@ class Schedule {
  		}
 
  		var curClass = [];
- 		for (var i = 0; i < subClassArr[0].getTimes().length; i++) {
- 			curClass = [subClassArr[0].getClassAbbr(), subClassArr[0].getSections()[i],
- 				subClassArr[0].getTimes()[i], subClassArr[0].getDays()[i]];
+ 		for (var i = 0; i < subClassArr[0].times.length; i++) {
+ 			curClass = [subClassArr[0].classAbbr, subClassArr[0].sections[i],
+ 				subClassArr[0].times[i], subClassArr[0].days[i]];
 
  			var newSched = [];
  			for (var j = 0; j < schedule.length; j++) {

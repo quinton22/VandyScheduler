@@ -1,42 +1,3 @@
-/*.myButton {
-	-moz-box-shadow:inset 0px 1px 0px 0px #9fb4f2;
-	-webkit-box-shadow:inset 0px 1px 0px 0px #9fb4f2;
-	box-shadow:inset 0px 1px 0px 0px #9fb4f2;
-	background-color:#8ea5cc;
-	-moz-border-radius:3px;
-	-webkit-border-radius:3px;
-	border-radius:3px;
-	border:1px solid #4e6096;
-	display:inline-block;
-	cursor:pointer;
-	color:#ffffff;
-	font-family:Arial;
-	font-size:14px;
-	font-weight:bold;
-	padding:0px 4px !important;
-	text-decoration:none;
-   width: auto;
-   text-align: center;
-   float: right;
-}
-.myButton:hover {
-	background-color:#6c8ab0;
-}
-.myButton:active {
-	position:relative;
-	top:1px;
-}
-
-.myButton.disabled {
-   opacity:0.65;
-   background-color:#6c8ab0;
-}
-
-.myButton.remove {
-   opacity: 1;
-   background-color: #8ea5cc;
-}*/
-
 .myButton {
    -moz-box-shadow:inset 0px 1px 0px 0px #212121;
 	-webkit-box-shadow:inset 0px 1px 0px 0px #212121;
@@ -91,4 +52,15 @@
 
 .myButton.modalButton {
    padding:3px 6px !important;
+}
+
+.myButton.modalButton2 {
+   padding: 3px 6px !important;
+   margin: 6px 4px;
+   float: none;
+}
+
+.pref-clear:hover {
+   background: #e03131;
+   color: #ededed;
 }

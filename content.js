@@ -126,14 +126,12 @@ function createModal() {
 
 	let div2 = document.createElement("div");
 	div.appendChild(div2);
-	div2.style.width = "100%";
-	div2.style.height = "100%";
 
 	let p = document.createElement("p");
-	p.innerHTML = "Select your preferences below. The preferenced schedules will be placed at the top in order from most preferences met, to least preferences met. Lunch break defaults to 12 p.m. If you do not want this break click \"Clear\" then click \"Save Preferences.\"";
+	p.innerHTML = "Select your preferences below. The preferenced schedules will be placed at the top in the order of most preferences met to least preferences met. Lunch break defaults to 12 p.m. and Saturdays and Sundays are default low preference. If you do not want this click \"Clear\" then click \"Save.\"";
 	div2.appendChild(p);
 	div2.className = "pref-modal-text";
-	div2.style.fontFamily = font;
+4
 
 	let breakCont = document.createElement("div");
 
@@ -141,7 +139,15 @@ function createModal() {
 	// TODO make a good way to select items for MWF and TR
 
 	// settings:
+	let breakFormCont = document.createElement("div");
+	breakFormCont.className = "form-container";
+
 	let breakForm = document.createElement("div");
+	breakForm.className = "inner-form-container";
+	breakFormCont.appendChild(breakForm);
+
+	div2.appendChild(breakFormCont);
+
 	let breakDay = []; // [M, T, W, R, F, Sa, Su]
 	let dayVec = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 	let prefMat = [];
@@ -154,13 +160,14 @@ function createModal() {
 		day.id = dayVec[i];
 		day.innerHTML = dayVec[i];
 		breakDay[i].appendChild(day);
-		
+
 		let selectAll = document.createElement("div");
 		selectAll.className = "break-select";
 		selectAll.id = "select-all";
 		selectAll.innerHTML = "Select All"
 		breakDay[i].appendChild(selectAll);
 		breakForm.appendChild(breakDay[i]);
+
 
 		let prefMatSub = [];
 
@@ -189,26 +196,20 @@ function createModal() {
 			breakDay[i].appendChild(breakSelect);
 		}
 		prefMat.push(prefMatSub);
-		div2.appendChild(breakDay[i]);
+		//div2.appendChild(breakDay[i]);
 	}
 
 
-	let clearBtn = document.createElement("button");
-	clearBtn.className = "myButton modalButton";
-	clearBtn.innerHTML = "Clear";
-	breakForm.appendChild(clearBtn);
-	clearBtn.onclick = function() {
-		// TODO clear selections
-	};
+	let prefBtnCont = document.createElement("div");
+	prefBtnCont.className = "pref-btn-container";
+	breakFormCont.appendChild(prefBtnCont);
 
-	document.querySelector("body").appendChild(prefModal);
-
-	let prefBtn = document.createElement("button");
-	prefBtn.className = "myButton modalButton";
-	prefBtn.innerHTML = "Save Preferences";
-
-	prefBtn.onclick = function() {
-		// TODO SAVE THE INFO
+	let saveBtn = document.createElement("button");
+	saveBtn.className = "myButton modalButton2";
+	saveBtn.innerHTML = "Save";
+	prefBtnCont.appendChild(saveBtn);
+	saveBtn.onclick = () => {
+		// TODO save selections
 
 		let pref = preferences;
 		chrome.storage.sync.set("pref", function() {
@@ -218,10 +219,19 @@ function createModal() {
 				console.error("Could not save preferences");
 				window.alert("Preferences not saved. Check internet connection.");
 			}
-		})
+		});
+	}
+
+	let clearBtn = document.createElement("button");
+	clearBtn.className = "myButton modalButton2 pref-clear";
+	clearBtn.innerHTML = "Clear";
+	prefBtnCont.appendChild(clearBtn);
+	clearBtn.onclick = () => {
+		// TODO clear selections
 
 	};
 
+	document.querySelector("body").appendChild(prefModal);
 
 	// exit if clicked not on modal
 	window.onclick = function(event) {
@@ -426,8 +436,8 @@ function makeScheduleButton(parent) {
 		contD[contD.length - 1].appendChild(prefBtn);
 		prefBtn.style.fontFamily = font;
 
-		button.setAttribute('id', 'makeSchedBtn')
-		button.setAttribute('class', 'myButton myButton2');
+		button.id = 'makeSchedBtn';
+		button.className = 'myButton myButton2';
 		button.style.fontFamily = font;
 		button.innerHTML = "Make Schedule";
 		parent.appendChild(btnContainer);
