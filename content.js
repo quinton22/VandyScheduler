@@ -96,12 +96,16 @@ function createModal() {
 	modalChild.appendChild(modalfooter);
 	document.querySelector("body").appendChild(modal);
 
+	chrome.storage.sync.clear();
 
-
-	chrome.storage.sync.get("pref", function(p) {
-		preferences = p;
-	})
-
+	chrome.storage.sync.get("pref", (obj) => {
+		if (obj !== undefined && obj !== null && !jQuery.isEmptyObject(obj)) {
+			preferences = obj.pref;
+		} else {
+			chrome.storage.sync.set({"pref" : preferences});
+		}
+		console.log(obj);
+	});
 
 	// creates preference modal
 	let prefModal = document.createElement("div");
@@ -128,10 +132,9 @@ function createModal() {
 	div.appendChild(div2);
 
 	let p = document.createElement("p");
-	p.innerHTML = "Select your preferences below. The preferenced schedules will be placed at the top in the order of most preferences met to least preferences met. Lunch break defaults to 12 p.m. and Saturdays and Sundays are default low preference. If you do not want this click \"Clear\" then click \"Save.\"";
+	p.innerHTML = "Select the time you do <strong><i>not</i></strong> want class below. The preferenced schedules will be placed at the top in the order of most preferences met to least preferences met. Lunch break defaults to 12 p.m. and Saturdays and Sundays are default low preference. If you do not want this click \"Clear\" then click \"Save.\"";
 	div2.appendChild(p);
 	div2.className = "pref-modal-text";
-4
 
 	let breakCont = document.createElement("div");
 
@@ -150,7 +153,7 @@ function createModal() {
 
 	let breakDay = []; // [M, T, W, R, F, Sa, Su]
 	let dayVec = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-	let prefMat = [];
+	let prefMat = new Map();
 	for(let i = 0; i < 7; ++i) {
 		breakDay[i] = document.createElement("div");
 		breakDay[i].className = "break-day"; // inline-block***
@@ -170,9 +173,9 @@ function createModal() {
 
 
 		let prefMatSub = [];
+		prefMatSub.push(12);
 
 		for(let j = 8; j <= 18; ++j) {
-			prefMatSub[j-8] = j === 12 ? true : false; // initially true for the 12pm time
 
 			let time = j % 12;
 			let timeStr = "";
@@ -190,15 +193,39 @@ function createModal() {
 			}
 
 			let breakSelect = document.createElement("div");
-			breakSelect.className = "break-select";
+			breakSelect.className = "break-select " + j;
 			breakSelect.innerHTML = timeStr;
-			breakSelect.id = time.toString();
+			breakSelect.onclick = () => {
+				prefMatSub.includes(j) ? prefMatSub.splice(prefMatSub.indexOf(j), 1) : prefMatSub.push(j);
+				console.log(prefMat);
+				$(breakSelect).hasClass("saved-preference") ? $(breakSelect).toggleClass("saved-preference") : $(breakSelect).toggleClass("one-chosen");
+			};
 			breakDay[i].appendChild(breakSelect);
 		}
-		prefMat.push(prefMatSub);
+
+		preferences.breakTime ? prefMat.set(dayVec[i], preferences.breakTime[davVec[i]]) : prefMat.set(dayVec[i], prefMatSub);
+
 		//div2.appendChild(breakDay[i]);
 	}
 
+
+	document.querySelector("body").appendChild(prefModal);
+
+	prefMat.forEach((value, key) => {
+		value.map((time) => {
+
+			console.log(time);
+
+			$("#" + key).parent().find("." + time.toString()).removeClass("one-chosen saved-preference").addClass("saved-preference");
+		});
+	});
+
+	preferences.breakTime = {};
+	prefMat.forEach((value, key) => {
+		console.log(preferences);
+
+		preferences.breakTime[key] = value;
+	});
 
 	let prefBtnCont = document.createElement("div");
 	prefBtnCont.className = "pref-btn-container";
@@ -208,16 +235,18 @@ function createModal() {
 	saveBtn.className = "myButton modalButton2";
 	saveBtn.innerHTML = "Save";
 	prefBtnCont.appendChild(saveBtn);
-	saveBtn.onclick = () => {
-		// TODO save selections
 
-		let pref = preferences;
-		chrome.storage.sync.set("pref", function() {
+
+	saveBtn.onclick = () => {
+
+		chrome.storage.sync.set({"pref": preferences}, () => {
 			console.log("error", chrome.runtime.lastError);
 			if (chrome.runtime.lastError) {
-				chrome.storage.sync.set("pref");
 				console.error("Could not save preferences");
 				window.alert("Preferences not saved. Check internet connection.");
+			} else {
+				console.log("Successfully saved");
+				updatePreferences(preferences, true);
 			}
 		});
 	}
@@ -228,18 +257,28 @@ function createModal() {
 	prefBtnCont.appendChild(clearBtn);
 	clearBtn.onclick = () => {
 		// TODO clear selections
+		for (let key in preferences.breakTime) {
+			for (let item in preferences.breakTime[key]) {
+				$(item).removeClass("one-chosen");
+			}
+			preferences.breakTime[key] = [];
+		}
+
+		updatePreferences(preferences, false);
 
 	};
-
-	document.querySelector("body").appendChild(prefModal);
 
 	// exit if clicked not on modal
 	window.onclick = function(event) {
 		if (event.target == modal) {
-		  modal.style.display = "none";
-		  modalBody.innerHTML = "";
+			modal.style.display = "none";
+			modalBody.innerHTML = "";
 		} else if (event.target == prefModal) {
-		 prefModal.style.display = "none";
+			prefModal.style.display = "none";
+			chrome.storage.sync.get("pref", (obj) => {
+				preferences = obj.pref;
+				updatePreferences(preferences, false);
+			});
 		}
 	};
 
@@ -251,8 +290,32 @@ function createModal() {
 
 	prefClose.onclick = function() {
 		prefModal.style.display = "none";
+		chrome.storage.sync.get("pref", (obj) => {
+			preferences = obj.pref;
+			updatePreferences(preferences, false);
+
+		});
 	};
 
+}
+
+
+function updatePreferences(p, saved) {
+	console.log(p);
+	for (let key in p.breakTime) {
+		p.breakTime[key].map((time) => {
+			if (saved) {
+				$("#" + key).parent().find("." + time.toString()).removeClass("one-chosen saved-preference").addClass("saved-preference");
+			} else {
+				if ($("#" + key).parent().find("." + time.toString()).hasClass("one-chosen")) {
+					$("#" + key).parent().find("." + time.toString()).removeClass("one-chosen");
+				}
+
+				// TODO fix this part
+			}
+		});
+	}
+	console.log(p);
 }
 
 /*
