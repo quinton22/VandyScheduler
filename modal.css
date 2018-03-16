@@ -65,7 +65,7 @@
 }
 
 .break-select:hover {
-   border: 1px solid blue;
+   border-color: blue !important;
    cursor: pointer;
 }
 
