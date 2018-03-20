@@ -4,9 +4,9 @@
    "version": "1.0.4",
    "description": "This extension organizes your potential classes and Vanderbilt YES class cart into a schedule for the upcoming semester.",
    "icons": {
-      "16": "schedule-icon16.png",
-      "48": "schedule-icon48.png",
-      "128": "schedule-icon128.png"
+      "16": "png/schedule-icon16.png",
+      "48": "png/schedule-icon48.png",
+      "128": "png/schedule-icon128.png"
    },
    "content_scripts": [
       {
@@ -20,6 +20,4 @@
       "tabs", "https://webapp.mis.vanderbilt.edu/more/SearchClasses*", "storage"
    ],
    "web_accessible_resources": ["png/comment-pic2.png", "png/comment-pic3.png"]
-
-
 }

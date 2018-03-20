@@ -1,7 +1,5 @@
-/*	To Do List:
-*	1. Lunch break
-*	2. Sort schedule by preference
-*/
+// TODO: sidebar instead of preferences button
+// in manifest: sidebar_action
 
 
 var classArr = [];		// contains classes to construct schedule with
@@ -926,8 +924,8 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		var commentDiv = document.createElement("div");
 		commentDiv.className = "comment-div";
 		var commentImg = document.createElement("img");
-		var iconUrl2 = chrome.extension.getURL("comment-pic2.png");
-		var iconUrl3 = chrome.extension.getURL("comment-pic3.png");
+		var iconUrl2 = chrome.extension.getURL("png/comment-pic2.png");
+		var iconUrl3 = chrome.extension.getURL("png/comment-pic3.png");
 		if($(scheduleDiv).css('background-color').toString() === "rgb(222, 222, 222)") {
 			$(commentImg).attr("src", iconUrl3);
 		} else {
