@@ -100,12 +100,11 @@ function createModal() {
 	let prefModal = document.createElement("div");
 
 	chrome.storage.sync.get("pref", (obj) => {
-		if (obj !== undefined && obj !== null && !jQuery.isEmptyObject(obj)) {
+		if (obj !== undefined && obj !== null && !$.isEmptyObject(obj)) {
 			preferences = obj.pref;
 		} else {
 			chrome.storage.sync.set({"pref" : preferences});
 		}
-		console.log(obj);
 		getFromStorageAndCreateModal(prefModal)
 	});
 
@@ -133,22 +132,21 @@ function createModal() {
 	div.appendChild(div2);
 
 	let p = document.createElement("p");
-	p.innerHTML = "Select the time(s) you do <strong><i>not</i></strong> want class below. The schedules that meet the most preferences will be placed at the top unless \"Do Not Show if No Preference is met\" is checked. Lunch break defaults to 12 p.m. and Saturdays and Sundays are default low preference. If you do not want this click \"Clear\" then click \"Save.\"";
+	console.log(preferences.breakTime);
+	p.innerHTML = "Select the time(s) you do <strong><i>not</i></strong> want class below. Schedules that have classes during these times will be at the bottom of the list unless \"Do not show schedules that conflict with break times\" is checked, in which case they will not be shown. "
+
 	div2.appendChild(p);
 	div2.className = "pref-modal-text";
 
-	// TODO make a good way to select items for MWF and TR
-
-
-
 	// exit if clicked not on modal
-	window.onclick = function(event) {
+	window.onclick = (event) => {
 		if (event.target == modal) {
 			modal.style.display = "none";
 			modalBody.innerHTML = "";
 		} else if (event.target == prefModal) {
 			prefModal.style.display = "none";
-			updatePreferences(prefMat)
+			updatePreferences();
+			console.log(preferences);
 		}
 	};
 
@@ -160,12 +158,20 @@ function createModal() {
 
 	prefClose.onclick = function() {
 		prefModal.style.display = "none";
-		updatePreferences(prefMat);
+		updatePreferences();
+		console.log(preferences);
 	};
 
 }
 
+
+/*
+*	Creates preferences modal and gets information from storage
+*/
 function getFromStorageAndCreateModal(prefModal) {
+	$('.pref-modal-text p').innerHTML += preferences.breakTime === null ? "Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" " : "";
+	$('.pref-modal-text p').innerHTML += "To select a break time for all of MWF, TR, or SU, double click on that time on any of those days.";
+
 	// settings:
 	let breakFormCont = document.createElement("div");
 	breakFormCont.className = "form-container";
@@ -179,46 +185,44 @@ function getFromStorageAndCreateModal(prefModal) {
 	let dayVec = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 	for(let i = 0; i < 7; ++i) {
 		breakDay[i] = document.createElement("div");
-		breakDay[i].className = "break-day"; // inline-block***
+		breakDay[i].className = "break-day";
 
 		let day = document.createElement("div");
-		day.className = "break-day-title";
+		let cname;
+		if (i !== 6 && i % 2 === 0) {
+			cname = "MWF";
+		} else if (i !== 5 && i % 2 === 1) {
+			cname = "TR";
+		} else {
+			cname = "SU";
+		}
+		day.className = "break-day-title " + cname;
+
 		day.id = dayVec[i];
 		day.innerHTML = dayVec[i];
 		breakDay[i].appendChild(day);
 
 		let selectAll = document.createElement("div");
+		let saspan = document.createElement("span");
 		selectAll.className = "break-select 7";
 		selectAll.id = "select-all";
-		selectAll.innerHTML = "Select All"
+		selectAll.appendChild(saspan);
+		saspan.innerHTML = "Select All"
+		selectAll.ondblclick = (event) => {preferenceDblClickHandler(event.target);};
 
-		// TODO add double click
 		selectAll.onclick = () => {
-			let key = $(selectAll).parent().find(".break-day-title").attr('id');
-			if (prefMat.get(key).length < 12) {
-				prefMat.set(key, []);
-				for (let k = 7; k <= 18; ++k) {
-					prefMat.get(key).push(k);
-					console.log("break-select " + k.toString(), $(selectAll).parent().find("." + k.toString()));
-					$(selectAll).parent().find("." + k.toString()).removeClass("one-chosen saved-preference").addClass("one-chosen");
-				}
+			let key = $(selectAll).siblings(".break-day-title").attr('id');
+			if (preferences.breakTime[key].length < 12) {
+				preferences.breakTime[key] = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+				$(selectAll).parent().find(".break-select").removeClass("one-chosen").addClass("one-chosen");
 			} else {
-				prefMat.get(key).forEach((item) => {
-					$(selectAll).parent().find("." + item.toString()).removeClass("one-chosen saved-preference");
-				});
-				prefMat.set(key, []);
+				preferences.breakTime[key] = [];
+				$(selectAll).parent().find('.break-select').removeClass("one-chosen");
 			}
 		};
 
 		breakDay[i].appendChild(selectAll);
 		breakForm.appendChild(breakDay[i]);
-
-
-		let prefMatSub = [];
-		prefMatSub.push(12);
-		if (dayVec[i] == "Saturday" || dayVec[i] == "Sunday") {
-			prefMatSub = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-		}
 
 		for(let j = 8; j <= 18; ++j) {
 
@@ -238,29 +242,35 @@ function getFromStorageAndCreateModal(prefModal) {
 			}
 
 			let breakSelect = document.createElement("div");
+			let bsspan = document.createElement("span");
+			breakSelect.appendChild(bsspan);
 			breakSelect.className = "break-select " + j;
-			breakSelect.innerHTML = timeStr;
+			bsspan.innerHTML = timeStr;
 			breakSelect.onclick = () => {
-				console.log(preferences);
-				let k = $(breakSelect).parent().find(".break-day-title").attr('id');
-				prefMat.get(k).includes(j) ? prefMat.get(k).splice(prefMat.get(k).indexOf(j), 1) : prefMat.get(k).push(j);
-				console.log(prefMat);
-				$(breakSelect).hasClass("saved-preference") ? $(breakSelect).toggleClass("saved-preference") : $(breakSelect).toggleClass("one-chosen");
+				let k = $(breakSelect).siblings(".break-day-title").attr('id');
+				preferences.breakTime[k].includes(j) ? preferences.breakTime[k].splice(preferences.breakTime[k].indexOf(j), 1) : preferences.breakTime[k].push(j);
+ 				$(breakSelect).toggleClass("one-chosen");
 
+				// handles checking and unchecking of select all based on
+				// if the rest of the items are full
 				if($(selectAll).hasClass("one-chosen")) {
 					$(selectAll).removeClass("one-chosen");
+					preferences.breakTime[k].splice(preferences.breakTime[k].indexOf(7), 1);
+				} else if ($(selectAll).hasClass("saved-preference")) {
+					$(selectAll).removeClass("saved-preference");
+					preferences.breakTime[k].splice(preferences.breakTime[k].indexOf(7), 1);
+				} else {
+					if (preferences.breakTime[k].length === 11) {
+						$(selectAll).trigger('click');
+					}
 				}
 			};
-			breakSelect.ondblclick = () => {
-				$(breakSelect).trigger("click");
-				// $(breakSelect).click();
-				// breakSelect.onclick;
-			};
+			breakSelect.ondblclick = (event) => {preferenceDblClickHandler(event.target);};
 			breakDay[i].appendChild(breakSelect);
 		}
 
-		console.log(preferences);
-		preferences.breakTime ? prefMat.set(dayVec[i], preferences.breakTime[dayVec[i]]) : prefMat.set(dayVec[i], prefMatSub.slice());
+
+		preferences.breakTime ? null : (preferences.breakTime[dayVec[i]] = (dayVec[i] === "Saturday" || dayVec[i] === "Sunday") ? [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] : [12]);
 		//div2.appendChild(breakDay[i]);
 	}
 
@@ -269,84 +279,89 @@ function getFromStorageAndCreateModal(prefModal) {
 	$('.pref-modal-text').append(breakFormCont);
 
 
-	prefMat.forEach((value, key) => {
-		value.map((time) => {
-			$("#" + key).parent().find("." + time.toString()).removeClass("one-chosen saved-preference").addClass("saved-preference");
+	for (let day in preferences.breakTime) {
+		preferences.breakTime[day].map((time) => {
+			$("#" + day).siblings("." + time.toString()).removeClass("one-chosen").addClass("one-chosen");
 		});
-	});
-
-	preferences.breakTime = {};
-	prefMat.forEach((value, key) => {
-		preferences.breakTime[key] = value.slice();
-	});
+	}
 
 	let prefBtnCont = document.createElement("div");
 	prefBtnCont.className = "pref-btn-container";
 	breakFormCont.appendChild(prefBtnCont);
 
-	let saveBtn = document.createElement("button");
-	saveBtn.className = "myButton modalButton2";
-	saveBtn.innerHTML = "Save";
-	prefBtnCont.appendChild(saveBtn);
+	let checkBoxDiv = document.createElement("div");
+	let checkBox = document.createElement("input");
+	let label = document.createElement("label");
+	checkBoxDiv.className = "checkbox-div";
+	checkBox.id = "pref-not-met";
+	checkBox.type = "checkbox";
+	checkBox.checked = preferences.noPrefMet ? true : false;
+	checkBox.name = "pref-not-met";
+	label.className = "preference-label";
+	label.htmlFor = "pref-not-met";
+	label.innerHTML = "Do not show schedules that conflict with break times"
+	checkBoxDiv.appendChild(checkBox);
+	checkBoxDiv.appendChild(label);
+	prefBtnCont.appendChild(checkBoxDiv);
 
-	saveBtn.onclick = () => {
-		prefMat.forEach((value, key) => {
-			console.log(preferences);
-
-			preferences.breakTime[key] = value;
-		});
-		// add a preferences = prefMat or something
-		chrome.storage.sync.set({"pref": preferences}, () => {
-			if (chrome.runtime.lastError) {
-				console.error("Could not save preferences");
-				window.alert("Preferences not saved. Check internet connection.");
-			} else {
-				console.log("Successfully saved");
-				updatePreferences(prefMat);
-			}
-		});
-	}
+	checkBox.onchange = () => {
+		preferences.noPrefMet = checkBox.checked;
+	};
 
 	let clearBtn = document.createElement("button");
 	clearBtn.className = "myButton modalButton2 pref-clear";
 	clearBtn.innerHTML = "Clear";
 	prefBtnCont.appendChild(clearBtn);
 	clearBtn.onclick = () => {
-		// TODO clear selections
-		prefMat.forEach((value, key) => {
-			value.forEach((item) => {
-				$("." + item.toString()).removeClass("one-chosen").removeClass("saved-preference");
-			});
-			prefMat.set(key, []);
-		});
-		console.log(prefMat);
+		$('#pref-not-met').prop('checked', false);
+		$('.break-select').removeClass("one-chosen");
+		for (let day in preferences.breakTime) {
+			preferences.breakTime[day] = [];
+		}
 	};
 }
 
+/*
+*	handles the double click on Preferences times
+*/
+function preferenceDblClickHandler(t) {
+	$(t).attr('class') ? null : t = $(t).parent();
+	let time = $(t).attr('class').match(/[0-9]+/)[0];
+	let day = $(t).siblings('.break-day-title').attr('class').match(/\s(\w+)/)[1];
+	let parent = $(t).parent().parent();
+	let click_flag = $(t).hasClass('one-chosen') ? false : true;
+	triggerDblClick(parent, day, time, click_flag);
+}
 
-function updatePreferences(prefMat) {
-	console.log(preferences);
-	prefMat.forEach((value, key) => {
-		value.map((time) => {
-			$("#" + key).parent().find("." + time.toString()).removeClass("one-chosen saved-preference");
-		});
+/*
+*	Triggers the click event on the proper days/times in the preferences modal
+*/
+function triggerDblClick(parent, days, time, click) {
+		if (click) {
+			$.each(parent.find('.' + days), (ind, el) => {
+				if (!$(el).siblings('.' + time).hasClass('one-chosen')) {
+					$(el).siblings('.' + time).trigger('click');
+				}
+			});
+		} else {
+			$.each(parent.find('.' + days), (ind, el) => {
+				if ($(el).siblings('.' + time).hasClass('one-chosen')) {
+					$(el).siblings('.' + time).trigger('click');
+				}
+			});
+		}
+}
+
+/*
+*	Updates the HTML view for preferences and updates prefMat
+*/
+function updatePreferences() {
+	chrome.storage.sync.set({"pref": preferences}, () => {
+		if (chrome.runtime.lastError) {
+			console.error("Could not save preferences");
+			window.alert("Preferences not saved. Check internet connection.");
+		}
 	});
-
-	for (let key in preferences.breakTime) {
-		prefMat.set(key, preferences.breakTime[key].slice());
-		preferences.breakTime[key].map((time) => {
-			// if (saved) {
-				$("#" + key).parent().find("." + time.toString()).addClass("saved-preference");
-			// } else {
-			// 	if ($("#" + key).parent().find("." + time.toString()).hasClass("one-chosen")) {
-			// 		$("#" + key).parent().find("." + time.toString()).removeClass("one-chosen");
-			// 	}
-
-				// TODO fix this part
-			// }
-		});
-	}
-	console.log(preferences);
 }
 
 /*
@@ -525,7 +540,6 @@ function makeScheduleButton(parent) {
 		prefBtn.id = "preferenceBtn";
 		prefBtn.innerHTML = "Preferences";
 		prefBtn.className = "myButton myButton2";
-		prefBtn.setAttribute("style", "float: right");
 		prefBtn.addEventListener("click", showPreferences);
 		contD[contD.length - 1].appendChild(prefBtn);
 		prefBtn.style.fontFamily = font;
@@ -562,8 +576,9 @@ function makeSchedClicked() {
 *	Shows the preferences for user to choose
 */
 function showPreferences() {
-	// TODO display preferences
 	document.getElementById("pref-modal").style.display = "block";
+	let width = $('#Wednesday.break-day-title').width();
+	$('.break-select').css({'min-width': width});
 }
 
 
@@ -572,6 +587,52 @@ function showPreferences() {
 */
 function sortBasedOnPreferences(arr) {
 	// TODO SORT THIS
+	let prefNotMetCount; // number of preferences broken
+	let breakArr = [];
+	let t;
+	let d;
+	for (let day in preferences.breakTime) {
+		d = day[0];
+		if (d === "T") {
+			d = day[1] === "h" ? d = "R" : d = "T";
+		} else if (d === "S") {
+			d = day[1] === "u" ? d = "U" : d = "S";
+		}
+
+		preferences.breakTime[day].forEach((time) => {
+			if (time !== 7 && time < 9) {
+				t = "0" + time.toString() + ":00-0" + (time + 1).toString() + ":00";
+			} else if (time === 9) {
+				t = "0" + time.toString() + ":00-" + (time + 1).toString() + ":00";
+			} else {
+				t = time.toString() + ":00-" + (time + 1).toString() + ":00";
+			}
+			breakArr.push(["CLASS ABBRV", "00", t, d]);
+		});
+	}
+	if (preferences.noPrefMet) { // do not show if no pref met
+		arr = arr.filter((sched) => {
+			let flag = true;
+			breakArr.forEach((c) => {
+				Schedule.checkOverlap(c, sched) ? flag = false : null;
+			});
+			return flag;
+		});
+	} else {
+		arr.sort((a, b) => {
+			prefNotMetCount = 0;
+			// a - b: negative then a is before b, 0  then same, pos then b before a
+			breakArr.forEach((c) => {
+				if (Schedule.checkOverlap(c, a)) {
+					++prefNotMetCount; // positive: more pref not met by a so a comes after b
+				}
+				if (Schedule.checkOverlap(c, b)) {
+					--prefNotMetCount; // negative: more pref not met by b so b comes after a
+				}
+			});
+			return prefNotMetCount;
+		});
+	}
 	return arr;
 }
 
@@ -582,183 +643,169 @@ function sortBasedOnPreferences(arr) {
 function createViewableContent(arr) {
 	var scheduleDiv;
 	if (arr.length > 0) {
-		for(var q = 0; q < 2; q++) {
-			if (q === 0) {
-				schedArr = convertToDetailed(arr);
-				var bigSchedDiv = document.createElement("div");
-			}
+		schedArr = convertToDetailed(arr);
+		var bigSchedDiv = document.createElement("div");
 
-			// creates schedule table
-			schedArr.forEach(function (schedule, idx) {
-				if (q===0) {
-					scheduleDiv = document.createElement("div");
-					idx % 2 === 0 ? $(scheduleDiv).addClass('schedule-div')
-					.css('background-color', '#fefefe') : $(scheduleDiv).addClass('schedule-div')
-					.css('background-color', '#dedede');
+		// creates schedule table
+		schedArr.forEach(function (schedule, idx) {
+			scheduleDiv = document.createElement("div");
+			idx % 2 === 0 ? $(scheduleDiv).addClass('schedule-div') : $(scheduleDiv).addClass('schedule-div')
+			.css('background-color', '#dedede');
 
-					var table = document.createElement("table");
-					$(table).addClass('schedule-table');
-					scheduleDiv.appendChild(table);
-					var caption = table.createCaption();
-					var capSpan = document.createElement("span");
-					var capButtonSpan = document.createElement("span");
-					var pickSchedBtn = document.createElement("button");
-					caption.appendChild(capSpan);
-					caption.appendChild(capButtonSpan);
-					capButtonSpan.appendChild(pickSchedBtn);
-					capSpan.innerHTML = "Schedule #" + (idx + 1).toString();
-					pickSchedBtn.className = "myButton modalButton";
-					pickSchedBtn.innerHTML = "Pick Schedule";
+			var table = document.createElement("table");
+			$(table).addClass('schedule-table');
+			scheduleDiv.appendChild(table);
+			var caption = table.createCaption();
+			var capSpan = document.createElement("span");
+			var capButtonSpan = document.createElement("span");
+			var pickSchedBtn = document.createElement("button");
+			caption.appendChild(capSpan);
+			caption.appendChild(capButtonSpan);
+			capButtonSpan.appendChild(pickSchedBtn);
+			capSpan.innerHTML = "Schedule #" + (idx + 1).toString();
+			pickSchedBtn.className = "myButton modalButton";
+			pickSchedBtn.innerHTML = "Pick Schedule";
 
-					// Remove classes not in schedule from cart
-					pickSchedBtn.addEventListener("click", function () {
-						var curSched = schedArr[(~~pickSchedBtn.parentNode.previousSibling.innerHTML
-								.substring(pickSchedBtn.parentNode.previousSibling.innerHTML.indexOf("#")+1)) - 1];
-						var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
-						for (var i = 0; i < parent2.length; i++) {
-							var children = parent2[i].children;
-							for (var j = 0; j < curSched.length; j++) {
-								if (children[0].innerHTML.includes(curSched[j].classAbbr)) {
-									for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
-										var sectionNum = classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerHTML;
-										var sectionNumStr = replaceSpaces(sectionNum);
-										if(sectionNumStr !== curSched[j].sections[0]) {
-											// Remove class
-											var p = classTab[i].getElementsByClassName("classRow")[k]
-												.getElementsByClassName("classActionButtons")[0];
-											var lId = p.children[0].id;
-											var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));
-											var newScript = document.createElement("script");
-											var script = p.getElementsByTagName("script");
-											var s = script[0].innerHTML;
-											var scriptToAdd = "\nStudentCartList_classSectionListRow_" + l +
-													"_removeSavedClassSection_onclick();\n";
-											var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
-												+ l + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
-												 + l + "_removeSavedClassSection_onclick );";
-											var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
+			// Remove classes not in schedule from cart
+			pickSchedBtn.addEventListener("click", () => {
+				var curSched = schedArr[~~pickSchedBtn.parentNode.previousSibling.innerHTML.match(/[0-9]+/) - 1];
+				var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
+				for (var i = 0; i < parent2.length; i++) {
+					var children = parent2[i].children;
+					for (var j = 0; j < curSched.length; j++) {
+						if (children[0].innerHTML.includes(curSched[j].classAbbr)) {
+							for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
+								var sectionNum = classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerHTML;
+								var sectionNumStr = replaceSpaces(sectionNum);
+								if(sectionNumStr !== curSched[j].sections[0]) {
+									// Remove class
+									var p = classTab[i].getElementsByClassName("classRow")[k]
+										.getElementsByClassName("classActionButtons")[0];
+									var lId = p.children[0].id;
+									var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));
+									var newScript = document.createElement("script");
+									var script = p.getElementsByTagName("script");
+									var s = script[0].innerHTML;
+									var scriptToAdd = "\nStudentCartList_classSectionListRow_" + l +
+											"_removeSavedClassSection_onclick();\n";
+									var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
+										+ l + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
+										 + l + "_removeSavedClassSection_onclick );";
+									var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
 
-											newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
-												+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
-												+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
+									newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
+										+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
+										+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
 
-											p.replaceChild(newScript, script[0]);
-										}
-
-									}
+									p.replaceChild(newScript, script[0]);
 								}
+
 							}
-
-
-						}
-						modal.style.display = "none";
-						document.getElementById("modalBody").innerHTML = "";
-
-						scheduleArr = [];
-					});
-
-					// creates table
-					$(capSpan).css('font-family', font).addClass('schedule-caption');
-					scheduleDiv.id = caption.innerHTML;
-					var header = table.createTHead();
-					var hrow = header.insertRow(0);
-					for (var i = 0; i < 8; i++) {
-						var hcell = document.createElement("th");
-						hrow.appendChild(hcell);
-						$(hcell).css('font-family', font).addClass('schedule-th');
-						switch(i){
-							case 0:
-								hcell.innerHTML = "";
-								break;
-							case 1:
-								hcell.innerHTML = "Mon";
-								break;
-							case 2:
-								hcell.innerHTML = "Tues";
-								break;
-							case 3:
-								hcell.innerHTML = "Wed";
-								break;
-							case 4:
-								hcell.innerHTML = "Thurs";
-								break;
-							case 5:
-								hcell.innerHTML = "Fri";
-								break;
-							case 6:
-								hcell.innerHTML = "Sat";
-								break;
-							case 7:
-								hcell.innerHTML = "Sun";
-								break;
-
 						}
 					}
 
-					// creates times
-					var tBody = table.createTBody();
-					for (var i = 0; i < 13; i++) {
-						var row = tBody.insertRow(i);
-						$(row).addClass('schedule-tr');
-						for (var j = 0; j < 8; j++) {
-							var cell = row.insertCell(j);
-							$(cell).addClass('schedule-td');
-							if (j === 0) {
-								var timeText = i + 7 <= 12 ? (i + 7).toString() :
-													((i + 7) % 13 + 1).toString();
-								if ((i+7) < 12) {
-									timeText += " am";
-								} else {
-									timeText += " pm";
-								}
-								cell.innerHTML = timeText;
-								$(cell).addClass('c1');
-							}
-						}
-					}
+
 				}
+				modal.style.display = "none";
+				document.getElementById("modalBody").innerHTML = "";
 
-				if (q === 1) {
-					// Places class
-					scheduleDiv = document.getElementsByClassName("schedule-div")[idx];
-					schedule.forEach(function (c) {
-						if(c.days[0] !== "TBA") {
-							for (var k = 0; k < c.days[0].length; k++) {
-								var classDiv = document.createElement("div");
-								classDiv.className = "class";
-								classDiv.id = c.classAbbr + "_" + k;
-								var classTextDiv = document.createElement("div");
-								classTextDiv.className = "classText";
-								classTextDiv.innerHTML = c.classAbbr + "-" + c.sections[0];
-								classDiv.appendChild(classTextDiv);
-								placeClass(classDiv, scheduleDiv, c.days[0].charAt(k), c.times[0]);
-								var height = Class_.lengthOfClass(c.times[0]);
-								height *= scheduleDiv.getElementsByTagName("tr")[1].offsetHeight;
-								$(classDiv).css('height', height);
-
-							}
-						}
-
-
-					});
-				}
-				if (q === 0) {
-					bigSchedDiv.appendChild(scheduleDiv);
-					$(scheduleDiv).css({'position': 'relative'});
-				}
+				scheduleArr = [];
 			});
 
-			if (q == 0) {
-				$("#modalBody").append(bigSchedDiv);
-				document.getElementsByClassName("modal-header")[0]
-					.getElementsByTagName("h2")[0]
-					.innerHTML = "Pick Schedule";
-				$("#modalHeaderText").css('color', 'black');
-				$(".modal-content").css('font-family', font);
-				modal.style.display = "block";
+			// creates table
+			$(capSpan).css('font-family', font).addClass('schedule-caption');
+			scheduleDiv.id = caption.innerHTML;
+			var header = table.createTHead();
+			var hrow = header.insertRow(0);
+			for (var i = 0; i < 8; i++) {
+				var hcell = document.createElement("th");
+				hrow.appendChild(hcell);
+				$(hcell).css('font-family', font).addClass('schedule-th');
+				switch(i){
+					case 0:
+						hcell.innerHTML = "";
+						break;
+					case 1:
+						hcell.innerHTML = "Mon";
+						break;
+					case 2:
+						hcell.innerHTML = "Tues";
+						break;
+					case 3:
+						hcell.innerHTML = "Wed";
+						break;
+					case 4:
+						hcell.innerHTML = "Thurs";
+						break;
+					case 5:
+						hcell.innerHTML = "Fri";
+						break;
+					case 6:
+						hcell.innerHTML = "Sat";
+						break;
+					case 7:
+						hcell.innerHTML = "Sun";
+						break;
+
+				}
 			}
 
-		}
+			// creates times
+			var tBody = table.createTBody();
+			for (var i = 0; i < 13; i++) {
+				var row = tBody.insertRow(i);
+				$(row).addClass('schedule-tr');
+				for (var j = 0; j < 8; j++) {
+					var cell = row.insertCell(j);
+					$(cell).addClass('schedule-td');
+					if (j === 0) {
+						var timeText = i + 7 <= 12 ? (i + 7).toString() :
+											((i + 7) % 13 + 1).toString();
+						if ((i+7) < 12) {
+							timeText += " am";
+						} else {
+							timeText += " pm";
+						}
+						cell.innerHTML = timeText;
+						$(cell).addClass('c1');
+					}
+				}
+			}
+			bigSchedDiv.appendChild(scheduleDiv);
+			$(scheduleDiv).css({'position': 'relative'});
+		});
+
+		$("#modalBody").append(bigSchedDiv);
+		document.getElementsByClassName("modal-header")[0]
+			.getElementsByTagName("h2")[0]
+			.innerHTML = "Pick Schedule";
+		$("#modalHeaderText").css('color', 'black');
+		$(".modal-content").css('font-family', font);
+		modal.style.display = "block";
+
+
+		schedArr.forEach((schedule, idx) => {
+		// Places class
+			scheduleDiv = document.getElementsByClassName("schedule-div")[idx];
+			schedule.forEach( (c) => {
+				if(c.days[0] !== "TBA") {
+					for (var k = 0; k < c.days[0].length; k++) {
+						var classDiv = document.createElement("div");
+						classDiv.className = "class";
+						classDiv.id = c.classAbbr + "_" + k;
+						var classTextDiv = document.createElement("div");
+						classTextDiv.className = "classText";
+						classTextDiv.innerHTML = c.classAbbr + "-" + c.sections[0];
+						classDiv.appendChild(classTextDiv);
+						placeClass(classDiv, scheduleDiv, c.days[0].charAt(k), c.times[0]);
+						var height = Class_.lengthOfClass(c.times[0]);
+						height *= (scheduleDiv.getElementsByTagName("tr")[1].offsetHeight - 2) / scheduleDiv.offsetHeight * 100;
+						// 2 for the border
+						$(classDiv).css('height', height.toString() + "%");
+					}
+				}
+			});
+		});
 	} else {
 		document.getElementsByClassName("modal-header")[0]
 			.getElementsByTagName("h2")[0]
@@ -825,11 +872,13 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 	var tab = scheduleDiv.firstChild.getElementsByTagName("tr");
 	var rowHeight = tab[1].offsetHeight;
 	var firstRowHeight = tab[0].offsetHeight;
-	var colWidth = scheduleDiv.firstChild.getElementsByTagName("td")[0].offsetWidth;
+	var colWidth = scheduleDiv.firstChild.getElementsByTagName("td")[0].offsetWidth - .5;
 	var tablePos = $(scheduleDiv.firstChild).position();
 	var tableX = tablePos.left;
+	console.log(rowHeight);
 	var tablePos2 = $(tab[0]).position();
 	var tableY = tablePos2.top;
+	console.log(colWidth);
 	if (divHeight !== 0) {
 		var xDisplace;
 		switch(day) {
@@ -866,8 +915,8 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		m = ~~time.substring(time.indexOf(":") + 1, time.indexOf(":") + 3);
 		m /= 60;
 		var yDisplace = (h + m) * rowHeight + firstRowHeight;
-		var x = ((xDisplace + tableX + 7) / divWidth) * 100;
-		var y = ((yDisplace + tableY - 2) / divHeight) * 100;
+		var x = ((xDisplace + tableX) / divWidth) * 100 + ((colWidth / divWidth) * 100 - 10) / 2;
+		var y = ((yDisplace + tableY) / divHeight) * 100;
 
 		$(classDiv).css('top', y.toString() + "%");
 		$(classDiv).css('left', x.toString() + "%");
@@ -909,7 +958,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 
 
 		// displays when hovered over class div
-		classDiv.onmouseover = function (event) {
+		classDiv.onmouseover = (event) => {
 			commentDiv.style.display = "block";
 			var curClassDiv;
 			if (event.target.className === "class") {

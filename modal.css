@@ -1,3 +1,7 @@
+:root {
+   --main-white: #fefefe; /*#fefefe for white*/
+}
+
 .modal {
     display: none;
     position: fixed; /* Stay in place */
@@ -29,6 +33,7 @@
    padding: 0 10px;
    text-align: left;
    overflow-y: auto;
+   overflow-x: hidden;
 }
 
 .pref-modal-text {
@@ -48,7 +53,7 @@
    overflow-x: auto;
    padding-top: 15px;
    padding-bottom: 10px;
-   border-top: 1px solid #555;
+   border-top: 1px solid #555; /*TODO remove top*/
 }
 
 .pref-btn-container {
@@ -57,10 +62,22 @@
    height: auto;
 }
 
+.checkbox-div {
+   display: block;
+   height: auto;
+   margin: 6px 0 6px 4px;
+   white-space: normal;
+}
+
+.preference-label {
+   padding-left: 10px;
+}
+
 .break-select {
    font-family: inherit;
    font-size: 14px;
    display: block;
+   user-select: none;
    /* border: 1px solid #555; */
 }
 
@@ -106,7 +123,7 @@
 }
 
 .break-day-title {
-   background: #555;
+   background: #d4b064;
    color: white;
    text-align: center;
    border-top-left-radius: 3px;
@@ -116,20 +133,36 @@
 }
 
 .one-chosen {
-     background: #0514bc !important;
-     color: #fefefe;
+     opacity: .25 !important;
+     /* color: var(--main-white); */
+     text-align: center;
 }
 
-.saved-preference {
-   background: #cc0404 !important;
-   color: #fefefe;
+.one-chosen:not(#select-all)::after {
+   content: 'Break';
+}
+
+.one-chosen:not(#select-all) span {
+   display: none;
+}
+
+.one-chosen:not(#select-all):hover {
+   text-align: left;
+}
+
+.one-chosen:not(#select-all):hover span {
+   display: inline;
+}
+
+.one-chosen:not(#select-all):hover::after {
+   content: '';
 }
 
 /* Modal Header */
 .modal-header {
     padding: 2px 16px;
     margin: 20px auto;
-    background-color: #fefefe;
+    background-color: var(--main-white);
     color: #000;
     font-size: 2vw;
 }
@@ -150,14 +183,14 @@
 /* Modal Footer */
 .modal-footer {
     padding: 2px 16px;
-    background-color: #fefefe;
+    background-color: var(--main-white);
 }
 
 
 /* Modal Content */
 .modal-content {
     position: relative;
-    background-color: #fefefe;
+    background-color: var(--main-white);
     margin: 15% auto;
     padding: 0px;
     border: 1px solid #888;
@@ -220,6 +253,7 @@
 .schedule-th, .schedule-td {
   padding: 10px;
   width: 10%;
+  font-size: 1.15vw;
 }
 
 .schedule-tr {
@@ -228,7 +262,8 @@
 
 .schedule-div {
   margin: auto;
-  padding: 5px;
+  margin-bottom: 15px;
+  padding: 10px;
   width: 90%;
 }
 
@@ -245,6 +280,7 @@
   border: 1px solid #071cff;
   border-radius: 4px;
   text-align: center;
+  user-select: none;
 
 }
 

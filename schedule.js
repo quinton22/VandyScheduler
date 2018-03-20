@@ -53,6 +53,7 @@ class Schedule {
 
 	/*
 	*	Checks the overlap of a class with the schedule it is in
+	*	returns true if overlap
 	*/
 	static checkOverlap(currentClass, schedule) {
 		var t = false;
