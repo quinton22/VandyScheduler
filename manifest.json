@@ -8,21 +8,18 @@
       "48": "schedule-icon48.png",
       "128": "schedule-icon128.png"
    },
-   "browser_action": {
-      "default_popup": "popup.html"
-   },
    "content_scripts": [
       {
          "matches": ["https://webapp.mis.vanderbilt.edu/more/SearchClasses*"],
-			"js": ["jquery-3.2.1.min.js", "content.js", "class.js", "schedule.js"],
-         "css": ["myButton.css", "modal.css"],
+			"js": ["src/jquery-3.2.1.min.js", "src/content.js", "src/class.js", "src/schedule.js"],
+         "css": ["css/myButton.css", "css/modal.css"],
 			"all_frames": true
       }
    ],
    "permissions": [
       "tabs", "https://webapp.mis.vanderbilt.edu/more/SearchClasses*", "storage"
    ],
-   "web_accessible_resources": ["comment-pic2.png", "comment-pic3.png"]
+   "web_accessible_resources": ["png/comment-pic2.png", "png/comment-pic3.png"]
 
 
 }
