@@ -82,7 +82,7 @@
 }
 
 .break-select:hover {
-   border-color: blue !important;
+   border-color: #555 !important;
    cursor: pointer;
 }
 
