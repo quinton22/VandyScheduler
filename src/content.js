@@ -1,4 +1,4 @@
-// TODO: sidebar instead of preferences button
+// IDEA: sidebar instead of preferences button
 // in manifest: sidebar_action
 
 
@@ -427,7 +427,7 @@ function addBtn() {
 				var button = addClassButton.firstChild;
 				button.className = "myButton remove";
 				button.innerHTML = "Remove Class";
-				addELToButton(button, j);
+				addELToRemoveButton(button);
 				addClassButton = clone;
 		}
 	}
@@ -657,40 +657,37 @@ function createViewableContent(arr) {
 			pickSchedBtn.addEventListener("click", () => {
 				var curSched = schedArr[~~pickSchedBtn.parentNode.previousSibling.innerHTML.match(/[0-9]+/) - 1];
 				var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
-				for (var i = 0; i < parent2.length; i++) {
-					var children = parent2[i].children;
-					for (var j = 0; j < curSched.length; j++) {
-						if (children[0].innerHTML.includes(curSched[j].classAbbr)) {
-							for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
-								var sectionNum = classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerHTML;
-								var sectionNumStr = replaceSpaces(sectionNum);
-								if(sectionNumStr !== curSched[j].sections[0]) {
-									// Remove class
-									var p = classTab[i].getElementsByClassName("classRow")[k]
-										.getElementsByClassName("classActionButtons")[0];
-									var lId = p.children[0].id;
-									var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));
-									var newScript = document.createElement("script");
-									var script = p.getElementsByTagName("script");
-									var s = script[0].innerHTML;
-									var scriptToAdd = "\nStudentCartList_classSectionListRow_" + l +
-											"_removeSavedClassSection_onclick();\n";
-									var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
-										+ l + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
-										 + l + "_removeSavedClassSection_onclick );";
-									var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
+				for (var i = 0; i < parent2.length; i++) {// parent2 = $('.left')
+					let currentClass = curSched.find((el) => {
+						return parent2[i].children[0].innerHTML.includes(el.classAbbr);
+					});
+					for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
+						var sectionNum = classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerHTML;
+						var sectionNumStr = replaceSpaces(sectionNum);
+						if(sectionNumStr !== currentClass.sections[0]) {
+							// Remove class
+							var p = classTab[i].getElementsByClassName("classRow")[k]
+								.getElementsByClassName("classActionButtons")[0];
+							var lId = p.children[0].id;
+							var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));
+							var newScript = document.createElement("script");
+							var script = p.getElementsByTagName("script");
+							var s = script[0].innerHTML;
+							var scriptToAdd = "\nStudentCartList_classSectionListRow_" + l +
+									"_removeSavedClassSection_onclick();\n";
+							var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
+								+ l + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
+								 + l + "_removeSavedClassSection_onclick );";
+							var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
 
-									newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
-										+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
-										+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
+							newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
+								+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
+								+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
 
-									p.replaceChild(newScript, script[0]);
-								}
-
-							}
+							p.replaceChild(newScript, script[0]);
 						}
-					}
 
+					}
 
 				}
 				modal.style.display = "none";
@@ -1058,7 +1055,7 @@ function printAllClasses() {
 *	Adds event listener to remove class button to remove
 *	all sections of a class
 */
-function addELToButton(button, i) {
+function addELToRemoveButton(button) {
 	$(button).click(() => {
 		$(button).parents('tbody').find('.classActionButtons a').trigger('click');
 		$.each($(button).parents('tbody').find('.classActionButtons a'), (ind , el) => {
@@ -1066,37 +1063,4 @@ function addELToButton(button, i) {
 		});
 		return false;
 	});
-	// var k = 0;
-	// var classTable = document.getElementById("studentCart").getElementsByClassName("classTable"); //one class containing multiple sections
-	// if (classTable[i] !== undefined) {
-	// 	var p = classTable[i].getElementsByClassName("classActionButtons"); // all
-	//
-	// 	for(var a = 0; a < i; a++) {
-	// 		for(var b = 0; b < classTable[a].getElementsByClassName("classActionButtons").length; b++) {
-	// 			k++;
-	// 		}
-	// 	}
-	//
-	// 	document.getElementById("RemoveBtn" + i.toString()).onclick = () => {
-	// 		for (var j = 0; j < p.length; j++) {
-	// 			var newScript = document.createElement("script");
-	// 			var script = p[j].getElementsByTagName("script");
-	// 			var s = script[0].innerHTML;
-	// 			var scriptToAdd = "\nStudentCartList_classSectionListRow_" + k.toString() +
-	// 					"_removeSavedClassSection_onclick();\n";
-	// 			var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
-	// 				+ k.toString() + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
-	// 				 + k.toString() + "_removeSavedClassSection_onclick );";
-	// 			var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
-	//
-	// 			newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
-	// 				+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
-	// 				+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
-	//
-	// 			p[j].replaceChild(newScript, script[0]);
-	// 			k++;
-	// 		}
-	// 		return false;
-	// 	}
-	// }
 }
