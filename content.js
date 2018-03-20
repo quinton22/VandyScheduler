@@ -469,9 +469,7 @@ function addClass(_class, classNumOnPage) {
 	var hoursList = specificClass.getElementsByClassName("classHours");
 	var daysList = specificClass.getElementsByClassName("classMeetingDays");
 	var timesList = specificClass.getElementsByClassName("classMeetingTimes");
-	var numOfClassPageList = specificClass.getElementsByClassName("classActionButtons");
 	var classBuildingList = specificClass.getElementsByClassName("classBuilding");
-	var numOfClassPage = [];
 	var sections = [];
 	var profs = [];
 	var hours = [];
@@ -488,11 +486,6 @@ function addClass(_class, classNumOnPage) {
 		times[num] = timesList[num].innerText.replace(/\s+$/, "").replace(/ - /g, "-");
 		location[num] = classBuildingList[num].innerText.replace(/\s+$/, "");
 
-		if (numOfClassPageList[num].children[0] !== undefined) {
-			var id = numOfClassPageList[num].children[0].id;
-			id = id.substring(id.indexOf("Row_") + 4, id.indexOf("_remove"));
-			numOfClassPage[num] = ~~id;
-		}
 	}
 
 	var newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times, location);
