@@ -9,7 +9,7 @@ var scheduleArr = [];	// contains all the schedules
 var modal, modalChild;
 var preferences = {
 	breakTime: null,
-	noPrefMet: null
+	noPrefMet: false
 }
 let prefMat = new Map();
 createModal();			// creates modal and appends to doc
@@ -132,7 +132,6 @@ function createModal() {
 	div.appendChild(div2);
 
 	let p = document.createElement("p");
-	console.log(preferences.breakTime);
 	p.innerHTML = "Select the time(s) you do <strong><i>not</i></strong> want class below. Schedules that have classes during these times will be at the bottom of the list unless \"Do not show schedules that conflict with break times\" is checked, in which case they will not be shown. "
 
 	div2.appendChild(p);
@@ -146,7 +145,6 @@ function createModal() {
 		} else if (event.target == prefModal) {
 			prefModal.style.display = "none";
 			updatePreferences();
-			console.log(preferences);
 		}
 	};
 
@@ -159,7 +157,6 @@ function createModal() {
 	prefClose.onclick = function() {
 		prefModal.style.display = "none";
 		updatePreferences();
-		console.log(preferences);
 	};
 
 }
@@ -169,7 +166,9 @@ function createModal() {
 *	Creates preferences modal and gets information from storage
 */
 function getFromStorageAndCreateModal(prefModal) {
-	$('.pref-modal-text p').innerHTML += preferences.breakTime === null ? "Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" " : "";
+	let firstTime = preferences.breakTime === null ? true : false;
+	preferences.breakTime = firstTime ? {} : preferences.breakTime;
+	$('.pref-modal-text p').innerHTML += firstTime ? "Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" " : "";
 	$('.pref-modal-text p').innerHTML += "To select a break time for all of MWF, TR, or SU, double click on that time on any of those days.";
 
 	// settings:
@@ -269,8 +268,7 @@ function getFromStorageAndCreateModal(prefModal) {
 			breakDay[i].appendChild(breakSelect);
 		}
 
-
-		preferences.breakTime ? null : (preferences.breakTime[dayVec[i]] = (dayVec[i] === "Saturday" || dayVec[i] === "Sunday") ? [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] : [12]);
+		firstTime ? (preferences.breakTime[dayVec[i]] = (dayVec[i] === "Saturday" || dayVec[i] === "Sunday") ? [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] : [12]) : null;
 		//div2.appendChild(breakDay[i]);
 	}
 
@@ -600,12 +598,10 @@ function sortBasedOnPreferences(arr) {
 		}
 
 		preferences.breakTime[day].forEach((time) => {
-			if (time !== 7 && time < 9) {
-				t = "0" + time.toString() + ":00-0" + (time + 1).toString() + ":00";
-			} else if (time === 9) {
-				t = "0" + time.toString() + ":00-" + (time + 1).toString() + ":00";
+			if (time !== 7 && time < 10) {
+				t = "0" + time.toString() + ":01-0" + time.toString() + ":59";
 			} else {
-				t = time.toString() + ":00-" + (time + 1).toString() + ":00";
+				t = time.toString() + ":01-" + time.toString() + ":59";
 			}
 			breakArr.push(["CLASS ABBRV", "00", t, d]);
 		});
@@ -875,10 +871,8 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 	var colWidth = scheduleDiv.firstChild.getElementsByTagName("td")[0].offsetWidth - .5;
 	var tablePos = $(scheduleDiv.firstChild).position();
 	var tableX = tablePos.left;
-	console.log(rowHeight);
 	var tablePos2 = $(tab[0]).position();
 	var tableY = tablePos2.top;
-	console.log(colWidth);
 	if (divHeight !== 0) {
 		var xDisplace;
 		switch(day) {
