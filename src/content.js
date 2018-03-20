@@ -422,12 +422,12 @@ function addBtn() {
 		if(children !== null && !children[children.length - 1].id.includes("RemoveBtn")){
 
 				clone = addClassButton.cloneNode(true);
-				addClassButton.setAttribute("id", "RemoveBtn" + j.toString());
+				addClassButton.id = "RemoveBtn" + j.toString();
 				parent2[j].appendChild(addClassButton);
 				var button = addClassButton.firstChild;
 				button.className = "myButton remove";
 				button.innerHTML = "Remove Class";
-				addELToButton(j);
+				addELToButton(button, j);
 				addClassButton = clone;
 		}
 	}
@@ -1058,38 +1058,45 @@ function printAllClasses() {
 *	Adds event listener to remove class button to remove
 *	all sections of a class
 */
-function addELToButton(i) {
-	var k = 0;
-	var classTable = document.getElementById("studentCart").getElementsByClassName("classTable"); //one class containing multiple sections
-	if (classTable[i] !== undefined) {
-		var p = classTable[i].getElementsByClassName("classActionButtons"); // all
-
-		for(var a = 0; a < i; a++) {
-			for(var b = 0; b < classTable[a].getElementsByClassName("classActionButtons").length; b++) {
-				k++;
-			}
-		}
-
-		document.getElementById("RemoveBtn" + i.toString()).onclick = function () {
-			for (var j = 0; j < p.length; j++) {
-				var newScript = document.createElement("script");
-				var script = p[j].getElementsByTagName("script");
-				var s = script[0].innerHTML;
-				var scriptToAdd = "\nStudentCartList_classSectionListRow_" + k.toString() +
-						"_removeSavedClassSection_onclick();\n";
-				var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
-					+ k.toString() + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
-					 + k.toString() + "_removeSavedClassSection_onclick );";
-				var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
-
-				newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
-					+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
-					+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
-
-				p[j].replaceChild(newScript, script[0]);
-				k++;
-			}
-			return false;
-		}
-	}
+function addELToButton(button, i) {
+	$(button).click(() => {
+		$(button).parents('tbody').find('.classActionButtons a').trigger('click');
+		$.each($(button).parents('tbody').find('.classActionButtons a'), (ind , el) => {
+			el.click();
+		});
+		return false;
+	});
+	// var k = 0;
+	// var classTable = document.getElementById("studentCart").getElementsByClassName("classTable"); //one class containing multiple sections
+	// if (classTable[i] !== undefined) {
+	// 	var p = classTable[i].getElementsByClassName("classActionButtons"); // all
+	//
+	// 	for(var a = 0; a < i; a++) {
+	// 		for(var b = 0; b < classTable[a].getElementsByClassName("classActionButtons").length; b++) {
+	// 			k++;
+	// 		}
+	// 	}
+	//
+	// 	document.getElementById("RemoveBtn" + i.toString()).onclick = () => {
+	// 		for (var j = 0; j < p.length; j++) {
+	// 			var newScript = document.createElement("script");
+	// 			var script = p[j].getElementsByTagName("script");
+	// 			var s = script[0].innerHTML;
+	// 			var scriptToAdd = "\nStudentCartList_classSectionListRow_" + k.toString() +
+	// 					"_removeSavedClassSection_onclick();\n";
+	// 			var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
+	// 				+ k.toString() + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
+	// 				 + k.toString() + "_removeSavedClassSection_onclick );";
+	// 			var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
+	//
+	// 			newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
+	// 				+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
+	// 				+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
+	//
+	// 			p[j].replaceChild(newScript, script[0]);
+	// 			k++;
+	// 		}
+	// 		return false;
+	// 	}
+	// }
 }
