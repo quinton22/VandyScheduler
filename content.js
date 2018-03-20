@@ -480,13 +480,13 @@ function addClass(_class, classNumOnPage) {
 	var location = [];
 
 	// Refines content
-	for (var num = 0; num < sectionsList.length; num++) {
-		sections[num] = replaceSpaces(sectionsList[num].innerHTML);
-		profs[num] = replaceLeadingSpaces(profsList[num].innerHTML);
-		hours[num] = replaceSpaces(hoursList[num].innerHTML);
-		days[num] = replaceSpaces(daysList[num].innerHTML);
-		times[num] = replaceSpaces(timesList[num].innerHTML);
-		location[num] = replaceLeadingSpaces(classBuildingList[num].innerHTML);
+	for (var num = 0; num < sectionsList.length; ++num) {
+		sections[num] = sectionsList[num].innerText.replace(/\s+$/, "");
+		profs[num] = profsList[num].innerText.replace(/\s+$/, "");
+		hours[num] = hoursList[num].innerText.replace(/\s+/g, "");
+		days[num] = daysList[num].innerText.replace(/\s+$/, "");
+		times[num] = timesList[num].innerText.replace(/\s+$/, "").replace(/ - /g, "-");
+		location[num] = classBuildingList[num].innerText.replace(/\s+$/, "");
 
 		if (numOfClassPageList[num].children[0] !== undefined) {
 			var id = numOfClassPageList[num].children[0].id;
@@ -788,7 +788,9 @@ function createViewableContent(arr) {
 					for (var k = 0; k < c.days[0].length; k++) {
 						var classDiv = document.createElement("div");
 						classDiv.className = "class";
-						classDiv.id = c.classAbbr + "_" + k;
+						$(classDiv).prop('time', c.times[0]);
+						$(classDiv).prop('location', c.location[0]);
+						classDiv.id = c.classAbbr.replace(/\s/g, "") + "_" + k;
 						var classTextDiv = document.createElement("div");
 						classTextDiv.className = "classText";
 						classTextDiv.innerHTML = c.classAbbr + "-" + c.sections[0];
@@ -805,7 +807,7 @@ function createViewableContent(arr) {
 	} else {
 		document.getElementsByClassName("modal-header")[0]
 			.getElementsByTagName("h2")[0]
-			.innerHTML = "<p>Error in creating schedule!</p><p class='errorText'>There was no possible schedule created from the classes in your cart. Try removing some classes that may overlap.</p>";
+			.innerHTML = "<p>Error in creating schedule!</p><p class='errorText'>There was no possible schedule created from the classes in your cart. Try removing some classes that may overlap. Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
 		$("#modalHeaderText").css('color', 'red');
 		$(".modal-content").css('font-family', font);
 		modal.style.display = "block";
@@ -829,8 +831,19 @@ function convertToDetailed(arr) {
 			var ind = getClass(classAbbr, section);
 			x = ind[0];
 			y = ind[1];
-			s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], x.prof,
-					[x.hours[y]], [x.days[y]], [x.times[y]], [x.location[y]]));
+			if ((/\n/).test(x.times[y]) && (/\n/).test(x.days[y])) {
+				let times = x.times[y].split(/\n/);
+				let days = x.days[y].split(/\n/);
+				let locations = x.location[y].split(/\n/);
+				while (locations.length < days.length) {
+					locations.push(locations[locations.length - 1]);
+				}
+				for (let i = 0; i < times.length; ++i) {
+					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], x.prof, [x.hours[y]], [days[i]], [times[i]], [locations[i]]));
+				}
+			} else {
+			s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], x.prof, [x.hours[y]], [x.days[y]], [x.times[y]], [x.location[y]]));
+			}
 
 		});
 		ss.push(s);
@@ -943,8 +956,8 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			if (scheduleDiv.id.includes(i+1)) {
 				for (var j = 0; j < schedArr[i].length; j++) {
 					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].classAbbr + "-" + schedArr[i][j].sections[0])) {
-						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + schedArr[i][j].times[0]
-							 + "&emsp;" + schedArr[i][j].location[0] + "<br/>" + schedArr[i][j].prof[0];
+						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + $(classDiv).prop('time')
+							 + "&emsp;" + $(classDiv).prop('location') + "<br/>" + schedArr[i][j].prof[0];
 					}
 				}
 			}

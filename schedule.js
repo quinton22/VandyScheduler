@@ -56,20 +56,50 @@ class Schedule {
 	*	returns true if overlap
 	*/
 	static checkOverlap(currentClass, schedule) {
-		var t = false;
-		var d = false;
-		for (var i = 0; i < schedule.length; i++) {
-			t = false;
-			d = false;
+		for (var i = 0; i < schedule.length; ++i) {
 			if (schedule[i][0] !== currentClass[0]) {
-				if(!Class_.compareTimes(schedule[i][2], currentClass[2])) {
-					t = true;		// times are equal
-				}
-				if(!Class_.compareDays(schedule[i][3],currentClass[3])) {
-					d = true;		// days are equal
-				}
-				if(t && d) {
-					return true;
+				if ((/\n/).test(schedule[i][2]) && (/\n/).test(schedule[i][3]) && (/\n/).test(currentClass[2]) && (/\n/).test(currentClass[3])) {
+					let times1 = schedule[i][2].split(/\n/);
+					let days1 = schedule[i][3].split(/\n/);
+					let times2 = currentClass[2].split(/\n/);
+					let days2 = currentClass[3].split(/\n/);
+
+					for(let j = 0; j < days1.length; ++j) {
+						for (let k = 0; k < days2.length; ++k) {
+							if(!Class_.compareDays(days1[j], days2[k])) {
+								if(!Class_.compareTimes(times1[j], times2[k])) {
+									return true;
+								}
+							}
+						}
+					}
+
+				} else if ((/\n/).test(schedule[i][2]) && (/\n/).test(schedule[i][3])) {
+					let times = schedule[i][2].split(/\n/);
+					let days = schedule[i][3].split(/\n/);
+					for (let j = 0; j < days.length; ++j) {
+						if(!Class_.compareDays(days[j], currentClass[3])) {
+							if(!Class_.compareTimes(times[j], currentClass[2])) {
+								return true;
+							}
+						}
+					}
+				} else if ((/\n/).test(currentClass[2]) && (/\n/).test(currentClass[3])) {
+					let times = currentClass[2].split(/\n/);
+					let days = currentClass[3].split(/\n/);
+					for (let j = 0; j < days.length; ++j) {
+						if(!Class_.compareDays(days[j], schedule[i][3])) {
+							if(!Class_.compareTimes(times[j], schedule[i][2])) {
+								return true;
+							}
+						}
+					}
+				} else {
+					if(!Class_.compareDays(schedule[i][3],currentClass[3])) {
+						if(!Class_.compareTimes(schedule[i][2], currentClass[2])) {
+									return true; // times are equal
+						}		// days are equal
+					}
 				}
 			}
 		}
