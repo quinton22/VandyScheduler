@@ -65,11 +65,9 @@ observer.observe(document, {childList: true, subtree: true});
 */
 function createModal() {
 	modal = document.createElement("div");
-	modal.className = "modal";
-	modal.id = "scheduleView";
+	$(modal).attr({class: 'modal', id: 'scheduleView'});
 	modalChild = document.createElement("div");
-	modalChild.id = "modalChild";
-	modalChild.className = "modal-content";
+	$(modalChild).attr({class: 'modal-content', id: 'modalChild'});
 	var modalHeader = document.createElement("div");
 	$(modalHeader).attr({'class': 'modal-header'});
 	modalChild.appendChild(modalHeader);
@@ -438,7 +436,6 @@ function addBtn() {
 function addEL(button) {
 	$(button).click(() => {
 		$.each($(button).parents('tbody').find('.classActionButtons a'), (ind , el) => {
-			console.log
 			el.click();
 		});
 		return false;
@@ -969,67 +966,4 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 	}
 	scheduleDiv.appendChild(classDiv);
 
-}
-
-
-/*
-*	Replaces only the leading spaces in a string
-*/
-function replaceLeadingSpaces(str) {
-	var rateMyProf = "";
-	if (str.indexOf("-") !== -1) {
-		rateMyProf = str.substring(str.indexOf("-"));
-		str = str.substring(0, str.indexOf("-"));
-	}
-
-	str = str.replace(/\n/g, "");
-	var i = str.indexOf(" ");
-	while(i === 0) {
-		str = str.substring(i+1);
-		i = str.indexOf(" ");
-	}
-
-
-	while (i !== -1 && str.charAt(i-1) !== " " && str.charAt(i+1) !== " ") {
-		str = str.substring(0, i) + "?" + str.substring(i+1);
-		i = str.indexOf(" ");
-	}
-
-	if(i > 0) {
-		str = str.substring(0, i);
-	}
-
-	str = str.replace(/\?/g, " ") + " " + rateMyProf;
-
-	if (str.indexOf("<br>") !== -1) {
-		str = str.substring(0, str.indexOf("<br>"));
-	}
-	return str;
-}
-
-
-/*
-*	Takes a string and removes all spaces and HTML elements
-*/
-function replaceSpaces(str) {
-	str = str.replace(/\s+/g, "");
-
-	while (str.indexOf("<") != -1) {
-		var begIndex = str.indexOf("<");
-		var endIndex = str.indexOf(">");
-		str = str.substring(0, begIndex) + str.substring(endIndex+1);
-	}
-	return str;
-}
-
-
-/*
-*	Prints class array to console
-*/
-function printAllClasses() {
-	var str = "";
-	classArr.forEach(function(element) {
-		str += element.printClass();
-	});
-	console.log(str);
 }
