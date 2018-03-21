@@ -119,18 +119,4 @@ class Class_ {
 		var len = hour2 + minute2 - hour1 - minute1;
 		return len;
 	}
-
-
-	/*
-	*	Prints class to console
-	*/
-	printClass() {
-		var str = this.classAbbr + " (" + this.classDesc + "):\n";
-		for (var i = 0; i < this.sections.length; i++) {
-			str += "Section " + this.sections[i] + ": " + this.hours[i] + "\t" + this.days[i] + "\t" + this.times[i] + "\n";
-		}
-		return str;
-	}
-
-
 }

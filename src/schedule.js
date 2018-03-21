@@ -2,6 +2,7 @@ class Schedule {
 	constructor(classesArr) {
 		this.classesArr = classesArr;		// all the classes to be put in schedule
 		this.scheduleArr = [];				// Array of schedules
+		this.overlappedClasses = new Map();
 	}
 
 	/*
@@ -11,7 +12,7 @@ class Schedule {
 	sortClasses() {
 		var schedule = [];
 		if(this.classesArr.length > 0) {
-			this.sortClassesSub(this.classesArr, schedule)
+			this.sortClassesSub(this.classesArr, schedule, true)
 		}
 
 	}
@@ -20,10 +21,10 @@ class Schedule {
 	*	Recursive sorting method of classes that takes each class and compares
 	*	times and days to check overlap and places into a schedule
 	*/
- 	sortClassesSub(subClassArr, schedule) {
+ 	sortClassesSub(subClassArr, schedule, noOverlap) {
  		if (subClassArr.length > 1) {
  			var newSubClassArr = [];
- 			for (var j = 1; j < subClassArr.length; j++) {
+ 			for (let j = 1; j < subClassArr.length; j++) {
  				newSubClassArr[j-1] = subClassArr[j];
  			}
  		}
@@ -34,21 +35,33 @@ class Schedule {
  				subClassArr[0].times[i], subClassArr[0].days[i]];
 
  			var newSched = [];
- 			for (var j = 0; j < schedule.length; j++) {
+ 			for (let j = 0; j < schedule.length; j++) {
  				newSched.push(schedule[j]);
  			}
 
-			if(!Schedule.checkOverlap(curClass, newSched)) {
+			if(!Schedule.checkOverlap(curClass, newSched) && noOverlap) {
+				this.checkOverlapOfAllClasses(curClass); // keep track of number of classes overlaped
 				if (subClassArr.length > 1) {
 					newSched.push(curClass);
-					this.sortClassesSub(newSubClassArr, newSched);
+					this.sortClassesSub(newSubClassArr, newSched, noOverlap);
 				} else {
 					newSched.push(curClass);
 					this.scheduleArr.push(newSched);
 				}
+			} else { // ensure loop runs all the way through instead of stopping when a schedule doesn't work
+				if (subClassArr.length > 1) {
+					this.checkOverlapOfAllClasses(curClass);
+					// console.log(curClass);
+					// this.overlappedClasses.has(curClass[0] + "-" + curClass[1]) ?
+					// this.overlappedClasses.set(curClass[0] + "-" + curClass[1], this.overlappedClasses.get(curClass[0] + "-" + curClass[1]) + 1) :
+					// this.overlappedClasses.set(curClass[0] + "-" + curClass[1], 0);
+					// console.log(this.overlappedClasses);
+					this.sortClassesSub(newSubClassArr, newSched, false);
+				}
 			}
  		}
  	}
+
 
 
 	/*
@@ -105,6 +118,26 @@ class Schedule {
 		}
 
 		return false;		// no overlap
+	}
+
+
+	checkOverlapOfAllClasses(cur) {
+		if (!this.overlappedClasses.has(cur[0] + "-" + cur[1])) {
+			this.overlappedClasses.set(cur[0] + "-" + cur[1],
+				this.classesArr.map(c => {
+					let overlap = 0;
+					if (c.classAbbr !== cur[0]) {
+						c.times.forEach((time, ind) => {
+							if (Schedule.checkOverlap(cur, [[c.classAbbr, c.sections[ind], time, c.days[ind]]])) {
+								++overlap;
+							}
+						});
+					}
+					return overlap;
+				}).reduce((accum, current) => accum + current));
+
+			console.log(cur[0] + "-" + cur[1], this.overlappedClasses.get(cur[0] + "-" + cur[1]));
+		}
 	}
 
 }

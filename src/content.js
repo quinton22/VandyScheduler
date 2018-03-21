@@ -1,5 +1,6 @@
 // IDEA: sidebar instead of preferences button
 // in manifest: sidebar_action
+// IDEA: say which classes conflict with the most when creating schedule and showing error
 
 
 var classArr = [];		// contains classes to construct schedule with
