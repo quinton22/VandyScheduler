@@ -133,9 +133,9 @@
 }
 
 .one-chosen {
-     opacity: .25 !important;
-     /* color: var(--main-white); */
-     text-align: center;
+   opacity: .25 !important;
+   /* color: var(--main-white); */
+   text-align: center;
 }
 
 .one-chosen:not(#select-all)::after {
@@ -160,11 +160,11 @@
 
 /* Modal Header */
 .modal-header {
-    padding: 2px 16px;
-    margin: 20px auto;
-    background-color: var(--main-white);
-    color: #000;
-    font-size: 2vw;
+   padding: 2px 16px;
+   margin: 20px auto;
+   background-color: var(--main-white);
+   color: #000;
+   font-size: 2vw;
 }
 
 /* Error Text */
@@ -175,6 +175,15 @@
    padding: 30px 16px 20px;
 }
 
+.tba-classes {
+   text-align: left;
+   font-family: Arial, sans-serif;
+   font-size: 1.2vw;
+   padding: 0 10px 0 10px;
+   margin: auto;
+   width: 90%;
+}
+
 /* Modal Body */
 .modal-body {
    padding: 2px 16px;
@@ -182,44 +191,44 @@
 
 /* Modal Footer */
 .modal-footer {
-    padding: 2px 16px;
-    background-color: var(--main-white);
+   padding: 2px 16px;
+   background-color: var(--main-white);
 }
 
 
 /* Modal Content */
 .modal-content {
-    position: relative;
-    background-color: var(--main-white);
-    margin: 15% auto;
-    padding: 0px;
-    border: 1px solid #888;
-    width: 80%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-    -webkit-animation-name: animatetop;
-    -webkit-animation-duration: 0.4s;
-    animation-name: animatetop;
-    animation-duration: 0.4s;
+   position: relative;
+   background-color: var(--main-white);
+   margin: 15% auto;
+   padding: 0px;
+   border: 1px solid #888;
+   width: 80%;
+   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+   -webkit-animation-name: animatetop;
+   -webkit-animation-duration: 0.4s;
+   animation-name: animatetop;
+   animation-duration: 0.4s;
 }
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
-    from {top: -300px; opacity: 0}
-    to {top: 0; opacity: 1}
+   from {top: -300px; opacity: 0}
+   to {top: 0; opacity: 1}
 }
 
 @keyframes animatetop {
-    from {top: -300px; opacity: 0}
-    to {top: 0; opacity: 1}
+   from {top: -300px; opacity: 0}
+   to {top: 0; opacity: 1}
 }
 
 .close {
-    color: #aaa;
-    float: right;
-    font-size: 36px;
-    font-weight: bold;
-    display: inline-block;
-    line-height: 16px;
+   color: #aaa;
+   float: right;
+   font-size: 36px;
+   font-weight: bold;
+   display: inline-block;
+   line-height: 16px;
 }
 
 .close:hover,

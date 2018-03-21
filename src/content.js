@@ -24,8 +24,7 @@ addClassButton.appendChild(btn);
 // sets parent node to course titles on either class search page or class cart page
 var parent = document.getElementById("classSearchResultsCarousel") !== null ? document.getElementById("classSearchResultsCarousel")
 						.getElementsByClassName("left") : null;
-var parent2 = document.getElementById("studentCart") !== null ? document.getElementById("studentCart")
-						.getElementsByClassName("left") : null;
+var parent2 = document.getElementById("studentCart") !== null ? document.getElementById("studentCart").getElementsByClassName("left") : null;
 
 // necessary for timeout
 var timeout = null;
@@ -408,7 +407,7 @@ function addBtn() {
 				addClassButton.setAttribute("id", "Btn" + i.toString());
 				parent[i].appendChild(addClassButton);
 				var button = addClassButton.firstChild;
-				addEL(addClassButton.children[0], i);
+				addEL(addClassButton.children[0]);
 				addClassButton = clone;
 		}
 	}
@@ -427,7 +426,7 @@ function addBtn() {
 				var button = addClassButton.firstChild;
 				button.className = "myButton remove";
 				button.innerHTML = "Remove Class";
-				addELToRemoveButton(button);
+				addEL(button);
 				addClassButton = clone;
 		}
 	}
@@ -436,47 +435,43 @@ function addBtn() {
 
 
 /*
-*	Adds event listener to add class buttons so that when clicked
-*	all the sections of a class are added
+*	Adds event listener to add class buttons and remove class buttons so that when clicked
+*	all the sections of a class are added/removed
 */
-function addEL(button, classNumOnPage) {
-	var addToCartList = document.getElementsByClassName("classTable")[classNumOnPage].getElementsByClassName("classActionButtons");
-	var str = "";
-	for (var i = 0; i < addToCartList.length; i++) {
-		if (addToCartList[i].children[0] !== undefined) {
-			str += addToCartList[i].children[0].getAttribute('onclick') + "; ";
-		}
-	}
-
-	button.setAttribute("onclick", str);
-
+function addEL(button) {
+	$(button).click(() => {
+		$.each($(button).parents('tbody').find('.classActionButtons a'), (ind , el) => {
+			console.log
+			el.click();
+		});
+		return false;
+	});
 }
-
 /*
 *	Makes a class "Class" and adds to an array containing all classes in the
 *	schedule
 */
 function addClass(_class, classNumOnPage) {
 
-	var classAbbr = _class.children[0].innerHTML;
+	let classAbbr = _class.children[0].innerHTML;
 	classAbbr = classAbbr.replace(/:/, "");
-	var classDesc = _class.children[1].innerHTML;
-	var specificClass = document.getElementById("cartDiv").getElementsByClassName("classTable")[classNumOnPage];
-	var sectionsList = specificClass.getElementsByClassName("classSection");
-	var profsList = specificClass.getElementsByClassName("classInstructor");
-	var hoursList = specificClass.getElementsByClassName("classHours");
-	var daysList = specificClass.getElementsByClassName("classMeetingDays");
-	var timesList = specificClass.getElementsByClassName("classMeetingTimes");
-	var classBuildingList = specificClass.getElementsByClassName("classBuilding");
-	var sections = [];
-	var profs = [];
-	var hours = [];
-	var days = [];
-	var times = [];
-	var location = [];
+	let classDesc = _class.children[1].innerHTML;
+	let specificClass = document.getElementById("cartDiv").getElementsByClassName("classTable")[classNumOnPage];
+	let sectionsList = specificClass.getElementsByClassName("classSection");
+	let profsList = specificClass.getElementsByClassName("classInstructor");
+	let hoursList = specificClass.getElementsByClassName("classHours");
+	let daysList = specificClass.getElementsByClassName("classMeetingDays");
+	let timesList = specificClass.getElementsByClassName("classMeetingTimes");
+	let classBuildingList = specificClass.getElementsByClassName("classBuilding");
+	let sections = [];
+	let profs = [];
+	let hours = [];
+	let days = [];
+	let times = [];
+	let location = [];
 
 	// Refines content
-	for (var num = 0; num < sectionsList.length; ++num) {
+	for (let num = 0; num < sectionsList.length; ++num) {
 		sections[num] = sectionsList[num].innerText.replace(/\s+$/, "");
 		profs[num] = profsList[num].innerText.replace(/\s+$/, "");
 		hours[num] = hoursList[num].innerText.replace(/\s+/g, "");
@@ -486,9 +481,8 @@ function addClass(_class, classNumOnPage) {
 
 	}
 
-	var newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times, location);
+	let newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times, location);
 	classArr.push(newClass);
-
 }
 
 
@@ -550,11 +544,18 @@ function makeScheduleButton(parent) {
 */
 function makeSchedClicked() {
 	if (ready) {
+			let tbaClasses = [];
+			classArr = classArr.filter(c => {
+				if(c.times.includes("TBA")) {
+					tbaClasses.push(c);
+				}
+				return !c.times.includes("TBA");
+			});
 			var sched = new Schedule(classArr);
 			sched.sortClasses();
 			scheduleArr = sched.scheduleArr;
 			scheduleArr = sortBasedOnPreferences(scheduleArr);
-			createViewableContent(scheduleArr);
+			createViewableContent(scheduleArr, tbaClasses);
 
 		} else {
 			setTimeout(makeSchedClicked, 50);
@@ -575,7 +576,6 @@ function showPreferences() {
 *	Sorts the array based on the preferences and returns the array
 */
 function sortBasedOnPreferences(arr) {
-	// TODO SORT THIS
 	let prefNotMetCount; // number of preferences broken
 	let breakArr = [];
 	let t;
@@ -627,11 +627,18 @@ function sortBasedOnPreferences(arr) {
 /*
 *	Creates modal with different schedules and tables
 */
-function createViewableContent(arr) {
+function createViewableContent(arr, tbaClasses) {
 	var scheduleDiv;
 	if (arr.length > 0) {
 		schedArr = convertToDetailed(arr);
-		var bigSchedDiv = document.createElement("div");
+		let bigSchedDiv = document.createElement("div");
+		if (tbaClasses.length > 0) {
+			let tbaClassesP = document.createElement("p");
+			let is_are = tbaClasses.length > 1 ? " are" : " is";
+			tbaClassesP.innerHTML = "**" + tbaClasses.map(c => c.classAbbr).toString().replace(/,/g, ", ") + is_are + " not shown because the" + (tbaClasses.length > 1 ? " times" : " time") + is_are + " TBA.";
+			bigSchedDiv.appendChild(tbaClassesP);
+			$(tbaClassesP).addClass('tba-classes');
+		}
 
 		// creates schedule table
 		schedArr.forEach(function (schedule, idx) {
@@ -657,34 +664,14 @@ function createViewableContent(arr) {
 			pickSchedBtn.addEventListener("click", () => {
 				var curSched = schedArr[~~pickSchedBtn.parentNode.previousSibling.innerHTML.match(/[0-9]+/) - 1];
 				var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
-				for (var i = 0; i < parent2.length; i++) {// parent2 = $('.left')
+				for (var i = 0; i < parent2.length; i++) { // parent2 = $('.left')
 					let currentClass = curSched.find((el) => {
 						return parent2[i].children[0].innerHTML.includes(el.classAbbr);
 					});
 					for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
-						var sectionNum = classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerHTML;
-						var sectionNumStr = replaceSpaces(sectionNum);
-						if(sectionNumStr !== currentClass.sections[0]) {
+ 					if (classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerText.replace(/\s/, "") !== currentClass.sections[0]) {
 							// Remove class
-							var p = classTab[i].getElementsByClassName("classRow")[k]
-								.getElementsByClassName("classActionButtons")[0];
-							var lId = p.children[0].id;
-							var l = lId.substring(lId.indexOf("Row_") + 4, lId.indexOf("_remove"));
-							var newScript = document.createElement("script");
-							var script = p.getElementsByTagName("script");
-							var s = script[0].innerHTML;
-							var scriptToAdd = "\nStudentCartList_classSectionListRow_" + l +
-									"_removeSavedClassSection_onclick();\n";
-							var strToInsertAfter = "YAHOO.util.Event.addListener( 'StudentCartList_classSectionListRow_"
-								+ l + "_removeSavedClassSection', 'click', StudentCartList_classSectionListRow_"
-								 + l + "_removeSavedClassSection_onclick );";
-							var subStr = s.substring(s.indexOf(strToInsertAfter) + strToInsertAfter.length);
-
-							newScript.innerHTML = s.substring(0, s.indexOf(strToInsertAfter) + strToInsertAfter.length)
-								+ subStr.substring(0, subStr.indexOf(strToInsertAfter) + strToInsertAfter.length)
-								+ scriptToAdd + subStr.substring(subStr.indexOf(strToInsertAfter) + strToInsertAfter.length);
-
-							p.replaceChild(newScript, script[0]);
+							$(classTab[i].getElementsByClassName('classRow')[k]).find('.classActionButtons a').get(0).click();
 						}
 
 					}
@@ -1048,19 +1035,4 @@ function printAllClasses() {
 		str += element.printClass();
 	});
 	console.log(str);
-}
-
-
-/*
-*	Adds event listener to remove class button to remove
-*	all sections of a class
-*/
-function addELToRemoveButton(button) {
-	$(button).click(() => {
-		$(button).parents('tbody').find('.classActionButtons a').trigger('click');
-		$.each($(button).parents('tbody').find('.classActionButtons a'), (ind , el) => {
-			el.click();
-		});
-		return false;
-	});
 }
