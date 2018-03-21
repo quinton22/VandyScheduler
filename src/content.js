@@ -22,8 +22,7 @@ btn.innerHTML = "Add to Schedule";
 addClassButton.appendChild(btn);
 
 // sets parent node to course titles on either class search page or class cart page
-var parent = document.getElementById("classSearchResultsCarousel") !== null ? document.getElementById("classSearchResultsCarousel")
-						.getElementsByClassName("left") : null;
+var parent = document.getElementById("classSearchResultsCarousel") !== null ? document.getElementById("classSearchResultsCarousel").getElementsByClassName("left") : null;
 var parent2 = document.getElementById("studentCart") !== null ? document.getElementById("studentCart").getElementsByClassName("left") : null;
 
 // necessary for timeout
@@ -38,10 +37,10 @@ if (focusPage.length !== 0) {
 }
 
 // constant font
-var font = $(".classAbbreviation").css('font-family');
+let font = $(".classAbbreviation").css('font-family');
 
 // updates class and adds buttons if the DOM subtree is changed
-var observer = new MutationObserver(function () {
+var observer = new MutationObserver(() => {
 	if(parent !== null && parent2 !== null) {
 			if (parent.length !== 0 || parent2.length !== 0) {
 		    	if (timeout) {
@@ -288,10 +287,8 @@ function getFromStorageAndCreateModal(prefModal) {
 	let checkBox = document.createElement("input");
 	let label = document.createElement("label");
 	checkBoxDiv.className = "checkbox-div";
-	checkBox.id = "pref-not-met";
-	checkBox.type = "checkbox";
+	$(checkBox).attr({id: "pref-not-met", type: "checkbox", name: "pref-not-met"});
 	checkBox.checked = preferences.noPrefMet ? true : false;
-	checkBox.name = "pref-not-met";
 	label.className = "preference-label";
 	label.htmlFor = "pref-not-met";
 	label.innerHTML = "Do not show schedules that conflict with break times"
@@ -369,7 +366,7 @@ function updateClassArr() {
 	if (t) {
 		clearTimeout(t);
 	}
-	t = setTimeout( function () {
+	t = setTimeout( () => {
 		for (var i = 0; i < parent2.length; i++) {
 			var children = parent2[i].children;
 			if(children !== null) {
@@ -965,7 +962,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			}
 
 		};
-		classDiv.onmouseout = function () {
+		classDiv.onmouseout = () => {
 			commentDiv.style.display = "none";
 		};
 

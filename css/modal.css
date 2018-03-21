@@ -20,16 +20,35 @@
 }
 
 .preference-modal {
-   width: 60% !important;
-   height: 70% !important;
-   margin-top: 5% !important;
+   -webkit-animation-name: animatetop2 !important;
+   -webkit-animation-duration: 0.4s;
+   animation-name: animatetop2 !important;
+   animation-duration: 0.4s;
+   top: 7%;
+   max-width: 65% !important;
+   max-height: 85% !important;
+   margin-top: 0 !important;
+   border-top: 15px solid var(--main-white) !important;
+   border-bottom: 15px solid var(--main-white) !important;
+   border-left: 4px solid var(--main-white) !important;
+   border-right: 4px solid var(--main-white) !important;
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+
+@-webkit-keyframes animatetop2 {
+   from {top: -300px; opacity: 0}
+   to {top: 7%; opacity: 1}
+}
+@keyframes animatetop2 {
+   from {top: -300px; opacity: 0}
+   to {top: 7%; opacity: 1}
 }
 
 .pref-modal-body {
    width: 95%;
-   height: calc(100% - 30px);
-   margin: 15px auto;
-   /* box-sizing: border-box; /*include padding in total height*/ */
+   margin: 0 auto;
+   /* box-sizing: border-box; /*include padding in total height */
    padding: 0 10px;
    text-align: left;
    overflow-y: auto;
@@ -37,7 +56,7 @@
 }
 
 .pref-modal-text {
-   font-size: 15px;
+   font-size: 14px;
    font-family: Arial, Helvetica, sans-serif;
    height: 80%;
    text-align: justify;
@@ -75,7 +94,7 @@
 
 .break-select {
    font-family: inherit;
-   font-size: 14px;
+   font-size: 12px;
    display: block;
    user-select: none;
    /* border: 1px solid #555; */
