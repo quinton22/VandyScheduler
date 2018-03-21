@@ -74,7 +74,7 @@ function createModal() {
 		modal.style.display = "none";
 		$('#modalBody').html("");
 	}),
-	$('<h2></h2>').html("<p>Error in making schedule.<p>").css({'id': 'modalHeaderText', 'color': 'red', 'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'})), // modalHeaderText
+	$('<h2></h2>').html("<p>Error in making schedule.<p>").css({'color': 'red', 'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'})), // modalHeaderText
  	$('<div></div>').attr({class: 'modal-body', id: 'modalBody'}), // modal body
 	$('<div></div>').attr('class', 'modal-footer')))); // modal footer
 
@@ -527,7 +527,8 @@ function makeSchedClicked() {
 				return !c.times.includes("TBA");
 			});
 			var sched = new Schedule(classArr);
-			sched.sortClasses();
+			let overlappedC = sched.overlappedClasses;
+			console.log(overlappedC);
 			scheduleArr = sched.scheduleArr;
 			scheduleArr = sortBasedOnPreferences(scheduleArr);
 			createViewableContent(scheduleArr, tbaClasses);
@@ -726,7 +727,7 @@ function createViewableContent(arr, tbaClasses) {
 		document.getElementsByClassName("modal-header")[0]
 			.getElementsByTagName("h2")[0]
 			.innerHTML = "Pick Schedule";
-		$("#modalHeaderText").css('color', 'black');
+		$('.modal-header h2').css('color', 'black');
 		$(".modal-content").css('font-family', font);
 		modal.style.display = "block";
 
@@ -759,7 +760,7 @@ function createViewableContent(arr, tbaClasses) {
 		document.getElementsByClassName("modal-header")[0]
 			.getElementsByTagName("h2")[0]
 			.innerHTML = "<p>Error in creating schedule!</p><p class='errorText'>There was no possible schedule created from the classes in your cart. Try removing some classes that may overlap. Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
-		$("#modalHeaderText").css('color', 'red');
+		$('modal-header h2').css('color', 'red');
 		$(".modal-content").css('font-family', font);
 		modal.style.display = "block";
 	}
