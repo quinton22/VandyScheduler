@@ -73,7 +73,7 @@ function createModal() {
 		modal.style.display = "none";
 		$('#modalBody').html("");
 	}),
-	$('<h2></h2>').html("<p>Error in making schedule.<p>").css({'id': 'modalHeaderText', 'style': 'color:red', 'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'})), // modalHeaderText
+	$('<h2></h2>').html("<p>Error in making schedule.<p>").css({'id': 'modalHeaderText', 'color': 'red', 'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'})), // modalHeaderText
  	$('<div></div>').attr({class: 'modal-body', id: 'modalBody'}), // modal body
 	$('<div></div>').attr('class', 'modal-footer')))); // modal footer
 
