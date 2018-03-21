@@ -65,31 +65,17 @@ observer.observe(document, {childList: true, subtree: true});
 */
 function createModal() {
 	modal = document.createElement("div");
-	$(modal).attr({class: 'modal', id: 'scheduleView'});
-	modalChild = document.createElement("div");
-	$(modalChild).attr({class: 'modal-content', id: 'modalChild'});
-	var modalHeader = document.createElement("div");
-	$(modalHeader).attr({'class': 'modal-header'});
-	modalChild.appendChild(modalHeader);
-	var close = document.createElement("div");
-	$(close).attr({'class': 'close'});
-	close.innerHTML = "&times;";
-	modalHeader.appendChild(close);
-	var modalHeaderText = document.createElement("h2");
-	modalHeaderText.innerHTML = "<p>Error in making schedule.<p>";
-	modalHeaderText.id = "modalHeaderText";
-	modalHeaderText.style = "color:red";
-	$(modalHeaderText).css({'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'});
-	modalHeader.appendChild(modalHeaderText);
-	modal.appendChild(modalChild);
-	var modalBody = document.createElement("div");
-	modalBody.className = "modal-body";
-	modalBody.id = "modalBody";
-	modalChild.appendChild(modalBody);
-	var modalfooter = document.createElement("div");
-	modalfooter.className = "modal-footer";
-	modalChild.appendChild(modalfooter);
-	document.querySelector("body").appendChild(modal);
+	$('body').eq(0).append($(modal).attr({class: 'modal', id: 'scheduleView'}) // modal
+	.append($('<div></div>').attr({class: 'modal-content', id: 'modalChild'}) // modalChild
+	.append($('<div></div>').attr({class: 'modal-header'}) // modal-header
+	.append($('<div></div>').html('&times;').attr({class: 'close'}) // close button
+	.click(() => {
+		modal.style.display = "none";
+		$('#modalBody').html("");
+	}),
+	$('<h2></h2>').html("<p>Error in making schedule.<p>").css({'id': 'modalHeaderText', 'style': 'color:red', 'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'})), // modalHeaderText
+ 	$('<div></div>').attr({class: 'modal-body', id: 'modalBody'}), // modal body
+	$('<div></div>').attr('class', 'modal-footer')))); // modal footer
 
 	let prefModal = document.createElement("div");
 
@@ -135,17 +121,11 @@ function createModal() {
 	window.onclick = (event) => {
 		if (event.target == modal) {
 			modal.style.display = "none";
-			modalBody.innerHTML = "";
+			$('#modalBody').html("");
 		} else if (event.target == prefModal) {
 			prefModal.style.display = "none";
 			updatePreferences();
 		}
-	};
-
-	 // exit if close button is clicked
-	close.onclick = function() {
-		modal.style.display = "none";
-	  	modalBody.innerHTML = "";
 	};
 
 	prefClose.onclick = function() {
@@ -663,7 +643,8 @@ function createViewableContent(arr, tbaClasses) {
 						return parent2[i].children[0].innerHTML.includes(el.classAbbr);
 					});
 					for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
- 					if (classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerText.replace(/\s/, "") !== currentClass.sections[0]) {
+ 					if (currentClass &&
+						classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerText.replace(/\s/, "") !== currentClass.sections[0]) {
 							// Remove class
 							$(classTab[i].getElementsByClassName('classRow')[k]).find('.classActionButtons a').get(0).click();
 						}
@@ -672,7 +653,7 @@ function createViewableContent(arr, tbaClasses) {
 
 				}
 				modal.style.display = "none";
-				document.getElementById("modalBody").innerHTML = "";
+				$('#modalBody').html("");
 
 				scheduleArr = [];
 			});
