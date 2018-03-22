@@ -143,8 +143,8 @@ function createModal() {
 function getFromStorageAndCreateModal(prefModal) {
 	let firstTime = preferences.breakTime === null ? true : false;
 	preferences.breakTime = firstTime ? {} : preferences.breakTime;
-	$('.pref-modal-text p').innerHTML += firstTime ? "Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" " : "";
-	$('.pref-modal-text p').innerHTML += "To select a break time for all of MWF, TR, or SU, double click on that time on any of those days.";
+	firstTime ? $(prefModal).find('.pref-modal-text p').text($(prefModal).find('.pref-modal-text p').text() + "Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" ") : null;
+	$(prefModal).find('.pref-modal-text p').text($(prefModal).find('.pref-modal-text p').text() + "To select a break time for all of MWF, TR, or SU, double click on that time on any of those days.");
 
 	// settings:
 	let breakFormCont = document.createElement("div");
