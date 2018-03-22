@@ -417,7 +417,9 @@ function addBtn() {
 function addEL(button) {
 	$(button).click(() => {
 		$.each($(button).parents('tbody').find('.classActionButtons a'), (ind , el) => {
-			el.click();
+			if (el.title !== "Edit Class") {
+				el.click();
+			}
 		});
 		return false;
 	});
