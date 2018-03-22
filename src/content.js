@@ -757,7 +757,6 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		});
 	} else {
 		let errorText = "<p>Error creating schedule!</p><p class='errorText'>There was no possible schedule that could be created from the classes in your cart. ";
-		console.log(overlappedClasses);
 		let errorClasses = Array.from(overlappedClasses);
 		let nonOverlapped = errorClasses.filter((item) => item[1] === 0).map((item) => item[0].substring(0, item[0].indexOf("-")));
 
@@ -768,7 +767,6 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		errorClasses = errorClasses.sort((a, b) => b[1] - a[1]);
 		let ec = new Set(errorClasses.map((item) => item[0].substring(0, item[0].indexOf("-"))));
 		ec = Array.from(ec);
-		console.log(ec);
 		if (ec.length !== 0) {
 			errorText += "Try removing one or more of the following classes:<br/>" + 			ec.toString().replace(/,/g, ", ") + "<br/>Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
 		} else {
