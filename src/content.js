@@ -429,7 +429,7 @@ function addEL(button) {
 function addClass(_class, classNumOnPage) {
 
 	let classAbbr = _class.children[0].innerHTML;
-	classAbbr = classAbbr.replace(/:/, "");
+	classAbbr = classAbbr.replace(/:/g, "");
 	let classDesc = _class.children[1].innerHTML;
 	let specificClass = document.getElementById("cartDiv").getElementsByClassName("classTable")[classNumOnPage];
 	let sectionsList = specificClass.getElementsByClassName("classSection");
@@ -528,10 +528,9 @@ function makeSchedClicked() {
 			});
 			var sched = new Schedule(classArr);
 			let overlappedC = sched.overlappedClasses;
-			console.log(overlappedC);
 			scheduleArr = sched.scheduleArr;
 			scheduleArr = sortBasedOnPreferences(scheduleArr);
-			createViewableContent(scheduleArr, tbaClasses);
+			createViewableContent(scheduleArr, tbaClasses, overlappedC);
 
 		} else {
 			setTimeout(makeSchedClicked, 50);
@@ -603,7 +602,7 @@ function sortBasedOnPreferences(arr) {
 /*
 *	Creates modal with different schedules and tables
 */
-function createViewableContent(arr, tbaClasses) {
+function createViewableContent(arr, tbaClasses, overlappedClasses) {
 	var scheduleDiv;
 	if (arr.length > 0) {
 		schedArr = convertToDetailed(arr);
@@ -646,7 +645,7 @@ function createViewableContent(arr, tbaClasses) {
 					});
 					for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
  					if (currentClass &&
-						classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerText.replace(/\s/, "") !== currentClass.sections[0]) {
+						classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerText.replace(/\s/g, "") !== currentClass.sections[0]) {
 							// Remove class
 							$(classTab[i].getElementsByClassName('classRow')[k]).find('.classActionButtons a').get(0).click();
 						}
@@ -757,9 +756,26 @@ function createViewableContent(arr, tbaClasses) {
 			});
 		});
 	} else {
-		document.getElementsByClassName("modal-header")[0]
-			.getElementsByTagName("h2")[0]
-			.innerHTML = "<p>Error in creating schedule!</p><p class='errorText'>There was no possible schedule created from the classes in your cart. Try removing some classes that may overlap. Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
+		let errorText = "<p>Error in creating schedule!</p><p class='errorText'>There was no possible schedule that could be created from the classes in your cart. ";
+		console.log(overlappedClasses);
+		let errorClasses = Array.from(overlappedClasses);
+		let nonOverlapped = errorClasses.filter((item) => item[1] === 0).map((item) => item[0].substring(0, item[0].indexOf("-")));
+
+		errorClasses = errorClasses.filter((item) => {
+			let str = item[0].substring(0, item[0].indexOf("-"));
+			return !nonOverlapped.includes(str)
+		});
+		errorClasses = errorClasses.sort((a, b) => b[1] - a[1]);
+		let ec = new Set(errorClasses.map((item) => item[0].substring(0, item[0].indexOf("-"))));
+		ec = Array.from(ec);
+		console.log(ec);
+		if (ec.length !== 0) {
+			errorText += "Try removing one or more of the following classes:<br/>" + 			ec.toString().replace(/,/g, ", ") + "<br/>Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
+		} else {
+			errorText += "Try to uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
+		}
+		$('.modal-header h2').html(errorText);
+
 		$('modal-header h2').css('color', 'red');
 		$(".modal-content").css('font-family', font);
 		modal.style.display = "block";
