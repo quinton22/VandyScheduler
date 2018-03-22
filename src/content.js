@@ -74,7 +74,7 @@ function createModal() {
 		modal.style.display = "none";
 		$('#modalBody').html("");
 	}),
-	$('<h2></h2>').html("<p>Error in making schedule.<p>").css({'color': 'red', 'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'})), // modalHeaderText
+	$('<h2></h2>').html("<p>Error creating schedule!<p>").css({'color': 'red', 'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'})), // modalHeaderText
  	$('<div></div>').attr({class: 'modal-body', id: 'modalBody'}), // modal body
 	$('<div></div>').attr('class', 'modal-footer')))); // modal footer
 
@@ -756,7 +756,7 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 			});
 		});
 	} else {
-		let errorText = "<p>Error in creating schedule!</p><p class='errorText'>There was no possible schedule that could be created from the classes in your cart. ";
+		let errorText = "<p>Error creating schedule!</p><p class='errorText'>There was no possible schedule that could be created from the classes in your cart. ";
 		console.log(overlappedClasses);
 		let errorClasses = Array.from(overlappedClasses);
 		let nonOverlapped = errorClasses.filter((item) => item[1] === 0).map((item) => item[0].substring(0, item[0].indexOf("-")));
@@ -776,7 +776,7 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		}
 		$('.modal-header h2').html(errorText);
 
-		$('modal-header h2').css('color', 'red');
+		$('.modal-header h2').css('color', 'red');
 		$(".modal-content").css('font-family', font);
 		modal.style.display = "block";
 	}
