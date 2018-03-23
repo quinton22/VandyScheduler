@@ -718,6 +718,8 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 						}
 						cell.innerHTML = timeText;
 						$(cell).addClass('c1');
+					} else {
+						$(cell).append($("<div></div>").addClass('schedule-td-div'));
 					}
 				}
 			}
@@ -750,9 +752,7 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 						classTextDiv.innerHTML = c.classAbbr + "-" + c.sections[0];
 						classDiv.appendChild(classTextDiv);
 						placeClass(classDiv, scheduleDiv, c.days[0].charAt(k), c.times[0]);
-						var height = Class_.lengthOfClass(c.times[0]);
-						height *= (scheduleDiv.getElementsByTagName("tr")[1].offsetHeight - 2) / scheduleDiv.offsetHeight * 100;
-						// 2 for the border
+						var height = Class_.lengthOfClass(c.times[0]) * 100 - 200 / $(classDiv).parent().get(0).offsetHeight; // account for border
 						$(classDiv).css('height', height.toString() + "%");
 					}
 				}
@@ -846,38 +846,29 @@ function getClass(classAbbr, section) {
 */
 function placeClass(classDiv, scheduleDiv, day, time) {
 	var divHeight = scheduleDiv.offsetHeight;
-	var divWidth = scheduleDiv.offsetWidth;
-	var tab = scheduleDiv.firstChild.getElementsByTagName("tr");
-	var rowHeight = tab[1].offsetHeight;
-	var firstRowHeight = tab[0].offsetHeight;
-	var colWidth = scheduleDiv.firstChild.getElementsByTagName("td")[0].offsetWidth - .5;
-	var tablePos = $(scheduleDiv.firstChild).position();
-	var tableX = tablePos.left;
-	var tablePos2 = $(tab[0]).position();
-	var tableY = tablePos2.top;
 	if (divHeight !== 0) {
 		var xDisplace;
 		switch(day) {
 			case "M":
-				xDisplace = colWidth;
+				xDisplace = 0;
 				break;
 			case "T":
-				xDisplace = colWidth * 2;
+				xDisplace = 1;
 				break;
 			case "W":
-				xDisplace = colWidth * 3;
+				xDisplace = 2;
 				break;
 			case "R":
-				xDisplace = colWidth * 4;
+				xDisplace = 3;
 				break;
 			case "F":
-				xDisplace = colWidth * 5;
+				xDisplace = 4;
 				break;
 			case "S":
-				xDisplace = colWidth * 6;
+				xDisplace = 5;
 				break;
 			case "U":
-				xDisplace = colWidth * 7;
+				xDisplace = 6;
 				break;
 		}
 		time = time.substring(0, time.indexOf("-"));
@@ -890,12 +881,9 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		h -= 7; // 7am = 0
 		m = ~~time.substring(time.indexOf(":") + 1, time.indexOf(":") + 3);
 		m /= 60;
-		var yDisplace = (h + m) * rowHeight + firstRowHeight;
-		var x = ((xDisplace + tableX) / divWidth) * 100 + ((colWidth / divWidth) * 100 - 10) / 2;
-		var y = ((yDisplace + tableY) / divHeight) * 100;
-
-		$(classDiv).css('top', y.toString() + "%");
-		$(classDiv).css('left', x.toString() + "%");
+		let cell = $($(scheduleDiv).find('tbody tr').get(h)).find('td .schedule-td-div').get(xDisplace);
+		cell.appendChild(classDiv);
+		$(classDiv).css('top', (m * 100).toString() + "%");
 
 
 		// adds detailed comment bubble on hover
@@ -910,7 +898,6 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			$(commentImg).attr("src", iconUrl2);
 		}
 		commentImg.className = "comment-img";
-		$(commentDiv).css('left', x.toString() + "%");
 		commentDiv.appendChild(commentImg);
 		scheduleDiv.appendChild(commentDiv);
 
@@ -943,20 +930,10 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 				curClassDiv = event.target.parentNode;
 			}
 
-			var topOfClass = $(curClassDiv).css('top');
-			var topOfClass2 = parseFloat(topOfClass);
-			$(commentDiv).css('top', (topOfClass2 - commentDiv.offsetHeight-.5).toString() + "px");
+			let top = $(classDiv).offset().top - $(scheduleDiv).offset().top - $(commentDiv).height();
+			let left = $(classDiv).offset().left - $(scheduleDiv).offset().left;
 
-			// minimizes comment and class placement to within .5px
-			var dist = parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2);
-			while (dist > .5) {
-				$(commentDiv).css('top', (parseFloat($(commentDiv).css('top')) - .1).toString() + "px");
-				dist = parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2);
-			}
-			while (dist < -.5) {
-				$(commentDiv).css('top', (parseFloat($(commentDiv).css('top')) + .1).toString() + "px");
-				dist = parseFloat($(commentDiv).css('top')) + parseFloat(commentDiv.offsetHeight) - parseFloat(topOfClass2);
-			}
+			$(commentDiv).css({'top': top, 'left': left});
 
 		};
 		classDiv.onmouseout = () => {
@@ -964,6 +941,6 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		};
 
 	}
-	scheduleDiv.appendChild(classDiv);
+	// scheduleDiv.appendChild(classDiv);
 
 }
