@@ -793,8 +793,8 @@ function convertToDetailed(arr) {
 	var classAbbr;
 	var section;
 	var x, y;
-	arr.forEach(function (sched) {
-		sched.forEach(function (c) {
+	arr.forEach((sched) => {
+		sched.forEach((c) => {
 			classAbbr = c[0];
 			section = c[1];
 			var ind = getClass(classAbbr, section);
@@ -808,10 +808,10 @@ function convertToDetailed(arr) {
 					locations.push(locations[locations.length - 1]);
 				}
 				for (let i = 0; i < times.length; ++i) {
-					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], x.prof, [x.hours[y]], [days[i]], [times[i]], [locations[i]]));
+					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.prof[y]], [x.hours[y]], [days[i]], [times[i]], [locations[i]]));
 				}
 			} else {
-			s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], x.prof, [x.hours[y]], [x.days[y]], [x.times[y]], [x.location[y]]));
+			s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.prof[y]], [x.hours[y]], [x.days[y]], [x.times[y]], [x.location[y]]));
 			}
 
 		});
