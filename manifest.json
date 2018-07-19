@@ -2,7 +2,7 @@
    "manifest_version": 2,
    "name": "Vandy Scheduler",
    "version": "1.2.0",
-   "description": "This extension organizes your potential classes and Vanderbilt YES class cart into a schedule for the upcoming semester. It also allows you to enroll in all of your classes in your cart with one click.",
+   "description": "This extension organizes your potential classes and Vanderbilt YES class cart into a schedule for the upcoming semester.",
    "icons": {
       "16": "png/schedule-icon16.png",
       "48": "png/schedule-icon48.png",
