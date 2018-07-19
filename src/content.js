@@ -4,16 +4,16 @@
 // IDEA: somehow find a way to show which classes you should take
 
 
-var classArr = [];		// contains classes to construct schedule with
-var scheduleArr = [];	// contains all the schedules
+var classArr = []; // contains classes to construct schedule with
+var scheduleArr = []; // contains all the schedules
 var modal, modalChild;
 var preferences = {
 	breakTime: null,
 	noPrefMet: false
 }
 let prefMat = new Map();
-createModal();			// creates modal and appends to doc
-var ready = false;		// allows modal to load
+createModal(); // creates modal and appends to doc
+var ready = false; // allows modal to load
 
 // creates button
 var addClassButton = document.createElement("span");
@@ -24,8 +24,10 @@ btn.innerHTML = "Add to Schedule";
 addClassButton.appendChild(btn);
 
 // sets parent node to course titles on either class search page or class cart page
-var parent = document.getElementById("classSearchResultsCarousel") !== null ? document.getElementById("classSearchResultsCarousel").getElementsByClassName("left") : null;
-var parent2 = document.getElementById("studentCart") !== null ? document.getElementById("studentCart").getElementsByClassName("left") : null;
+var parent = document.getElementById("classSearchResultsCarousel") !== null ? document.getElementById(
+	"classSearchResultsCarousel").getElementsByClassName("left") : null;
+var parent2 = document.getElementById("studentCart") !== null ? document.getElementById(
+	"studentCart").getElementsByClassName("left") : null;
 
 // necessary for timeout
 var timeout = null;
@@ -43,41 +45,62 @@ let font = $(".classAbbreviation").css('font-family');
 
 // updates class and adds buttons if the DOM subtree is changed
 var observer = new MutationObserver(() => {
-	if(parent !== null && parent2 !== null) {
-			if (parent.length !== 0 || parent2.length !== 0) {
-		    	if (timeout) {
-		        clearTimeout(timeout);
-		    	}
-		    	page = focusPage[0].getElementsByTagName("h1")[0].innerHTML;
-		    	ready = false;
-		    	if (page === "Class Cart") {
-		   		updateClassArr();
-		    	}
+	if (parent !== null && parent2 !== null) {
+		if (parent.length !== 0 || parent2.length !== 0) {
+			if (timeout) {
+				clearTimeout(timeout);
+			}
+			page = focusPage[0].getElementsByTagName("h1")[0].innerHTML;
+			ready = false;
+			if (page === "Class Cart") {
+				updateClassArr();
+			}
 
-		    	timeout = setTimeout(addBtn, 100);
+			timeout = setTimeout(addBtn, 100);
 
-		 	}
+		}
 	}
 });
-observer.observe(document, {childList: true, subtree: true});
+observer.observe(document, {
+	childList: true,
+	subtree: true
+});
 
 
 /*
-*	Creates the modal with the default to display an error message
-*/
+ *	Creates the modal with the default to display an error message
+ */
 function createModal() {
 	modal = document.createElement("div");
-	$('body').eq(0).append($(modal).attr({class: 'modal', id: 'scheduleView'}) // modal
-	.append($('<div></div>').attr({class: 'modal-content', id: 'modalChild'}) // modalChild
-	.append($('<div></div>').attr({class: 'modal-header'}) // modal-header
-	.append($('<div></div>').html('&times;').attr({class: 'close'}) // close button
-	.click(() => {
-		modal.style.display = "none";
-		$('#modalBody').html("");
-	}),
-	$('<h2></h2>').html("<p>Error creating schedule!<p>").css({'color': 'red', 'font-weight': 'bold', 'font-size': '1.5em', 'margin': 'auto'})), // modalHeaderText
- 	$('<div></div>').attr({class: 'modal-body', id: 'modalBody'}), // modal body
-	$('<div></div>').attr('class', 'modal-footer')))); // modal footer
+	$('body').eq(0).append($(modal).attr({
+			class: 'modal',
+			id: 'scheduleView'
+		}) // modal
+		.append($('<div></div>').attr({
+				class: 'modal-content',
+				id: 'modalChild'
+			}) // modalChild
+			.append($('<div></div>').attr({
+					class: 'modal-header'
+				}) // modal-header
+				.append($('<div></div>').html('&times;').attr({
+						class: 'close'
+					}) // close button
+					.click(() => {
+						modal.style.display = "none";
+						$('#modalBody').html("");
+					}),
+					$('<h2></h2>').html("<p>Error creating schedule!<p>").css({
+						'color': 'red',
+						'font-weight': 'bold',
+						'font-size': '1.5em',
+						'margin': 'auto'
+					})), // modalHeaderText
+				$('<div></div>').attr({
+					class: 'modal-body',
+					id: 'modalBody'
+				}), // modal body
+				$('<div></div>').attr('class', 'modal-footer')))); // modal footer
 
 	let prefModal = document.createElement("div");
 
@@ -85,7 +108,9 @@ function createModal() {
 		if (obj !== undefined && obj !== null && !$.isEmptyObject(obj)) {
 			preferences = obj.pref;
 		} else {
-			chrome.storage.sync.set({"pref" : preferences});
+			chrome.storage.sync.set({
+				"pref": preferences
+			});
 		}
 		getFromStorageAndCreateModal(prefModal)
 	});
@@ -114,7 +139,8 @@ function createModal() {
 	div.appendChild(div2);
 
 	let p = document.createElement("p");
-	p.innerHTML = "Select the time(s) you do <strong><i>not</i></strong> want class below. Schedules that have classes during these times will be at the bottom of the list unless \"Do not show schedules that conflict with break times\" is checked, in which case they will not be shown. "
+	p.innerHTML =
+		"Select the time(s) you do <strong><i>not</i></strong> want class below. Schedules that have classes during these times will be at the bottom of the list unless \"Do not show schedules that conflict with break times\" is checked, in which case they will not be shown. "
 
 	div2.appendChild(p);
 	div2.className = "pref-modal-text";
@@ -139,13 +165,17 @@ function createModal() {
 
 
 /*
-*	Creates preferences modal and gets information from storage
-*/
+ *	Creates preferences modal and gets information from storage
+ */
 function getFromStorageAndCreateModal(prefModal) {
 	let firstTime = preferences.breakTime === null ? true : false;
 	preferences.breakTime = firstTime ? {} : preferences.breakTime;
-	firstTime ? $(prefModal).find('.pref-modal-text p').text($(prefModal).find('.pref-modal-text p').text() + "Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" ") : null;
-	$(prefModal).find('.pref-modal-text p').text($(prefModal).find('.pref-modal-text p').text() + "To select a break time for all of MWF, TR, or SU, double click on that time on any of those days.");
+	firstTime ? $(prefModal).find('.pref-modal-text p').text($(prefModal).find('.pref-modal-text p').text() +
+		"Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" "
+	) : null;
+	$(prefModal).find('.pref-modal-text p').text($(prefModal).find('.pref-modal-text p').text() +
+		"To select a break time for all of MWF, TR, or SU, double click on that time on any of those days."
+	);
 
 	// settings:
 	let breakFormCont = document.createElement("div");
@@ -158,7 +188,7 @@ function getFromStorageAndCreateModal(prefModal) {
 
 	let breakDay = []; // [M, T, W, R, F, Sa, Su]
 	let dayVec = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-	for(let i = 0; i < 7; ++i) {
+	for (let i = 0; i < 7; ++i) {
 		breakDay[i] = document.createElement("div");
 		breakDay[i].className = "break-day";
 
@@ -183,7 +213,9 @@ function getFromStorageAndCreateModal(prefModal) {
 		selectAll.id = "select-all";
 		selectAll.appendChild(saspan);
 		saspan.innerHTML = "Select All"
-		selectAll.ondblclick = (event) => {preferenceDblClickHandler(event.target);};
+		selectAll.ondblclick = (event) => {
+			preferenceDblClickHandler(event.target);
+		};
 
 		selectAll.onclick = () => {
 			let key = $(selectAll).siblings(".break-day-title").attr('id');
@@ -199,7 +231,7 @@ function getFromStorageAndCreateModal(prefModal) {
 		breakDay[i].appendChild(selectAll);
 		breakForm.appendChild(breakDay[i]);
 
-		for(let j = 8; j <= 18; ++j) {
+		for (let j = 8; j <= 18; ++j) {
 
 			let time = j % 12;
 			let timeStr = "";
@@ -223,12 +255,13 @@ function getFromStorageAndCreateModal(prefModal) {
 			bsspan.innerHTML = timeStr;
 			breakSelect.onclick = () => {
 				let k = $(breakSelect).siblings(".break-day-title").attr('id');
-				preferences.breakTime[k].includes(j) ? preferences.breakTime[k].splice(preferences.breakTime[k].indexOf(j), 1) : preferences.breakTime[k].push(j);
- 				$(breakSelect).toggleClass("one-chosen");
+				preferences.breakTime[k].includes(j) ? preferences.breakTime[k].splice(preferences.breakTime[k]
+					.indexOf(j), 1) : preferences.breakTime[k].push(j);
+				$(breakSelect).toggleClass("one-chosen");
 
 				// handles checking and unchecking of select all based on
 				// if the rest of the items are full
-				if($(selectAll).hasClass("one-chosen")) {
+				if ($(selectAll).hasClass("one-chosen")) {
 					$(selectAll).removeClass("one-chosen");
 					preferences.breakTime[k].splice(preferences.breakTime[k].indexOf(7), 1);
 				} else if ($(selectAll).hasClass("saved-preference")) {
@@ -240,11 +273,14 @@ function getFromStorageAndCreateModal(prefModal) {
 					}
 				}
 			};
-			breakSelect.ondblclick = (event) => {preferenceDblClickHandler(event.target);};
+			breakSelect.ondblclick = (event) => {
+				preferenceDblClickHandler(event.target);
+			};
 			breakDay[i].appendChild(breakSelect);
 		}
 
-		firstTime ? (preferences.breakTime[dayVec[i]] = (dayVec[i] === "Saturday" || dayVec[i] === "Sunday") ? [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] : [12]) : null;
+		firstTime ? (preferences.breakTime[dayVec[i]] = (dayVec[i] === "Saturday" || dayVec[i] ===
+			"Sunday") ? [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] : [12]) : null;
 		//div2.appendChild(breakDay[i]);
 	}
 
@@ -267,7 +303,11 @@ function getFromStorageAndCreateModal(prefModal) {
 	let checkBox = document.createElement("input");
 	let label = document.createElement("label");
 	checkBoxDiv.className = "checkbox-div";
-	$(checkBox).attr({id: "pref-not-met", type: "checkbox", name: "pref-not-met"});
+	$(checkBox).attr({
+		id: "pref-not-met",
+		type: "checkbox",
+		name: "pref-not-met"
+	});
 	checkBox.checked = preferences.noPrefMet ? true : false;
 	label.className = "preference-label";
 	label.htmlFor = "pref-not-met";
@@ -294,8 +334,8 @@ function getFromStorageAndCreateModal(prefModal) {
 }
 
 /*
-*	handles the double click on Preferences times
-*/
+ *	handles the double click on Preferences times
+ */
 function preferenceDblClickHandler(t) {
 	$(t).attr('class') ? null : t = $(t).parent();
 	let time = $(t).attr('class').match(/[0-9]+/)[0];
@@ -306,29 +346,31 @@ function preferenceDblClickHandler(t) {
 }
 
 /*
-*	Triggers the click event on the proper days/times in the preferences modal
-*/
+ *	Triggers the click event on the proper days/times in the preferences modal
+ */
 function triggerDblClick(parent, days, time, click) {
-		if (click) {
-			$.each(parent.find('.' + days), (ind, el) => {
-				if (!$(el).siblings('.' + time).hasClass('one-chosen')) {
-					$(el).siblings('.' + time).trigger('click');
-				}
-			});
-		} else {
-			$.each(parent.find('.' + days), (ind, el) => {
-				if ($(el).siblings('.' + time).hasClass('one-chosen')) {
-					$(el).siblings('.' + time).trigger('click');
-				}
-			});
-		}
+	if (click) {
+		$.each(parent.find('.' + days), (ind, el) => {
+			if (!$(el).siblings('.' + time).hasClass('one-chosen')) {
+				$(el).siblings('.' + time).trigger('click');
+			}
+		});
+	} else {
+		$.each(parent.find('.' + days), (ind, el) => {
+			if ($(el).siblings('.' + time).hasClass('one-chosen')) {
+				$(el).siblings('.' + time).trigger('click');
+			}
+		});
+	}
 }
 
 /*
-*	Updates the HTML view for preferences and updates prefMat
-*/
+ *	Updates the HTML view for preferences and updates prefMat
+ */
 function updatePreferences() {
-	chrome.storage.sync.set({"pref": preferences}, () => {
+	chrome.storage.sync.set({
+		"pref": preferences
+	}, () => {
 		if (chrome.runtime.lastError) {
 			console.error("Could not save preferences");
 			window.alert("Preferences not saved. Check internet connection.");
@@ -337,8 +379,8 @@ function updatePreferences() {
 }
 
 /*
-*	Clears class array and puts classes in cart in class arr
-*/
+ *	Clears class array and puts classes in cart in class arr
+ */
 function updateClassArr() {
 	classArr = [];
 
@@ -346,10 +388,10 @@ function updateClassArr() {
 	if (t) {
 		clearTimeout(t);
 	}
-	t = setTimeout( () => {
+	t = setTimeout(() => {
 		for (var i = 0; i < parent2.length; i++) {
 			var children = parent2[i].children;
-			if(children !== null) {
+			if (children !== null) {
 				addClass(parent2[i], i);
 			}
 		}
@@ -359,10 +401,10 @@ function updateClassArr() {
 
 
 /*
-*	Adds a button to each unique class
-*/
+ *	Adds a button to each unique class
+ */
 function addBtn() {
-	font =  $(".classAbbreviation").css('font-family');
+	font = $(".classAbbreviation").css('font-family');
 
 	if (page === "Class Cart") {
 		makeScheduleButton(focusPage[0].children[0]);
@@ -379,13 +421,13 @@ function addBtn() {
 		var children = parent[i].children;
 
 		// adds buttons to the page
-		if(children !== null && !children[children.length - 1].id.includes("Btn")){
-				clone = addClassButton.cloneNode(true);
-				addClassButton.setAttribute("id", "Btn" + i.toString());
-				parent[i].appendChild(addClassButton);
-				var button = addClassButton.firstChild;
-				addEL(addClassButton.children[0]);
-				addClassButton = clone;
+		if (children !== null && !children[children.length - 1].id.includes("Btn")) {
+			clone = addClassButton.cloneNode(true);
+			addClassButton.setAttribute("id", "Btn" + i.toString());
+			parent[i].appendChild(addClassButton);
+			var button = addClassButton.firstChild;
+			addEL(addClassButton.children[0]);
+			addClassButton = clone;
 		}
 	}
 
@@ -395,16 +437,16 @@ function addBtn() {
 		var children = parent2[j].children;
 
 		// adds buttons to the page
-		if(children !== null && !children[children.length - 1].id.includes("RemoveBtn")){
+		if (children !== null && !children[children.length - 1].id.includes("RemoveBtn")) {
 
-				clone = addClassButton.cloneNode(true);
-				addClassButton.id = "RemoveBtn" + j.toString();
-				parent2[j].appendChild(addClassButton);
-				var button = addClassButton.firstChild;
-				button.className = "myButton remove";
-				button.innerHTML = "Remove Class";
-				addEL(button);
-				addClassButton = clone;
+			clone = addClassButton.cloneNode(true);
+			addClassButton.id = "RemoveBtn" + j.toString();
+			parent2[j].appendChild(addClassButton);
+			var button = addClassButton.firstChild;
+			button.className = "myButton remove";
+			button.innerHTML = "Remove Class";
+			addEL(button);
+			addClassButton = clone;
 		}
 	}
 
@@ -412,13 +454,13 @@ function addBtn() {
 
 
 /*
-*	Adds event listener to add class buttons and remove class buttons so that when clicked
-*	all the sections of a class are added/removed
-*/
+ *	Adds event listener to add class buttons and remove class buttons so that when clicked
+ *	all the sections of a class are added/removed
+ */
 function addEL(button) {
 	$(button).click(() => {
-		$.each($(button).parents('tbody').find('.classActionButtons a'), (ind , el) => {
-			if (el.title !== "Edit Class") {
+		$.each($(button).parents('tbody').find('.classActionButtons a'), (ind, el) => {
+			if (el.title === "Remove Class From Cart" || el.title === "Add this class to your cart") {
 				el.click();
 			}
 		});
@@ -426,15 +468,16 @@ function addEL(button) {
 	});
 }
 /*
-*	Makes a class "Class" and adds to an array containing all classes in the
-*	schedule
-*/
+ *	Makes a class "Class" and adds to an array containing all classes in the
+ *	schedule
+ */
 function addClass(_class, classNumOnPage) {
 
 	let classAbbr = _class.children[0].innerHTML;
 	classAbbr = classAbbr.replace(/:/g, "");
 	let classDesc = _class.children[1].innerHTML;
-	let specificClass = document.getElementById("cartDiv").getElementsByClassName("classTable")[classNumOnPage];
+	let specificClass = document.getElementById("cartDiv").getElementsByClassName("classTable")[
+		classNumOnPage];
 	let sectionsList = specificClass.getElementsByClassName("classSection");
 	let profsList = specificClass.getElementsByClassName("classInstructor");
 	let hoursList = specificClass.getElementsByClassName("classHours");
@@ -465,22 +508,22 @@ function addClass(_class, classNumOnPage) {
 
 
 /*
-*	Adds class added img and adds a remove button -- currently unfunctional
-*/
+ *	Adds class added img and adds a remove button -- currently unfunctional
+ */
 function classAdded(button) {
-		button.setAttribute('class', 'myButton disabled');
-		button.disabled = true;
-		setTimeout(function() {
-			button.innerHTML = "Added";
-		}, 200);
+	button.setAttribute('class', 'myButton disabled');
+	button.disabled = true;
+	setTimeout(function() {
+		button.innerHTML = "Added";
+	}, 200);
 }
 
 
 /*
-*	Creates the make schedule button
-*/
+ *	Creates the make schedule button
+ */
 function makeScheduleButton(parent) {
-		if (!parent.querySelector("button")) {
+	if (!parent.querySelector("button")) {
 
 		$('#yui-gen9').css('height', 'auto');
 		var btnContainer = document.createElement("table");
@@ -511,48 +554,142 @@ function makeScheduleButton(parent) {
 		button.innerHTML = "Make Schedule";
 		parent.appendChild(btnContainer);
 		button.addEventListener("click", makeSchedClicked);
+
+	}
+
+	if (!document.querySelector('#oneClickEnrollButton')) {
+		let oneClickEnrollDiv = document.createElement("div");
+		let oneClickEnroll = document.createElement("button");
+		$(oneClickEnroll).attr('id', 'oneClickEnrollButton').addClass(
+			'myButton').addClass('myButton2');
+		oneClickEnroll.style.fontFamily = font;
+		oneClickEnroll.innerHTML = 'One Click Enroll';
+		oneClickEnroll.addEventListener('click', enroll);
+		$(oneClickEnrollDiv).append(oneClickEnroll);
+
+		if (document.querySelector('#enrollButton-button'))
+			$('#cartDiv').append(oneClickEnrollDiv);
+	}
+	//
+	// if (!document.querySelector('#oneClickEnrollButton'))
+	// 	console.log("NOT HERE");
+}
+
+
+/*
+ *	When make schedule button is clicked, creates a
+ *	schedule array using all the classes in the cart.
+ *	Puts schedules into viewable modal
+ */
+function makeSchedClicked() {
+	if (ready) {
+		let tbaClasses = [];
+		classArr = classArr.filter(c => {
+			if (c.times.includes("TBA")) {
+				tbaClasses.push(c);
+			}
+			return !c.times.includes("TBA");
+		});
+		var sched = new Schedule(classArr);
+		let overlappedC = sched.overlappedClasses;
+		scheduleArr = sched.scheduleArr;
+		scheduleArr = sortBasedOnPreferences(scheduleArr);
+		createViewableContent(scheduleArr, tbaClasses, overlappedC);
+
+	} else {
+		setTimeout(makeSchedClicked, 50);
 	}
 }
 
-
 /*
-*	When make schedule button is clicked, creates a
-*	schedule array using all the classes in the cart.
-*	Puts schedules into viewable modal
-*/
-function makeSchedClicked() {
-	if (ready) {
-			let tbaClasses = [];
-			classArr = classArr.filter(c => {
-				if(c.times.includes("TBA")) {
-					tbaClasses.push(c);
-				}
-				return !c.times.includes("TBA");
-			});
-			var sched = new Schedule(classArr);
-			let overlappedC = sched.overlappedClasses;
-			scheduleArr = sched.scheduleArr;
-			scheduleArr = sortBasedOnPreferences(scheduleArr);
-			createViewableContent(scheduleArr, tbaClasses, overlappedC);
-
-		} else {
-			setTimeout(makeSchedClicked, 50);
-		}
-}
-
-/*
-*	Shows the preferences for user to choose
-*/
+ *	Shows the preferences for user to choose
+ */
 function showPreferences() {
 	document.getElementById("pref-modal").style.display = "block";
 	let width = $('#Wednesday.break-day-title').width();
-	$('.break-select').css({'min-width': width});
+	$('.break-select').css({
+		'min-width': width
+	});
 }
 
 
 /*
-*	Sorts the array based on the preferences and returns the array
-*/
+ * Uses code courtesy of Samuel Lijin to enroll in every class in your cart with one click
+ */
+function enroll() {
+	cart = document.getElementById("StudentCartList_div");
+	classes = cart.getElementsByClassName("classTable");
+	//There are multiple classTables within the page; specifying those within the StudentCartList_div
+	//restricts $classes to those tables corresponding to actual classes.
+	//console.log(classes);
+	//console.log(cart.childNodes);
+
+	for (i = 0; i < classes.length; i++) {
+		//Log the iteration step.
+		//console.log(i);
+
+		classInfo = classes[i].getElementsByClassName("left")[0].childNodes;
+		className = classInfo[1].innerText + " " + classInfo[3].innerText;
+		//console.log(className);
+		//Voodoo magic to grab the contents of the <div> containing the class name.
+
+		classSelection = classes[i].getElementsByClassName("classSelection")[0];
+		//console.log(classSelection);
+		//Grabs the classSelection <td> associated with the class.
+		//Note that if registered for multiple /sections/ of the same class, this only grabs the first section.
+		//The Class Cart page is formatted to give each class its own classTable <table>, but different sections
+		//of the SAME class are placed as classSelection <td>s within a single classTable <table>.
+
+		sub = classSelection.childNodes;
+		//console.log(sub);
+		//This grabs the childNode tree of the accessed TableData element, which contains 7 elements:
+		//0: text ; 1: input ; 2: text ; 3: input.waitListHidden ; 4: text ; 5: div.enrollmentMenuDiv ; 6: text
+		//The only relevant elements are [1], [3], [5].
+		//[1] and [3] are inputs to enroll and/or waitList in the class; 5 is the 3rd parent of the ▼ dropdown text.
+		//Not 100% sure why there are two associated inputs, but the following behavior is known:
+		//    Clicking E▼ removes the "disabled" attribute from both, but does NOT toggle the waitListHidden input true.
+		//    Clicking W▼ does the same, but DOES toggle the waitListHidden input true.
+		//    Registering for a full class WITHOUT toggling the waitListHidden input true does NOT give a waitlist message.
+		//    Registering for a full class WHEN toggling the waitListHidden input true DOES give a waitlist message.
+		//    * In both attempts, an error of failure to enroll in the class is thrown, as would be expected.
+		//Thus HIGHLY LIKELY that [1] and [3] are enrollment and waitlist inputs, e.g.:
+		//    try {register-for-class(this) if [1]} catch {waitlist-for-class(this) if [3]}
+		//The first code revision, however, was perfectly functional and only enabled the first input. Its ability to
+		//handle waitlisting was not specifically tested.
+
+		try {
+			sub[1].removeAttribute("disabled");
+			sub[3].removeAttribute("disabled");
+			sub[3].value = "true";
+
+			buttonText = sub[5].firstChild.firstChild.firstChild;
+			buttonText.textContent = "W▼";
+			//This accesses and modifies the dropdown text. While not necessary for this script to be
+			//functional, that its it serves as
+			//visual confirmation that the function has executed properly.
+			//firstChild returns a read-only element; textContent references the actual string in the CSS
+			//console.log(buttonText.textContent);
+
+			//console.log("Trying to enrollwaitlist for: " + className);
+		} catch (TypeError) {
+			console.log("Error during " + i + "-th iteration:");
+			console.log(TypeError);
+		}
+		//This enables the inputs.
+		//console.log(sub[1]);
+		//console.log(sub[3]);
+
+
+		//console.log(buttonText);
+	}
+
+	document.getElementById("enrollButton-button").click();
+}
+
+
+/*
+ *	Sorts the array based on the preferences and returns the array
+ */
 function sortBasedOnPreferences(arr) {
 	let prefNotMetCount; // number of preferences broken
 	let breakArr = [];
@@ -603,8 +740,8 @@ function sortBasedOnPreferences(arr) {
 
 
 /*
-*	Creates modal with different schedules and tables
-*/
+ *	Creates modal with different schedules and tables
+ */
 function createViewableContent(arr, tbaClasses, overlappedClasses) {
 	var scheduleDiv;
 	if (arr.length > 0) {
@@ -613,16 +750,19 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		if (tbaClasses.length > 0) {
 			let tbaClassesP = document.createElement("p");
 			let is_are = tbaClasses.length > 1 ? " are" : " is";
-			tbaClassesP.innerHTML = "**" + tbaClasses.map(c => c.classAbbr).toString().replace(/,/g, ", ") + is_are + " not shown because the" + (tbaClasses.length > 1 ? " times" : " time") + is_are + " TBA.";
+			tbaClassesP.innerHTML = "**" + tbaClasses.map(c => c.classAbbr).toString().replace(/,/g, ", ") +
+				is_are + " not shown because the" + (tbaClasses.length > 1 ? " times" : " time") + is_are +
+				" TBA.";
 			bigSchedDiv.appendChild(tbaClassesP);
 			$(tbaClassesP).addClass('tba-classes');
 		}
 
 		// creates schedule table
-		schedArr.forEach(function (schedule, idx) {
+		schedArr.forEach(function(schedule, idx) {
 			scheduleDiv = document.createElement("div");
-			idx % 2 === 0 ? $(scheduleDiv).addClass('schedule-div') : $(scheduleDiv).addClass('schedule-div')
-			.css('background-color', '#dedede');
+			idx % 2 === 0 ? $(scheduleDiv).addClass('schedule-div') : $(scheduleDiv).addClass(
+					'schedule-div')
+				.css('background-color', '#dedede');
 
 			var table = document.createElement("table");
 			$(table).addClass('schedule-table');
@@ -640,17 +780,20 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 
 			// Remove classes not in schedule from cart
 			pickSchedBtn.addEventListener("click", () => {
-				var curSched = schedArr[~~pickSchedBtn.parentNode.previousSibling.innerHTML.match(/[0-9]+/) - 1];
+				var curSched = schedArr[~~pickSchedBtn.parentNode.previousSibling.innerHTML.match(/[0-9]+/) -
+					1];
 				var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
 				for (var i = 0; i < parent2.length; i++) { // parent2 = $('.left')
 					let currentClass = curSched.find((el) => {
 						return parent2[i].children[0].innerHTML.includes(el.classAbbr);
 					});
 					for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
- 					if (currentClass &&
-						classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[0].innerText.replace(/\s/g, "") !== currentClass.sections[0]) {
+						if (currentClass &&
+							classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[
+								0].innerText.replace(/\s/g, "") !== currentClass.sections[0]) {
 							// Remove class
-							$(classTab[i].getElementsByClassName('classRow')[k]).find('.classActionButtons a').get(0).click();
+							$(classTab[i].getElementsByClassName('classRow')[k]).find('.classActionButtons a').get(0)
+								.click();
 						}
 
 					}
@@ -671,7 +814,7 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 				var hcell = document.createElement("th");
 				hrow.appendChild(hcell);
 				$(hcell).css('font-family', font).addClass('schedule-th');
-				switch(i){
+				switch (i) {
 					case 0:
 						hcell.innerHTML = "";
 						break;
@@ -710,8 +853,8 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 					$(cell).addClass('schedule-td');
 					if (j === 0) {
 						var timeText = i + 7 <= 12 ? (i + 7).toString() :
-											((i + 7) % 13 + 1).toString();
-						if ((i+7) < 12) {
+							((i + 7) % 13 + 1).toString();
+						if ((i + 7) < 12) {
 							timeText += " am";
 						} else {
 							timeText += " pm";
@@ -724,7 +867,9 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 				}
 			}
 			bigSchedDiv.appendChild(scheduleDiv);
-			$(scheduleDiv).css({'position': 'relative'});
+			$(scheduleDiv).css({
+				'position': 'relative'
+			});
 		});
 
 		$("#modalBody").append(bigSchedDiv);
@@ -737,10 +882,10 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 
 
 		schedArr.forEach((schedule, idx) => {
-		// Places class
+			// Places class
 			scheduleDiv = document.getElementsByClassName("schedule-div")[idx];
-			schedule.forEach( (c) => {
-				if(c.days[0] !== "TBA") {
+			schedule.forEach((c) => {
+				if (c.days[0] !== "TBA") {
 					for (var k = 0; k < c.days[0].length; k++) {
 						var classDiv = document.createElement("div");
 						classDiv.className = "class";
@@ -759,9 +904,11 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 			});
 		});
 	} else {
-		let errorText = "<p>Error creating schedule!</p><p class='errorText'>There was no possible schedule that could be created from the classes in your cart. ";
+		let errorText =
+			"<p>Error creating schedule!</p><p class='errorText'>There was no possible schedule that could be created from the classes in your cart. ";
 		let errorClasses = Array.from(overlappedClasses);
-		let nonOverlapped = errorClasses.filter((item) => item[1] === 0).map((item) => item[0].substring(0, item[0].indexOf("-")));
+		let nonOverlapped = errorClasses.filter((item) => item[1] === 0).map((item) => item[0].substring(
+			0, item[0].indexOf("-")));
 
 		errorClasses = errorClasses.filter((item) => {
 			let str = item[0].substring(0, item[0].indexOf("-"));
@@ -771,9 +918,12 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		let ec = new Set(errorClasses.map((item) => item[0].substring(0, item[0].indexOf("-"))));
 		ec = Array.from(ec);
 		if (ec.length !== 0) {
-			errorText += "Try removing one or more of the following classes:<br/>" + 			ec.toString().replace(/,/g, ", ") + "<br/>Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
+			errorText += "Try removing one or more of the following classes:<br/>" + ec.toString().replace(
+					/,/g, ", ") +
+				"<br/>Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
 		} else {
-			errorText += "Try to uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
+			errorText +=
+				"Try to uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
 		}
 		$('.modal-header h2').html(errorText);
 
@@ -785,8 +935,8 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 
 
 /*
-*	Creates detailed schedule array from the less detailed array
-*/
+ *	Creates detailed schedule array from the less detailed array
+ */
 function convertToDetailed(arr) {
 	var ss = [];
 	var s = [];
@@ -808,10 +958,13 @@ function convertToDetailed(arr) {
 					locations.push(locations[locations.length - 1]);
 				}
 				for (let i = 0; i < times.length; ++i) {
-					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.prof[y]], [x.hours[y]], [days[i]], [times[i]], [locations[i]]));
+					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.prof[y]], [x.hours[y]], [
+						days[i]
+					], [times[i]], [locations[i]]));
 				}
 			} else {
-			s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.prof[y]], [x.hours[y]], [x.days[y]], [x.times[y]], [x.location[y]]));
+				s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.prof[y]], [x.hours[y]], [x.days[
+					y]], [x.times[y]], [x.location[y]]));
 			}
 
 		});
@@ -824,9 +977,9 @@ function convertToDetailed(arr) {
 
 
 /*
-*	Gets the class with the class abbreviation and section from
-*	the class array. Returns class and index of section
-*/
+ *	Gets the class with the class abbreviation and section from
+ *	the class array. Returns class and index of section
+ */
 function getClass(classAbbr, section) {
 	for (var i = 0; i < classArr.length; i++) {
 		if (classAbbr === classArr[i].classAbbr) {
@@ -842,13 +995,13 @@ function getClass(classAbbr, section) {
 
 
 /*
-*	Places class on schedule based on time and day
-*/
+ *	Places class on schedule based on time and day
+ */
 function placeClass(classDiv, scheduleDiv, day, time) {
 	var divHeight = scheduleDiv.offsetHeight;
 	if (divHeight !== 0) {
 		var xDisplace;
-		switch(day) {
+		switch (day) {
 			case "M":
 				xDisplace = 0;
 				break;
@@ -892,7 +1045,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		var commentImg = document.createElement("img");
 		var iconUrl2 = chrome.extension.getURL("png/comment-pic2.png");
 		var iconUrl3 = chrome.extension.getURL("png/comment-pic3.png");
-		if($(scheduleDiv).css('background-color').toString() === "rgb(222, 222, 222)") {
+		if ($(scheduleDiv).css('background-color').toString() === "rgb(222, 222, 222)") {
 			$(commentImg).attr("src", iconUrl3);
 		} else {
 			$(commentImg).attr("src", iconUrl2);
@@ -909,11 +1062,12 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 		$(upperLeftText).css('font-family', font);
 
 		for (var i = 0; i < schedArr.length; i++) {
-			if (scheduleDiv.id.includes(i+1)) {
+			if (scheduleDiv.id.includes(i + 1)) {
 				for (var j = 0; j < schedArr[i].length; j++) {
-					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].classAbbr + "-" + schedArr[i][j].sections[0])) {
-						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + $(classDiv).prop('time')
-							 + "&emsp;" + $(classDiv).prop('location') + "<br/>" + schedArr[i][j].prof[0];
+					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].classAbbr + "-" + schedArr[i][j].sections[
+							0])) {
+						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + $(classDiv).prop('time') +
+							"&emsp;" + $(classDiv).prop('location') + "<br/>" + schedArr[i][j].prof[0];
 					}
 				}
 			}
@@ -933,7 +1087,10 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			let top = $(classDiv).offset().top - $(scheduleDiv).offset().top - $(commentDiv).height();
 			let left = $(classDiv).offset().left - $(scheduleDiv).offset().left;
 
-			$(commentDiv).css({'top': top, 'left': left});
+			$(commentDiv).css({
+				'top': top,
+				'left': left
+			});
 
 		};
 		classDiv.onmouseout = () => {
