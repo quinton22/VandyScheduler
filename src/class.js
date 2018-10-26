@@ -1,6 +1,6 @@
 class Class_ {
 
-	constructor(classAbbr, classDesc, sections, prof, hours, days, times, location) {
+	constructor(classAbbr, classDesc, sections, type, prof, hours, days, times, location) {
 		// Class Abbreviation
 		// Type: String
 		//	Ex: "CS 1101"
@@ -15,6 +15,11 @@ class Class_ {
 		// Type: String
 		// Ex: "01" or "02"
 		this.sections = sections;
+
+		// Class type
+		// Type: String
+		// Ex: "Laboratory" or "Lecture"
+		this.type = type;
 
 		// Credit Hours
 		// Type: String
@@ -118,5 +123,9 @@ class Class_ {
 
 		var len = hour2 + minute2 - hour1 - minute1;
 		return len;
+	}
+
+	toString() {
+		return JSON.stringify(this);
 	}
 }

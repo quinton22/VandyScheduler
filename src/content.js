@@ -73,19 +73,19 @@ observer.observe(document, {
 function createModal() {
 	modal = document.createElement("div");
 	$('body').eq(0).append($(modal).attr({
-			class: 'modal',
-			id: 'scheduleView'
-		}) // modal
+		class: 'modal',
+		id: 'scheduleView'
+	}) // modal
 		.append($('<div></div>').attr({
-				class: 'modal-content',
-				id: 'modalChild'
-			}) // modalChild
+			class: 'modal-content',
+			id: 'modalChild'
+		}) // modalChild
 			.append($('<div></div>').attr({
-					class: 'modal-header'
-				}) // modal-header
+				class: 'modal-header'
+			}) // modal-header
 				.append($('<div></div>').html('&times;').attr({
-						class: 'close'
-					}) // close button
+					class: 'close'
+				}) // close button
 					.click(() => {
 						modal.style.display = "none";
 						$('#modalBody').html("");
@@ -156,7 +156,7 @@ function createModal() {
 		}
 	};
 
-	prefClose.onclick = function() {
+	prefClose.onclick = function () {
 		prefModal.style.display = "none";
 		updatePreferences();
 	};
@@ -480,12 +480,14 @@ function addClass(_class, classNumOnPage) {
 		classNumOnPage];
 	let sectionsList = specificClass.getElementsByClassName("classSection");
 	let profsList = specificClass.getElementsByClassName("classInstructor");
+	let typeList = specificClass.getElementsByClassName("classType");
 	let hoursList = specificClass.getElementsByClassName("classHours");
 	let daysList = specificClass.getElementsByClassName("classMeetingDays");
 	let timesList = specificClass.getElementsByClassName("classMeetingTimes");
 	let classBuildingList = specificClass.getElementsByClassName("classBuilding");
 	let sections = [];
 	let profs = [];
+	let types = [];
 	let hours = [];
 	let days = [];
 	let times = [];
@@ -493,17 +495,24 @@ function addClass(_class, classNumOnPage) {
 
 	// Refines content
 	for (let num = 0; num < sectionsList.length; ++num) {
-		sections[num] = sectionsList[num].innerText.replace(/\s+$/, "");
-		profs[num] = profsList[num].innerText.replace(/\s+$/, "");
+		sections[num] = sectionsList[num].innerText.trim();
+		profs[num] = profsList[num].innerText.trim();
+		types[num] = typeList[num].innerText.trim();
 		hours[num] = hoursList[num].innerText.replace(/\s+/g, "");
-		days[num] = daysList[num].innerText.replace(/\s+$/, "");
-		times[num] = timesList[num].innerText.replace(/\s+$/, "").replace(/ - /g, "-");
-		location[num] = classBuildingList[num].innerText.replace(/\s+$/, "");
+		days[num] = daysList[num].innerText.trim();
+		times[num] = timesList[num].innerText.trim().replace(/ - /g, "-");
+		location[num] = classBuildingList[num].innerText.trim();
 
 	}
 
-	let newClass = new Class_(classAbbr, classDesc, sections, profs, hours, days, times, location);
-	classArr.push(newClass);
+	let bigArr = [sections, types, profs, hours, days, times, location];
+	let distinctTypes = new Set(types);
+	distinctTypes.forEach((type) => {
+		let typeIndices = types.map((t, i) => t === type ? i : -1).filter((index) => index !== -1);
+		let bigArr2 = bigArr.map((littleArr) => littleArr.filter((_, index) => typeIndices.includes(index)));
+		let newClass = new Class_(classAbbr, classDesc, ...bigArr2)
+		classArr.push(newClass);
+	})
 }
 
 
@@ -513,7 +522,7 @@ function addClass(_class, classNumOnPage) {
 function classAdded(button) {
 	button.setAttribute('class', 'myButton disabled');
 	button.disabled = true;
-	setTimeout(function() {
+	setTimeout(function () {
 		button.innerHTML = "Added";
 	}, 200);
 }
@@ -758,10 +767,10 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		}
 
 		// creates schedule table
-		schedArr.forEach(function(schedule, idx) {
+		schedArr.forEach(function (schedule, idx) {
 			scheduleDiv = document.createElement("div");
 			idx % 2 === 0 ? $(scheduleDiv).addClass('schedule-div') : $(scheduleDiv).addClass(
-					'schedule-div')
+				'schedule-div')
 				.css('background-color', '#dedede');
 
 			var table = document.createElement("table");
@@ -783,22 +792,28 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 				var curSched = schedArr[~~pickSchedBtn.parentNode.previousSibling.innerHTML.match(/[0-9]+/) -
 					1];
 				var classTab = document.getElementById("studentCart").getElementsByClassName("classTable");
-				for (var i = 0; i < parent2.length; i++) { // parent2 = $('.left')
-					let currentClass = curSched.find((el) => {
-						return parent2[i].children[0].innerHTML.includes(el.classAbbr);
-					});
-					for (var k = 0; k < classTab[i].getElementsByClassName("classRow").length; k++) {
-						if (currentClass &&
-							classTab[i].getElementsByClassName("classRow")[k].getElementsByClassName("classSection")[
-								0].innerText.replace(/\s/g, "") !== currentClass.sections[0]) {
-							// Remove class
-							$(classTab[i].getElementsByClassName('classRow')[k]).find('.classActionButtons a').get(0)
-								.click();
-						}
 
-					}
+				let inSchedule = new Map();
+				curSched.forEach((c) => {
+					// gets key for inSchedule which is the index of the overall class (class table)
+					let key = Array.from(parent2).findIndex((el) => el.children[0].innerText.includes(c.classAbbr));
+					// gets value for key which is index of section in class
+					let value = [Array.from(classTab[key].getElementsByClassName("classRow"))
+						.findIndex((el) => el.querySelector('.classSection').innerText.trim() === c.sections[0])];
+					if (inSchedule.has(key))
+						inSchedule.set(key, inSchedule.get(key).concat(value));
+					else
+						inSchedule.set(key, value);
+				});
 
-				}
+				// if key & value are not in inSchedule => remove
+				Array.from(classTab).forEach((cl, i) =>
+					Array.from(cl.getElementsByClassName("classRow")).forEach((el, k) => {
+						if (!inSchedule.get(i).includes(k))
+							el.querySelector('.classActionButtons').querySelector("a[title='Remove Class From Cart']").click();
+					})
+				);
+
 				modal.style.display = "none";
 				$('#modalBody').html("");
 
@@ -919,7 +934,7 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		ec = Array.from(ec);
 		if (ec.length !== 0) {
 			errorText += "Try removing one or more of the following classes:<br/>" + ec.toString().replace(
-					/,/g, ", ") +
+				/,/g, ", ") +
 				"<br/>Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
 		} else {
 			errorText +=
@@ -958,12 +973,13 @@ function convertToDetailed(arr) {
 					locations.push(locations[locations.length - 1]);
 				}
 				for (let i = 0; i < times.length; ++i) {
-					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.prof[y]], [x.hours[y]], [
+					// TODO:: fix this
+					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.type[y]], [x.prof[y]], [x.hours[y]], [
 						days[i]
 					], [times[i]], [locations[i]]));
 				}
 			} else {
-				s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.prof[y]], [x.hours[y]], [x.days[
+				s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.type[y]], [x.prof[y]], [x.hours[y]], [x.days[
 					y]], [x.times[y]], [x.location[y]]));
 			}
 
@@ -1065,7 +1081,7 @@ function placeClass(classDiv, scheduleDiv, day, time) {
 			if (scheduleDiv.id.includes(i + 1)) {
 				for (var j = 0; j < schedArr[i].length; j++) {
 					if (classDiv.firstChild.innerHTML.includes(schedArr[i][j].classAbbr + "-" + schedArr[i][j].sections[
-							0])) {
+						0])) {
 						upperLeftText.innerHTML = classDiv.firstChild.innerHTML + "<br/>" + $(classDiv).prop('time') +
 							"&emsp;" + $(classDiv).prop('location') + "<br/>" + schedArr[i][j].prof[0];
 					}

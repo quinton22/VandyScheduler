@@ -122,7 +122,7 @@ class Schedule {
 							let overlap = 0;
 							if (c.classAbbr !== _class.classAbbr) {
 								c.times.forEach((time, ind) => {
-									if (Schedule.checkOverlap([_class.classAbbr, section, _class.times[i], _class.days[i]], [[c.classAbbr, c.sections[ind], time, c.days[ind]]])) {
+									if (Schedule.checkOverlap([_class.classAbbr, section, _class.times[i], _class.days[i], _class.type[i]], [[c.classAbbr, c.sections[ind], time, c.days[ind], c.type[i]]])) {
 										++overlap;
 									}
 								});
