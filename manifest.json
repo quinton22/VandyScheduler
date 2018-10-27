@@ -15,7 +15,13 @@
       "all_frames": true
    }],
    "permissions": [
-      "tabs", "*://*.vanderbilt.edu/more/SearchClasses*", "storage"
+      "tabs",
+      "*://*.vanderbilt.edu/more/SearchClasses*",
+      "storage"
    ],
-   "web_accessible_resources": ["png/comment-pic2.png", "png/comment-pic3.png"]
+   "web_accessible_resources": [
+       "png/comment-pic2.png",
+        "png/comment-pic3.png",
+        "html/modal.html"
+    ]
 }
