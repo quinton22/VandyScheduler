@@ -957,7 +957,7 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 
 			// creates table
 			$(capSpan).css('font-family', font).addClass('schedule-caption');
-			scheduleDiv.id = caption.innerHTML;
+			scheduleDiv.id = caption.querySelector('span').innerText;
 			var header = table.createTHead();
 			var hrow = header.insertRow(0);
 			for (var i = 0; i < 8; i++) {
