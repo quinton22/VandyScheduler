@@ -137,7 +137,7 @@ function createPrefModal() {
 	let divOuter = $(`
 		<div class="modal-content preference-modal">
 			<div class="pref-modal-body">
-				<span class="close">&times;</span>
+				<span class="close" style="position: sticky; top: 0; padding-top: 5px;">&times;</span>
 				<h1 class="pref-title">Preferences</h1>
 				<div id='include-pref' class="pref-subcontent">
 					<div id='include-pref-text'>

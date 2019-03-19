@@ -51,8 +51,6 @@
    /* box-sizing: border-box; /*include padding in total height */
    padding: 0 10px;
    text-align: left;
-   overflow-y: auto;
-   overflow-x: hidden;
 }
 
 .pref-title {
