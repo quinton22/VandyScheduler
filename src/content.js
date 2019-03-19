@@ -412,8 +412,8 @@ function updatePrefClassesToInclude() {
 	if (classArr && classArr.length !== 0) {
 		try {
 			Array.from(document.getElementById('include-pref').getElementsByTagName('ul')).forEach(el => el.remove());
-			$('#include-pref').append($(`<ul class="include-pref-list">${classArr.map((c) => {
-				return `<li style="padding-top: 10px">
+			$('#include-pref').append($(`<ul class="include-pref-list">${classArr.map((c, j) => {
+				return `<li style="padding: 10px; background-color:${j % 2 === 0 ? '#eee' : '#f9f9f9'}">
 					<input id="${c.classAbbr.replace(' ', '_')}" class="include-class-checkbox" type="checkbox"/> <label class="class-abbr-label">${c.classAbbr}: ${c.classDesc}</label>
 					<ul>
 						${c.sections.map((s, i) => `<li>
@@ -438,14 +438,25 @@ function updatePrefClassesToInclude() {
 
 			classArr.forEach((c) => currentClasses.set(c.classAbbr.replace(' ', '_'), c.sections));
 
-			console.log('currentClasses:', currentClasses);
-
 			if (storedClasses) {
 				// set the session storage to be the intersection of the current classes and what is already in storage
 				let intersection = [];
 				currentClasses.forEach((v, k) => storedClasses.has(k) ? intersection.push(k) : null);
 				for (const [k, v] of storedClasses) {
-					if (!intersection.includes(k)) storedClasses.delete(k)
+					if (!intersection.includes(k))
+						storedClasses.delete(k);
+					else
+						v.forEach((sec, i) => {
+						if (!currentClasses.get(k).includes(sec)) {
+							let sc = storedClasses.get(k);
+							sc.splice(i, 1);
+							storedClasses.set(k, sc);
+							if (storedClasses.get(k).length === 0) {
+								storedClasses.delete(k);
+							}
+						}
+					});
+
 				}
 				// update storage
 				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
