@@ -12,17 +12,17 @@ class Class_ {
 		this.classDesc = classDesc;
 
 		// Class Section
-		// Type: String
+		// Type: Array of String
 		// Ex: "01" or "02"
 		this.sections = sections;
 
 		// Class type
-		// Type: String
+		// Type: array of String
 		// Ex: "Laboratory" or "Lecture"
 		this.type = type;
 
 		// Credit Hours
-		// Type: String
+		// Type: array of String
 		// Ex: "1.0hrs"
 		this.hours = hours;
 
@@ -131,5 +131,20 @@ class Class_ {
 
 	equal(other) {
 		return this.toString() === other.toString();
+	}
+
+	copy() {
+		return new Class_(this.classAbbr, this.classDesc, this.sections.slice(), this.type.slice(), this.prof.slice(), this.hours.slice(), this.days.slice(), this.times.slice(), this.location.slice());
+	}
+
+	removeSection(sectionString) {
+		let index = this.sections.indexOf(sectionString);
+		this.sections = this.sections.filter((_, i) => i !== index);
+		this.type = this.type.filter((_, i) => i !== index);
+		this.prof = this.prof.filter((_, i) => i !== index);
+		this.hours = this.hours.filter((_, i) => i !== index);
+		this.days = this.days.filter((_, i) => i !== index);
+		this.times = this.times.filter((_, i) => i !== index);
+		this.location = this.location.filter((_, i) => i !== index);
 	}
 }

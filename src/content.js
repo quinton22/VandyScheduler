@@ -413,8 +413,8 @@ function updatePrefClassesToInclude() {
 		try {
 			Array.from(document.getElementById('include-pref').getElementsByTagName('ul')).forEach(el => el.remove());
 			$('#include-pref').append($(`<ul class="include-pref-list">${classArr.map((c) => {
-				return `<li>
-					<input id="${c.classAbbr.replace(' ', '_')}" class="include-class-checkbox" type="checkbox"/> <label class="class-abbr-label">${c.classAbbr}:</label>
+				return `<li style="padding-top: 10px">
+					<input id="${c.classAbbr.replace(' ', '_')}" class="include-class-checkbox" type="checkbox"/> <label class="class-abbr-label">${c.classAbbr}: ${c.classDesc}</label>
 					<ul>
 						${c.sections.map((s, i) => `<li>
 								<div class="class-details-pref">
@@ -439,7 +439,6 @@ function updatePrefClassesToInclude() {
 			classArr.forEach((c) => currentClasses.set(c.classAbbr.replace(' ', '_'), c.sections));
 
 			console.log('currentClasses:', currentClasses);
-			console.log('storedClasses:', storedClasses);
 
 			if (storedClasses) {
 				// set the session storage to be the intersection of the current classes and what is already in storage
@@ -471,7 +470,6 @@ function updatePrefClassesToInclude() {
 				let el = ev.target
 				if (el.checked) {
 					// remove from stored
-					console.log('change!', el);
 					let match = el.id.match(/(.*)-(.*)/);
 					let k = match[1];
 					let k2 = match[2];
@@ -488,7 +486,6 @@ function updatePrefClassesToInclude() {
 
 				} else {
 					// add to stored
-					console.log('change!', el)
 					let match = el.id.match(/(.*)-(.*)/);
 					let k = match[1];
 					let k2 = match[2];
@@ -501,7 +498,6 @@ function updatePrefClassesToInclude() {
 					}
 				}
 
-				console.log('updated storage:', storedClasses);
 				// update the session storage
 				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
 			});
@@ -522,7 +518,6 @@ function updatePrefClassesToInclude() {
 
 				}
 
-				console.log('updated storage:', storedClasses);
 				// update the session storage
 				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
 
@@ -667,6 +662,7 @@ function classAdded(button) {
  *	Creates the make schedule button
  */
 function makeScheduleButton(parent) {
+	// add make schedule button if it doesn't exist
 	if (!parent.querySelector("button")) {
 
 		$('#yui-gen9').css('height', 'auto');
@@ -701,6 +697,7 @@ function makeScheduleButton(parent) {
 
 	}
 
+	// add one click enroll if doesn't exist
 	if (!document.querySelector('#oneClickEnrollButton')) {
 		let oneClickEnrollDiv = document.createElement("div");
 		let oneClickEnroll = document.createElement("button");
@@ -714,9 +711,7 @@ function makeScheduleButton(parent) {
 		if (document.querySelector('#enrollButton-button'))
 			$('#cartDiv').append(oneClickEnrollDiv);
 	}
-	//
-	// if (!document.querySelector('#oneClickEnrollButton'))
-	// 	console.log("NOT HERE");
+
 }
 
 
@@ -734,7 +729,23 @@ function makeSchedClicked() {
 			}
 			return !c.times.includes("TBA");
 		});
-		var sched = new Schedule(classArr);
+		let includeClasses = classArr.map(c => c.copy());
+		let doNotIncludeString = sessionStorage.getItem('includePreferences');
+		if (doNotIncludeString) {
+			let doNotIncludeClasses = new Map(JSON.parse(doNotIncludeString));
+			includeClasses.forEach(c => {
+				// want to remove sections from what we are looking at
+				let k = c.classAbbr.replace(' ', '_');
+				if (doNotIncludeClasses.has(k)) {
+					doNotIncludeClasses.get(k).forEach(section => c.removeSection(section));
+					console.log('Not including classes:', k, doNotIncludeClasses.get(k))
+				}
+			});
+			// remove all classes with no sections
+			includeClasses = includeClasses.filter(c => c.sections.length > 0);
+		}
+
+		var sched = new Schedule(includeClasses);
 		let overlappedC = sched.overlappedClasses;
 		scheduleArr = sched.scheduleArr;
 		scheduleArr = sortBasedOnPreferences(scheduleArr);
