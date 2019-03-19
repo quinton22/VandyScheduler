@@ -128,4 +128,8 @@ class Class_ {
 	toString() {
 		return JSON.stringify(this);
 	}
+
+	equal(other) {
+		return this.toString() === other.toString();
+	}
 }

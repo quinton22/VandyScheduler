@@ -55,30 +55,57 @@
    overflow-x: hidden;
 }
 
+.pref-title {
+   margin: 0;
+   padding: 0 10px 10px 10px;
+   border-bottom: black 1px solid;
+}
+
+.pref-subtitle {
+   margin: 0;
+   padding: 5px;
+}
+
+.pref-subcontent {
+   padding: 0 10px;
+}
+
 .pref-modal-text {
    font-size: 14px;
    font-family: Arial, Helvetica, sans-serif;
    height: 80%;
    text-align: justify;
-   margin: 0 5px;
+   padding: 0 5px;
 }
 
 .form-container {
    white-space: nowrap;
-   margin-top: 10px;
 }
 
 .inner-form-container {
    overflow-x: auto;
    padding-top: 15px;
    padding-bottom: 10px;
-   border-top: 1px solid #555; /*TODO remove top*/
 }
 
-.pref-btn-container {
+#pref-button-container {
    display: block;
    width: 100%;
    height: auto;
+}
+
+.include-pref-list {
+   padding: 5px;
+}
+
+.include-pref-list ul {
+   padding: 5px 0 5px 30px;
+}
+
+.class-details-pref {
+   display: grid;
+   grid-template-columns: 3ch 3ch 6ch 14ch auto;
+   grid-gap: 5px;
 }
 
 .checkbox-div {

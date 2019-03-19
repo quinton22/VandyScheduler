@@ -1,7 +1,7 @@
 // IDEA: sidebar instead of preferences button
 // in manifest: sidebar_action
-// IDEA: say which classes conflict with the most when creating schedule and showing error
 // IDEA: somehow find a way to show which classes you should take
+// TODO: make this a react app :)
 
 
 var classArr = []; // contains classes to construct schedule with
@@ -10,8 +10,7 @@ var modal, modalChild;
 var preferences = {
 	breakTime: null,
 	noPrefMet: false
-}
-let prefMat = new Map();
+};
 createModal(); // creates modal and appends to doc
 var ready = false; // allows modal to load
 
@@ -102,6 +101,21 @@ function createModal() {
 				}), // modal body
 				$('<div></div>').attr('class', 'modal-footer')))); // modal footer
 
+	let prefModal = createPrefModal();
+
+	// exit if clicked not on modal
+	window.onclick = (event) => {
+		if (event.target === modal) {
+			modal.style.display = "none";
+			$('#modalBody').html("");
+		} else if (event.target === prefModal) {
+			prefModal.style.display = "none";
+			updatePreferences();
+		}
+	};
+}
+
+function createPrefModal() {
 	let prefModal = document.createElement("div");
 
 	chrome.storage.sync.get("pref", (obj) => {
@@ -112,57 +126,46 @@ function createModal() {
 				"pref": preferences
 			});
 		}
+
 		getFromStorageAndCreateModal(prefModal)
 	});
 
 	// creates preference modal
 	prefModal.className = "modal";
 	prefModal.id = "pref-modal";
-	let divOuter = document.createElement("div");
-	divOuter.className = "modal-content preference-modal";
-	prefModal.appendChild(divOuter);
-	let div = document.createElement("div");
-	div.className = "pref-modal-body";
-	divOuter.appendChild(div);
 
+	let divOuter = $(`
+		<div class="modal-content preference-modal">
+			<div class="pref-modal-body">
+				<span class="close">&times;</span>
+				<h1 class="pref-title">Preferences</h1>
+				<div id='include-pref' class="pref-subcontent">
+					<div id='include-pref-text'>
+						<h3 class="pref-subtitle">Include Classes</h3>
+						<p class="pref-modal-text">Choose which classes are included in making the schedule. Note that these preferences will be reset each time you log in.</p>
+					</div>
+				</div>
+				<div id='break-pref' class="pref-subcontent">
+					<div id='break-pref-text'>
+						<h3 class="pref-subtitle">Breaks</h3>
+						<p class="pref-modal-text">Select the time(s) you do <strong><i>not</i></strong> want class below. Schedules that have classes during these times will be at the bottom of the list unless "Do not show schedules that do not meet preferences" is checked, in which case they will not be shown.</p>
+					</div>
+				</div>
+				<div id='pref-button-container' class="pref-subcontent">
+				</div>
+			</div>
+		</div>
+	`)
 
-	let prefClose = document.createElement("span");
-	prefClose.className = "close";
-	prefClose.innerHTML = "&times;";
-	div.appendChild(prefClose);
-
-	let head = document.createElement("h1");
-	head.innerHTML = "Preferences";
-	div.appendChild(head);
-
-	let div2 = document.createElement("div");
-	div.appendChild(div2);
-
-	let p = document.createElement("p");
-	p.innerHTML =
-		"Select the time(s) you do <strong><i>not</i></strong> want class below. Schedules that have classes during these times will be at the bottom of the list unless \"Do not show schedules that conflict with break times\" is checked, in which case they will not be shown. "
-
-	div2.appendChild(p);
-	div2.className = "pref-modal-text";
-
-	// exit if clicked not on modal
-	window.onclick = (event) => {
-		if (event.target == modal) {
-			modal.style.display = "none";
-			$('#modalBody').html("");
-		} else if (event.target == prefModal) {
-			prefModal.style.display = "none";
-			updatePreferences();
-		}
-	};
-
-	prefClose.onclick = function () {
-		prefModal.style.display = "none";
+	$($(divOuter).find('span.close')[0]).click(() => {
+		document.getElementById('pref-modal').style.display = 'none';
 		updatePreferences();
-	};
+	});
 
+	$(prefModal).append(divOuter);
+
+	return prefModal;
 }
-
 
 /*
  *	Creates preferences modal and gets information from storage
@@ -170,10 +173,10 @@ function createModal() {
 function getFromStorageAndCreateModal(prefModal) {
 	let firstTime = preferences.breakTime === null ? true : false;
 	preferences.breakTime = firstTime ? {} : preferences.breakTime;
-	firstTime ? $(prefModal).find('.pref-modal-text p').text($(prefModal).find('.pref-modal-text p').text() +
+	firstTime ? $('#break-pref-text').text($('#break-pref-text').text() +
 		"Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" "
 	) : null;
-	$(prefModal).find('.pref-modal-text p').text($(prefModal).find('.pref-modal-text p').text() +
+	$('#break-pref-text').text($('#break-pref-text').text() +
 		"To select a break time for all of MWF, TR, or SU, double click on that time on any of those days."
 	);
 
@@ -284,9 +287,8 @@ function getFromStorageAndCreateModal(prefModal) {
 		//div2.appendChild(breakDay[i]);
 	}
 
-
-	document.querySelector('body').appendChild(prefModal)
-	$('.pref-modal-text').append(breakFormCont);
+	document.body.appendChild(prefModal)
+	$('#break-pref').append(breakFormCont);
 
 
 	for (let day in preferences.breakTime) {
@@ -295,9 +297,7 @@ function getFromStorageAndCreateModal(prefModal) {
 		});
 	}
 
-	let prefBtnCont = document.createElement("div");
-	prefBtnCont.className = "pref-btn-container";
-	breakFormCont.appendChild(prefBtnCont);
+	let prefBtnCont = document.getElementById('pref-button-container');
 
 	let checkBoxDiv = document.createElement("div");
 	let checkBox = document.createElement("input");
@@ -311,7 +311,7 @@ function getFromStorageAndCreateModal(prefModal) {
 	checkBox.checked = preferences.noPrefMet ? true : false;
 	label.className = "preference-label";
 	label.htmlFor = "pref-not-met";
-	label.innerHTML = "Do not show schedules that conflict with break times"
+	label.innerHTML = "Do not show schedules that do not meet preferences"
 	checkBoxDiv.appendChild(checkBox);
 	checkBoxDiv.appendChild(label);
 	prefBtnCont.appendChild(checkBoxDiv);
@@ -382,6 +382,7 @@ function updatePreferences() {
  *	Clears class array and puts classes in cart in class arr
  */
 function updateClassArr() {
+	oldclassArr = classArr.slice();
 	classArr = [];
 
 	// adds classes in cart to class arr
@@ -396,7 +397,141 @@ function updateClassArr() {
 			}
 		}
 		ready = true;
+
+
+		// do nothing if classes array has not changed
+		if (oldclassArr.length === classArr.length && oldclassArr.every((c,i) => c.equal(classArr[i]))) {
+			return;
+		}
+		updatePrefClassesToInclude();
+
 	}, 100);
+}
+
+function updatePrefClassesToInclude() {
+	if (classArr && classArr.length !== 0) {
+		try {
+			Array.from(document.getElementById('include-pref').getElementsByTagName('ul')).forEach(el => el.remove());
+			$('#include-pref').append($(`<ul class="include-pref-list">${classArr.map((c) => {
+				return `<li>
+					<input id="${c.classAbbr.replace(' ', '_')}" class="include-class-checkbox" type="checkbox"/> <label class="class-abbr-label">${c.classAbbr}:</label>
+					<ul>
+						${c.sections.map((s, i) => `<li>
+								<div class="class-details-pref">
+									<div class="grid-item"><input id="${c.classAbbr.replace(' ', '_')}-${s}" class="include-section-checkbox" type="checkbox"/></div>
+									<div class="grid-item">${s}</div>
+									<div class="grid-item">${c.days[i]}</div>
+									<div class="grid-item">${c.times[i]}</div>
+									<div class="grid-item">${c.prof[i]}</div.
+								</div>
+							</li>`).join('')}
+					</ul>
+				</li>`
+			}).join('')}</ul>`));
+
+			let currentClasses = new Map();
+
+			// this stores all the classes that we do not want to include!
+			let sStorage = sessionStorage.getItem('includePreferences');
+			// convert the string to a map if not undefined / null
+			let storedClasses = sStorage ? new Map(JSON.parse(sStorage)) : sStorage;
+
+			classArr.forEach((c) => currentClasses.set(c.classAbbr.replace(' ', '_'), c.sections));
+
+			console.log('currentClasses:', currentClasses);
+			console.log('storedClasses:', storedClasses);
+
+			if (storedClasses) {
+				// set the session storage to be the intersection of the current classes and what is already in storage
+				let intersection = [];
+				currentClasses.forEach((v, k) => storedClasses.has(k) ? intersection.push(k) : null);
+				for (const [k, v] of storedClasses) {
+					if (!intersection.includes(k)) storedClasses.delete(k)
+				}
+				// update storage
+				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
+			} else {
+				// set session storage to have preferences for classes included in making schedule
+				storedClasses = new Map();
+				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
+			}
+
+			// check everything
+			$('.include-pref-list input').each((_, el) => el.checked = true);
+
+			// remove checks of stored classes
+			storedClasses.forEach((v, k) => {
+				$('.include-class-checkbox').filter((_, el) => el.id === k.replace(' ', '_'))[0].checked = false;
+				v.forEach((s) => $('.include-section-checkbox').filter((_, el) => k.replace(' ', '_') + '-' + s === el.id)[0].checked = false);
+			});
+
+			console.log('storedClasses:', storedClasses)
+
+			$('.include-section-checkbox').change((ev) => {
+				let el = ev.target
+				if (el.checked) {
+					// remove from stored
+					console.log('change!', el);
+					let match = el.id.match(/(.*)-(.*)/);
+					let k = match[1];
+					let k2 = match[2];
+					storedClasses.set(k, storedClasses.get(k).filter(e => e !== k2));
+
+					// check if every item in this list is true
+					if ($(el).closest('ul').find('input').filter((_, element) => element.checked === false).length === 0) {
+						$(el).parents('li').find('.include-class-checkbox').get(0).checked = true;
+						storedClasses.delete(k);
+					}
+
+					// update storage
+					sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
+
+				} else {
+					// add to stored
+					console.log('change!', el)
+					let match = el.id.match(/(.*)-(.*)/);
+					let k = match[1];
+					let k2 = match[2];
+					storedClasses.has(k) ? storedClasses.set(k, storedClasses.get(k).concat(k2)) : storedClasses.set(k, [k2]);
+
+					// TODO remove check if at least one item is unchecked
+					let x = $(el).parents('li').find('.include-class-checkbox').get(0);
+					if (x.checked) {
+						x.checked = false;
+					}
+				}
+
+				console.log('updated storage:', storedClasses);
+				// update the session storage
+				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
+			});
+
+			$('.include-class-checkbox').change((ev) => {
+				let el = ev.target;
+				if (el.checked) {
+					// remove items from storedClasses
+					$(el).parent().find('.include-section-checkbox').filter((_, element) => !element.checked).each((_, element) => {
+						storedClasses.delete(element.id.match(/(.*)-.*/)[1]);
+						element.checked = true;
+					});
+				} else {
+					storedClasses.set(el.id, Array.from($(el).parent().find('.include-section-checkbox').map((_, element) => {
+						element.checked = false;
+						return element.id.match(/-(.*)/)[1];
+					})));
+
+				}
+
+				console.log('updated storage:', storedClasses);
+				// update the session storage
+				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
+
+			});
+		} catch(e) {
+			console.error(e);
+			console.error('DOM not loaded.')
+		}
+	}
 }
 
 
@@ -933,12 +1068,13 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		let ec = new Set(errorClasses.map((item) => item[0].substring(0, item[0].indexOf("-"))));
 		ec = Array.from(ec);
 		if (ec.length !== 0) {
+			// TODO: edit this text to say to check preferences
 			errorText += "Try removing one or more of the following classes:<br/>" + ec.toString().replace(
 				/,/g, ", ") +
-				"<br/>Or uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
+				"<br/>Or uncheck the \"Do not show schedules that do not meet preferences\" box in preferences.</p>";
 		} else {
 			errorText +=
-				"Try to uncheck the \"Do not show schedules that conflict with break times\" box in preferences.</p>";
+				"Try to uncheck the \"Do not show schedules that do not meet preferences\" box in preferences.</p>";
 		}
 		$('.modal-header h2').html(errorText);
 
