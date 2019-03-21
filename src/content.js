@@ -161,6 +161,7 @@ function createPrefModal() {
 						</form>
 					</div>
 				</div>
+				<div class="pref-divider"></div>
 				<div id='break-pref' class="pref-subcontent">
 					<div id='break-pref-text'>
 						<h3 class="pref-subtitle">Breaks</h3>
@@ -456,6 +457,9 @@ function updatePrefClassesToInclude() {
 					</ul>
 				</li>`
 			}).join('')}</ul>`).insertAfter($('#include-pref-text'));
+
+			$('.class-abbr-label').click((ev) => $(ev.delegateTarget).prev().trigger('click'));
+			$('.class-details-pref').click((ev) => $(ev.delegateTarget).find('input')[0].click())
 
 			let currentClasses = new Map();
 
