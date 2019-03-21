@@ -337,6 +337,8 @@ function getFromStorageAndCreateModal(prefModal) {
 
 	$('#break-pref').append(checkBoxDiv);
 
+	$('.radio-container').each((_, el) => el.onclick = () => $(el).find('input')[0].click());
+
 
 	for (let day in preferences.breakTime) {
 		preferences.breakTime[day].map((time) => {
