@@ -11,6 +11,9 @@ var preferences = {
 	breakTime: null,
 	noPrefMet: false
 };
+var includePreferences = new Map();
+var includeClassesInRemoval = false;
+
 createModal(); // creates modal and appends to doc
 var ready = false; // allows modal to load
 
@@ -142,20 +145,39 @@ function createPrefModal() {
 				<div id='include-pref' class="pref-subcontent">
 					<div id='include-pref-text'>
 						<h3 class="pref-subtitle">Include Classes</h3>
-						<p class="pref-modal-text">Choose which classes are included in making the schedule. Note that these preferences will be reset each time you log in.</p>
+						<p class="pref-modal-text">Choose which classes are included in making the schedule.</p>
+					</div>
+					<div>
+						<form id="remove-classes-pref-form" action="javascript:void(0)">
+							<fieldset class="preferences-fieldset">
+								<legend class="preferences-legend">Keep unselected classes in cart if a schedule is chosen?</legend>
+								<div class="radio-container">
+									<input type="radio" class="preferences-radio" id="include-classes-input-keep" name="include-pref" value="true" checked="true"><label for="include-classes-input-keep">Keep</label>
+								</div>
+								<div class="radio-container">
+									<input type="radio" class="preferences-radio" id="include-classes-input-remove" name="include-pref" value="false"><label for="include-classes-input-remove">Remove</label>
+								</div>
+							</fieldset>
+						</form>
 					</div>
 				</div>
 				<div id='break-pref' class="pref-subcontent">
 					<div id='break-pref-text'>
 						<h3 class="pref-subtitle">Breaks</h3>
-						<p class="pref-modal-text">Select the time(s) you do <strong><i>not</i></strong> want class below. Schedules that have classes during these times will be at the bottom of the list unless "Do not show schedules that do not meet preferences" is checked, in which case they will not be shown.</p>
+						<p class="pref-modal-text">
+							Select the time(s) you do <strong><i>not</i></strong> want class below. Your schedules will be sorted based on this.
+						</p>
 					</div>
 				</div>
 				<div id='pref-button-container' class="pref-subcontent">
 				</div>
 			</div>
 		</div>
-	`)
+	`);
+
+	$($(divOuter).find('#remove-classes-pref-form')[0]).find('input').each((_, el) => {
+		el.onchange = () => includeClassesInRemoval = !JSON.parse(el.value);
+	});
 
 	$($(divOuter).find('span.close')[0]).click(() => {
 		document.getElementById('pref-modal').style.display = 'none';
@@ -173,12 +195,13 @@ function createPrefModal() {
 function getFromStorageAndCreateModal(prefModal) {
 	let firstTime = preferences.breakTime === null ? true : false;
 	preferences.breakTime = firstTime ? {} : preferences.breakTime;
-	firstTime ? $('#break-pref-text').text($('#break-pref-text').text() +
-		"Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click \"Clear.\" "
-	) : null;
-	$('#break-pref-text').text($('#break-pref-text').text() +
-		"To select a break time for all of MWF, TR, or SU, double click on that time on any of those days."
-	);
+	firstTime ? $('#break-pref-text').append($(`<p class="pref-modal-text">
+			Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click "Clear Preferences."
+		</p>`)) : null;
+
+	$('#break-pref-text').append($(`<p class="pref-modal-text">
+			To select a break time for all of MWF, TR, or SU, double click on that time on any of those days.
+		</p>`));
 
 	// settings:
 	let breakFormCont = document.createElement("div");
@@ -290,6 +313,30 @@ function getFromStorageAndCreateModal(prefModal) {
 	document.body.appendChild(prefModal)
 	$('#break-pref').append(breakFormCont);
 
+	// hide / show schedules that do not meet pref option
+	let checkBoxDiv = $(`
+		<div class="checkbox-div">
+			<form id="pref-not-met-form" action="javascript:void(0)">
+				<fieldset class="preferences-fieldset">
+					<legend class="preferences-legend">Show schedules that do not meet preferences?</legend>
+					<div class="radio-container">
+						<input type="radio" class="preferences-radio" id="break-pref-input-show" name="break-pref" value="true"><label for="break-pref-input-show">Show</label>
+					</div>
+					<div class="radio-container">
+						<input type="radio" class="preferences-radio" id="break-pref-input-hide" name="break-pref" value="false"><label for="break-pref-input-hide">Hide</label>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	`);
+
+	$(checkBoxDiv).find('input').each((_, el) => {
+		el.checked = JSON.parse(el.value) !== preferences.noPrefMet;
+		el.onchange = () => {preferences.noPrefMet = !JSON.parse(el.value)};
+	});
+
+	$('#break-pref').append(checkBoxDiv);
+
 
 	for (let day in preferences.breakTime) {
 		preferences.breakTime[day].map((time) => {
@@ -299,33 +346,12 @@ function getFromStorageAndCreateModal(prefModal) {
 
 	let prefBtnCont = document.getElementById('pref-button-container');
 
-	let checkBoxDiv = document.createElement("div");
-	let checkBox = document.createElement("input");
-	let label = document.createElement("label");
-	checkBoxDiv.className = "checkbox-div";
-	$(checkBox).attr({
-		id: "pref-not-met",
-		type: "checkbox",
-		name: "pref-not-met"
-	});
-	checkBox.checked = preferences.noPrefMet ? true : false;
-	label.className = "preference-label";
-	label.htmlFor = "pref-not-met";
-	label.innerHTML = "Do not show schedules that do not meet preferences"
-	checkBoxDiv.appendChild(checkBox);
-	checkBoxDiv.appendChild(label);
-	prefBtnCont.appendChild(checkBoxDiv);
-
-	checkBox.onchange = () => {
-		preferences.noPrefMet = checkBox.checked;
-	};
-
 	let clearBtn = document.createElement("button");
 	clearBtn.className = "myButton modalButton2 pref-clear";
-	clearBtn.innerHTML = "Clear";
+	clearBtn.innerHTML = "Clear Preferences";
 	prefBtnCont.appendChild(clearBtn);
 	clearBtn.onclick = () => {
-		$('#pref-not-met').prop('checked', false);
+		$('#break-pref-input-show').trigger('click');
 		$('.break-select').removeClass("one-chosen");
 		for (let day in preferences.breakTime) {
 			preferences.breakTime[day] = [];
@@ -412,7 +438,7 @@ function updatePrefClassesToInclude() {
 	if (classArr && classArr.length !== 0) {
 		try {
 			Array.from(document.getElementById('include-pref').getElementsByTagName('ul')).forEach(el => el.remove());
-			$('#include-pref').append($(`<ul class="include-pref-list">${classArr.map((c, j) => {
+			$(`<ul class="include-pref-list">${classArr.map((c, j) => {
 				return `<li style="padding: 10px; background-color:${j % 2 === 0 ? '#eee' : '#f9f9f9'}">
 					<input id="${c.classAbbr.replace(' ', '_')}" class="include-class-checkbox" type="checkbox"/> <label class="class-abbr-label">${c.classAbbr}: ${c.classDesc}</label>
 					<ul>
@@ -427,7 +453,7 @@ function updatePrefClassesToInclude() {
 							</li>`).join('')}
 					</ul>
 				</li>`
-			}).join('')}</ul>`));
+			}).join('')}</ul>`).insertAfter($('#include-pref-text'));
 
 			let currentClasses = new Map();
 
@@ -466,6 +492,8 @@ function updatePrefClassesToInclude() {
 				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
 			}
 
+			includePreferences = new Map(storedClasses);
+
 			// check everything
 			$('.include-pref-list input').each((_, el) => el.checked = true);
 
@@ -474,8 +502,6 @@ function updatePrefClassesToInclude() {
 				$('.include-class-checkbox').filter((_, el) => el.id === k.replace(' ', '_'))[0].checked = false;
 				v.forEach((s) => $('.include-section-checkbox').filter((_, el) => k.replace(' ', '_') + '-' + s === el.id)[0].checked = false);
 			});
-
-			console.log('storedClasses:', storedClasses)
 
 			$('.include-section-checkbox').change((ev) => {
 				let el = ev.target
@@ -502,7 +528,6 @@ function updatePrefClassesToInclude() {
 					let k2 = match[2];
 					storedClasses.has(k) ? storedClasses.set(k, storedClasses.get(k).concat(k2)) : storedClasses.set(k, [k2]);
 
-					// TODO remove check if at least one item is unchecked
 					let x = $(el).parents('li').find('.include-class-checkbox').get(0);
 					if (x.checked) {
 						x.checked = false;
@@ -511,6 +536,7 @@ function updatePrefClassesToInclude() {
 
 				// update the session storage
 				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
+				includePreferences = new Map(storedClasses);
 			});
 
 			$('.include-class-checkbox').change((ev) => {
@@ -531,10 +557,9 @@ function updatePrefClassesToInclude() {
 
 				// update the session storage
 				sessionStorage.setItem('includePreferences', JSON.stringify([...storedClasses]));
-
+				includePreferences = new Map(storedClasses);
 			});
 		} catch(e) {
-			console.error(e);
 			console.error('DOM not loaded.')
 		}
 	}
@@ -749,7 +774,6 @@ function makeSchedClicked() {
 				let k = c.classAbbr.replace(' ', '_');
 				if (doNotIncludeClasses.has(k)) {
 					doNotIncludeClasses.get(k).forEach(section => c.removeSection(section));
-					console.log('Not including classes:', k, doNotIncludeClasses.get(k))
 				}
 			});
 			// remove all classes with no sections
@@ -879,10 +903,12 @@ function sortBasedOnPreferences(arr) {
 		});
 	}
 	if (preferences.noPrefMet) { // do not show if no pref met
+		console.log('here')
 		arr = arr.filter((sched) => {
 			let flag = true;
 			breakArr.forEach((c) => {
-				Schedule.checkOverlap(c, sched) ? flag = false : null;
+				if (Schedule.checkOverlap(c, sched))
+					flag = false;
 			});
 			return flag;
 		});
@@ -966,10 +992,26 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 				// if key & value are not in inSchedule => remove
 				Array.from(classTab).forEach((cl, i) =>
 					Array.from(cl.getElementsByClassName("classRow")).forEach((el, k) => {
-						if (!inSchedule.get(i).includes(k))
-							el.querySelector('.classActionButtons').querySelector("a[title='Remove Class From Cart']").click();
-					})
-				);
+						// If not including class in schedule making via preferences, then i will not be in 'inSchedule'
+						// TODO: change the following:
+						// In preferences, if a certain section is not included then it will still be deleted
+						if (!inSchedule.has(i)) {
+							// class not in schedule -- remove or don't remove based on preference
+							if (includeClassesInRemoval) {
+								el.querySelector('.classActionButtons').querySelector("a[title='Remove Class From Cart']").click();
+							}
+						} else if (!inSchedule.get(i).includes(k)) {
+							let key = $(el).prevAll().find('.classHeader')[0].getElementsByClassName('classAbbreviation')[0].innerText.match(/[^:]+/)[0].replace(' ', '_');
+							let value = $(el).find('.classSection')[0].innerText.match(/[\S]+/)[0];
+							if (includePreferences.has(key) && includePreferences.get(key).includes(value)) {
+								if (includeClassesInRemoval)
+									el.querySelector('.classActionButtons').querySelector("a[title='Remove Class From Cart']").click();
+							} else {
+								el.querySelector('.classActionButtons').querySelector("a[title='Remove Class From Cart']").click();
+							}
+						}
+					}
+				));
 
 				modal.style.display = "none";
 				$('#modalBody').html("");
@@ -1077,7 +1119,7 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		});
 	} else {
 		let errorText =
-			"<p>Error creating schedule!</p><p class='errorText'>There was no possible schedule that could be created from the classes in your cart. ";
+			"<div class='errorText'><p>There was no possible schedule that could be created from the classes in your cart.</p>";
 		let errorClasses = Array.from(overlappedClasses);
 		let nonOverlapped = errorClasses.filter((item) => item[1] === 0).map((item) => item[0].substring(
 			0, item[0].indexOf("-")));
@@ -1090,18 +1132,19 @@ function createViewableContent(arr, tbaClasses, overlappedClasses) {
 		let ec = new Set(errorClasses.map((item) => item[0].substring(0, item[0].indexOf("-"))));
 		ec = Array.from(ec);
 		if (ec.length !== 0) {
-			// TODO: edit this text to say to check preferences
-			errorText += "Try removing one or more of the following classes:<br/>" + ec.toString().replace(
+
+			errorText += "<p>The following classes have conflicts:</p><br/><p style='padding-left: 10px'>" + ec.toString().replace(
 				/,/g, ", ") +
-				"<br/>Or uncheck the \"Do not show schedules that do not meet preferences\" box in preferences.</p>";
+				"</p><br/><p>In preferences you can choose to <strong><i>not</i></strong> include the classes when creating a schedule. This will not remove the classes from your cart but will just ignore the classes when creating schedules. If a schedule is chosen, then the ignored classes will be removed from your cart.</p><p>Alternately, try clicking \"show\" for classes that do not meet preferences in preferences.</p></div>";
 		} else {
 			errorText +=
-				"Try to uncheck the \"Do not show schedules that do not meet preferences\" box in preferences.</p>";
+				"<p>Try clicking \"show\" for classes that do not meet preferences in preferences.</p></div>";
 		}
-		$('.modal-header h2').html(errorText);
+		$('.modal-header h2').html('Error creating schedule!');
 
 		$('.modal-header h2').css('color', 'red');
 		$(".modal-content").css('font-family', font);
+		$('#modalBody').html(errorText);
 		modal.style.display = "block";
 	}
 }
@@ -1132,9 +1175,8 @@ function convertToDetailed(arr) {
 				}
 				for (let i = 0; i < times.length; ++i) {
 					// TODO:: fix this
-					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.type[y]], [x.prof[y]], [x.hours[y]], [
-						days[i]
-					], [times[i]], [locations[i]]));
+					s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.type[y]], [x.prof[y]], [x.hours[y]],
+						[days[i]], [times[i]], [locations[i]]));
 				}
 			} else {
 				s.push(new Class_(x.classAbbr, x.classDesc, [x.sections[y]], [x.type[y]], [x.prof[y]], [x.hours[y]], [x.days[
