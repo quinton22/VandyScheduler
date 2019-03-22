@@ -2,14 +2,11 @@
    "manifest_version": 2,
    "name": "Vandy Scheduler",
    "version": "2.0.0",
-   "description": "This extension organizes your potential classes and Vanderbilt YES class cart into a schedule for the upcoming semester, and it shows professor ratings from Rate My Professor.",
+   "description": "This extension organizes your potential classes and Vanderbilt YES class cart into a schedule for the upcoming semester.",
    "icons": {
       "16": "png/schedule-icon16.png",
       "48": "png/schedule-icon48.png",
       "128": "png/schedule-icon128.png"
-   },
-   "page_action": {
-      "default_icon": "png/schedule-icon.png"
    },
    "content_scripts": [{
       "matches": ["*://*.vanderbilt.edu/more/SearchClasses*"],
