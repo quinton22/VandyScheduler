@@ -1,5 +1,5 @@
-const BASE_URL = 'http://www.ratemyprofessors.com';
-const BASE_SEARCH_URL = 'http://www.ratemyprofessors.com/search.jsp?queryoption=HEADER&queryBy=teacherName&schoolName=Vanderbilt+University&schoolID=4002&query=';
+const BASE_URL = 'https://www.ratemyprofessors.com';
+const BASE_SEARCH_URL = 'https://www.ratemyprofessors.com/search.jsp?queryoption=HEADER&queryBy=teacherName&schoolName=Vanderbilt+University&schoolID=4002&query=';
 const GREEN = '#27AE60';
 const YELLOW = '#FF9800';
 const RED = '#E74C3C';
