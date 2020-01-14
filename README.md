@@ -7,6 +7,7 @@ This extension can be downloaded at the Chrome Web Store [here](https://chrome.g
 ## How to use
 Just download from the Chrome Web Store and go to [Course Registration](https://acad.app.vanderbilt.edu/more/SearchClasses.action#) from your YES page, log in, and start using!
 ## Changelog
+- 2.0.2 - Update in accordance with RateMyProfessors site update.
 - 2.0.1 - Small bug fix.
 - 2.0.0 - Shows ratings from rate my professor next to professor names.
 - 1.3.0 - Allows for the user to choose which classes from the cart are included in making the schedule. Minor refactoring.

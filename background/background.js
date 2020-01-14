@@ -1,5 +1,7 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	const method = request.method ? request.method.toUpperCase() : 'GET';
+	const BASE_URL = 'https://www.ratemyprofessors.com';
+	const BASE_SEARCH_URL = 'https://www.ratemyprofessors.com/search.jsp?queryoption=HEADER&queryBy=teacherName&schoolName=Vanderbilt+University&schoolID=4002&query=';
+	const method = 'GET';
 	const headers = new Headers();
 	if (method === 'POST') headers.append('Content-Type', 'application/x-www-form-urlencoded');
 	const config = {
@@ -11,7 +13,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 	switch (request.action) {
 		case 'searchForProfessor':
-			fetch(request.url, config)
+			fetch(BASE_SEARCH_URL + request.query, config)
 				.then(res => res.text())
 				.then(pageText => {
 					const searchPage = document.createElement('html');
@@ -29,13 +31,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			return true;
 			break;
 		case 'getOverallScore':
-			fetch(request.url, config)
+			fetch(BASE_URL + request.query, config)
 				.then(res => res.text())
 				.then(pageText => {
 					const ratingPage = document.createElement('html');
 					ratingPage.innerHTML = pageText;
 					console.log(ratingPage);
-					const profRating = ratingPage.querySelector('div:not(.form-element).grade').textContent;
+					const profRating = ratingPage.querySelector('div.RatingValue__Numerator-qw8sqy-2').textContent;
 					sendResponse({ profRating });
 				})
 				.catch(err => {

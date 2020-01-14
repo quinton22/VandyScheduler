@@ -1,5 +1,3 @@
-const BASE_URL = 'https://www.ratemyprofessors.com';
-const BASE_SEARCH_URL = 'https://www.ratemyprofessors.com/search.jsp?queryoption=HEADER&queryBy=teacherName&schoolName=Vanderbilt+University&schoolID=4002&query=';
 const GREEN = '#27AE60';
 const YELLOW = '#FF9800';
 const RED = '#E74C3C';
@@ -53,8 +51,7 @@ function getProfessorNodes() {
 function getProfessorId(profName) {
 	const config = {
 		action: 'searchForProfessor',
-		method: 'POST',
-		url: BASE_SEARCH_URL + convertName(profName)
+		query: convertName(profName)
 	};
 
 	return new Promise((resolve, reject) => {
@@ -75,8 +72,7 @@ function getProfessorId(profName) {
 function getOverallScore(profId) {
 	const config = {
 		action: 'getOverallScore',
-		method: 'POST',
-		url: BASE_URL + profId,
+		query: profId,
 	};
 
 	return new Promise((resolve, reject) => {
