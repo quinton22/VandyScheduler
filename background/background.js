@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				.then(pageText => {
 					const searchPage = document.createElement('html');
 					searchPage.innerHTML = pageText;
-					const profId = searchPage.querySelector('.listing.PROFESSOR');
+					const profId = searchPage.querySelector('.SearchResultsPage__SearchResultsWrapper-sc-1srop1v-1');
 					const ret = (profId) ? profId.getElementsByTagName('a')[0].getAttribute('href') : profId;
 					sendResponse({ profId: ret });
 				})
