@@ -32,6 +32,7 @@ function rateProfessorsOnPage() {
 				groupedProfessorNodes[name].forEach(node => setInvalidScore(name, node));
 			}
 		} catch (err) {
+			console.error(err);
 			groupedProfessorNodes[name].forEach(node => setInvalidScore(name, node));
 		}
 	});
@@ -60,7 +61,7 @@ function getProfessorId(profName) {
 			if (res.profId) {
 				resolve(res.profId);
 			} else {
-				reject('Search result not found');
+				reject(`Search result not found. Professor name: ${profName}`);
 			}
 		});
 	});

@@ -3,6 +3,9 @@
 // IDEA: somehow find a way to show which classes you should take
 // TODO: make this a react app :)
 
+// IDEA: show the number of ratings along side rateMyProf scores.
+// IDEA: make the professor's name a link that goes directly to the rmp page
+
 
 var classArr = []; // contains classes to construct schedule with
 var scheduleArr = []; // contains all the schedules
