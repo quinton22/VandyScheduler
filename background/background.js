@@ -1,3 +1,9 @@
+// TODO: allow the fetching rating part to fail in a predictable way when rmp site is changed.
+
+function profPageURL(profId, rmpBaseURL){
+	return rmpBaseURL + "professor/" + profId;
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	const BASE_URL = 'https://www.ratemyprofessors.com/';
 	const BASE_SEARCH_URL = 'https://www.ratemyprofessors.com/search/professors?sid=4002&q=';
@@ -29,8 +35,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			return true;
 			break;
 		case 'getOverallScore':
-			console.log("search4score" + BASE_SEARCH_URL + request.query);
-			fetch(BASE_URL + "professor/" + request.query, config)
+			fetch(profPageURL(request.query, BASE_URL), config)
 				.then(res => res.text())
 				.then(pageText => {
 					const ratingPage = document.createElement('html');
@@ -48,6 +53,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				})
 			return true;
 			break;
+		case 'getProfessorURL':
+			// this action does actually fetch anything. It is just here so that the logic that deals with rmp site are all in one place
+			const profURL = profPageURL(request.query, BASE_URL);
+			sendResponse({profURL})
+			return true;
 		default:
 			console.log(`Action ${request.action} not recognized`);
 			break;
