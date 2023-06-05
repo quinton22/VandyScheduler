@@ -1,6 +1,6 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	const BASE_URL = 'https://www.ratemyprofessors.com/';
-	const BASE_SEARCH_URL = 'https://www.ratemyprofessors.com/search.jsp?queryoption=HEADER&queryBy=teacherName&schoolName=Vanderbilt+University&sid=4002&query=';
+	const BASE_SEARCH_URL = 'https://www.ratemyprofessors.com/search/professors?sid=4002&q=';
 
 	const method = 'GET';
 	const headers = new Headers();
