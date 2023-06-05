@@ -2,7 +2,7 @@ const GREEN = '#27AE60';
 const YELLOW = '#FF9800';
 const RED = '#E74C3C';
 // Use the same loading indicator that the page already does; don't host our own
-const LOADING_INDICATOR = '<img src="https://acad.app.vanderbilt.edu/more/images/loading.gif">';
+const LOADING_INDICATOR = '<img src="https://more.app.vanderbilt.edu/more/images/loading.gif">';
 // The divs that contain possible locations for professor names to populate
 const COURSE_LIST_AREAS = [
   document.getElementById('searchClassSectionsResults'),
@@ -25,9 +25,14 @@ function rateProfessorsOnPage() {
 	Object.keys(groupedProfessorNodes).forEach(async name => {
 		try {
 			if (isValidProfessor(name) && isUnratedProfessor(name)) {
+				// the reason for using groupedProfessorNodes[name].forEach is because there may be multiple nodes with the same professor name
 				groupedProfessorNodes[name].forEach(setIsLoading);
-				const score = await getProfessorId(name).then(getOverallScore);
+				const professorId = await getProfessorId(name);
+				const score = await getOverallScore(professorId);
 				groupedProfessorNodes[name].forEach(node => setScore(name, node, score));
+
+				const profURL = await getProfessorURL(professorId);
+				groupedProfessorNodes[name].forEach(node => turnNodeIntoLink(node, profURL));
 			} else if (isUnratedProfessor(name)) {
 				groupedProfessorNodes[name].forEach(node => setInvalidScore(name, node));
 			}
@@ -89,6 +94,34 @@ function getOverallScore(profId) {
 			}
 		});
 	});
+}
+
+// TODO cmt
+function getProfessorURL(profId){
+	const config = {
+		action: 'getProfessorURL',
+		query: profId,
+	};
+
+	return new Promise((resolve, reject) => {
+		chrome.runtime.sendMessage(config, res => {
+			if (res && res.profURL) {
+				resolve(res.profURL);
+			} else {
+				reject('No URL found');
+			}
+		});
+	});
+}
+
+function turnNodeIntoLink(node, url){
+	const link = document.createElement('a');
+	link.setAttribute('href', url);
+	link.setAttribute('target', '_blank');
+	link.appendChild(node.cloneNode(true));
+	node.parentNode.replaceChild(link, node);
+	
+	return node;
 }
 
 /**

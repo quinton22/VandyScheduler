@@ -7,6 +7,7 @@ This extension can be downloaded at the Chrome Web Store [here](https://chrome.g
 ## How to use
 Just download from the Chrome Web Store and go to [Course Registration](https://acad.app.vanderbilt.edu/more/SearchClasses.action#) from your YES page, log in, and start using!
 ## Changelog
+- 2.0.5 - Another update to match RateMyProfessors site update. Also add the functionality of turning the professor name into a link that leads directly to their RateMyProfessors page.
 - 2.0.4 - Another update to match RateMyProfessors site update. Thanks to @DavidHuang2002
 - 2.0.3 - Another update to match RateMyProfessors site update.
 - 2.0.2 - Update in accordance with RateMyProfessors site update.
