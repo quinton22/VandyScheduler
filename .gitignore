@@ -1,3 +1,5 @@
 *.png
 !comment-pic2.png
 !comment-pic3.png
+png/.DS_Store
+.DS_Store
