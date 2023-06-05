@@ -1,12 +1,10 @@
-// TODO: allow the fetching rating part to fail in a predictable way when rmp site is changed.
-
 function profPageURL(profId, rmpBaseURL){
 	return rmpBaseURL + "professor/" + profId;
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	const BASE_URL = 'https://www.ratemyprofessors.com/';
-	const BASE_SEARCH_URL = 'https://www.ratemyprofessors.com/search/professors?sid=4002&q=';
+	const BASE_SEARCH_URL = BASE_URL+'search/professors?sid=4002&q=';
 
 	const method = 'GET';
 	const headers = new Headers();
@@ -20,7 +18,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 	switch (request.action) {
 		case 'searchForProfessor':
-			fetch(BASE_SEARCH_URL + request.query, config)
+			let fullQuery = BASE_SEARCH_URL + request.query;
+			fetch(fullQuery, config)
 				.then(res => res.text())
 				.then(pageText => {
 					const profId = extractProfId(pageText);
@@ -28,8 +27,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				})
 				.catch(err => {
 					console.error('[ERROR: searchForProfessor]');
+					console.error(`error's query ${fullQuery}`);
 					console.error(err);
-					sendResponse();
+					sendResponse({});
 					return false;
 				});
 			return true;
@@ -70,19 +70,27 @@ function extractProfId(pageText){
 	// instead it is stored within a JSON data under variable __RELAY_STORE__ in a <script> tag. So here we extract it from that variabl
 	let scriptDataRegex = /window\.__RELAY_STORE__ = (.*?);/;
 	let scriptDataMatch = pageText.match(scriptDataRegex);
-
+	
+	// console.error(pageText);
 	if (scriptDataMatch) {
-			let jsonData = JSON.parse(scriptDataMatch[1]);
+		let jsonData = JSON.parse(scriptDataMatch[1]);
 
-			// extract the legacyId from the JSON data
-			for (let key in jsonData) {
-					if (jsonData[key].legacyId) {
-						return jsonData[key].legacyId;
-					} 
+		// extract the legacyId from the JSON data. Find all matches to handle the case of multiple teachers showing up on the same page
+		let result = [];
+		for (let key in jsonData) {
+			if (jsonData[key].legacyId) {
+				result.push(jsonData[key].legacyId);
 			}
+		}
 
-			return null;
-	}  else {
-		throw "error extracting the window\.__RELAY_STORE__  variable when trying to find profId"
+		if(result.length == 0){
+			throw "error extracting the legacyId from the window\.__RELAY_STORE__ when trying to find profId. Possibly no professor is found"
+		} else if(result.length > 1){
+			throw "error extracting the legacyId from the window\.__RELAY_STORE__ when trying to find profId. Multiple matches found"
+		} else {
+			return result[0];
+		}
+	} else {
+		throw "error extracting the window\.__RELAY_STORE__. __RELAY_STORE__ doesn't exist in pageText"
 	}
 }
