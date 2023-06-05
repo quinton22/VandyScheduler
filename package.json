@@ -1,0 +1,23 @@
+{
+  "name": "vandy-scheduler",
+  "targets": {
+    "content_scripts": {
+      "source": "src/content_scripts/index.ts",
+      "includeNodeModules": true
+    },
+    "service_worker": {
+      "source": "src/service_worker/background.js",
+      "outputFormat": "esmodule"
+    }
+  },
+  "scripts": {
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "devDependencies": {
+    "parcel": "^2.9.0"
+  },
+  "dependencies": {
+    "jquery": "^3.7.0"
+  }
+}
