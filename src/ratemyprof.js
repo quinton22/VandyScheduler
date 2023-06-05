@@ -2,7 +2,7 @@ const GREEN = '#27AE60';
 const YELLOW = '#FF9800';
 const RED = '#E74C3C';
 // Use the same loading indicator that the page already does; don't host our own
-const LOADING_INDICATOR = '<img src="https://acad.app.vanderbilt.edu/more/images/loading.gif">';
+const LOADING_INDICATOR = '<img src="https://more.app.vanderbilt.edu/more/images/loading.gif">';
 // The divs that contain possible locations for professor names to populate
 const COURSE_LIST_AREAS = [
   document.getElementById('searchClassSectionsResults'),
