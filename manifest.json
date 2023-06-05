@@ -1,11 +1,13 @@
 {
    "manifest_version": 2,
    "name": "Vandy Scheduler",
-   "version": "2.0.3",
+   "version": "2.0.4",
    "description": "This extension organizes your potential classes and Vanderbilt YES class cart into a schedule for the upcoming semester.",
    "icons": {
       "16": "png/schedule-icon16.png",
+      "32": "png/schedule-icon32.png",
       "48": "png/schedule-icon48.png",
+      "64": "png/schedule-icon64.png",
       "128": "png/schedule-icon128.png"
    },
    "content_scripts": [{
