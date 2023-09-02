@@ -12,10 +12,17 @@
   },
   "scripts": {
     "start": "parcel",
-    "build": "parcel build"
+    "build": "parcel build",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "parcel": "^2.9.0"
+    "@tsconfig/recommended": "^1.0.2",
+    "@types/chrome": "^0.0.241",
+    "@types/jquery": "^3.5.18",
+    "eslint": "^8.48.0",
+    "parcel": "^2.9.0",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
     "jquery": "^3.7.0"

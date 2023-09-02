@@ -1,24 +1,59 @@
-import { DEFAULT_SCHOOL_ID, DEFAULT_SCHOOL_NAME } from "../../constants";
+import {
+  DEFAULT_SCHOOL_ID,
+  DEFAULT_SCHOOL_NAME,
+  PROFESSOR_NAME_REGEX,
+} from '../../constants';
 import {
   School,
   SchoolQueryResponse,
   Teacher,
   TeacherQueryResponse,
   TeacherQueryVariables,
-} from "./graphql.types";
+} from './graphql.types';
+import {
+  MessageRequest,
+  OnMessageListener,
+  IRateMyProfessor,
+  ActionReturnType,
+} from './types';
 
-interface IRateMyProfessor {
-  getProfId(profName: string, schoolId?: string): Promise<string>;
-  getOverallScore(profId: string): Promise<string>;
-  getOverallScore(profName: string, schoolId?: string): Promise<string>;
-  getAllProfessors(schoolName: string): Promise<Array<{}>>;
-}
+// TODO: fuzzy search
+const getNameVariations = (profName: string) => {
+  const matches = PROFESSOR_NAME_REGEX.exec(profName);
+
+  if (!matches) {
+    throw new Error(`Could not convert name: ${profName}`);
+  }
+
+  matches.shift();
+
+  let alternate: string | undefined;
+  if (matches.length === 3) {
+    alternate = matches.pop()!;
+  }
+
+  return [
+    matches.reverse().join(' '),
+    alternate && matches.splice(0, 1, alternate) && matches.join(' '),
+  ].filter(Boolean);
+};
+
+const getResult = async <T>(
+  profName: string,
+  query: (n?: string) => Promise<T[] | undefined>
+): Promise<T[]> => {
+  const nameVariations = getNameVariations(profName);
+
+  const result = await Promise.all(nameVariations.map(query));
+
+  return result.filter((r) => r && r.length > 0).reverse()[0] ?? [];
+};
 
 abstract class RateMyProfessorApi implements IRateMyProfessor {
-  protected apiEndpoint = "https://www.ratemyprofessors.com/";
+  protected apiEndpoint = 'https://www.ratemyprofessors.com/';
 
   protected getUrl(
-    path = "",
+    path = '',
     searchParams: Array<[name: string, value: string]> = []
   ) {
     const url = new URL(path, this.apiEndpoint);
@@ -28,15 +63,21 @@ abstract class RateMyProfessorApi implements IRateMyProfessor {
     return url;
   }
 
-  abstract getProfId(profName: string, schoolName: string);
-  abstract getOverallScore(profId: string);
-  abstract getOverallScore(profName: string, schoolName: string);
-  abstract getAllProfessors(schoolName: string);
+  abstract getProfId(
+    profName: string,
+    schoolName: string
+  ): Promise<string | undefined>;
+  abstract getOverallScore(profName: string): Promise<number | undefined>;
+  abstract getOverallScore(
+    profName: string,
+    schoolId?: string
+  ): Promise<number | undefined>;
+  abstract getAllProfessors(schoolName?: string): Promise<Teacher[]>;
 }
 
 class RateMyProfessorGraphql extends RateMyProfessorApi {
   private readonly queries = {
-    school: `query SchoolQuery {
+    school: `query SchoolQuery($schoolName: String) {
   newSearch {
     schools(query: {
       text: $schoolName
@@ -82,12 +123,12 @@ class RateMyProfessorGraphql extends RateMyProfessorApi {
 }`,
   };
   private readonly requestOptions: RequestInit = {
-    method: "POST",
-    mode: "cors",
+    method: 'POST',
+    mode: 'cors',
     headers: new Headers({
-      "Content-Type": "application/json",
-      accept: "application/json",
-      Authorization: "Basic dGVzdDp0ZXN0",
+      'Content-Type': 'application/json',
+      accept: 'application/json',
+      Authorization: 'Basic dGVzdDp0ZXN0',
     }),
   };
 
@@ -107,7 +148,7 @@ class RateMyProfessorGraphql extends RateMyProfessorApi {
     };
 
     try {
-      return await fetch(this.getUrl("graphql"), {
+      return await fetch(this.getUrl('graphql'), {
         ...this.requestOptions,
         body: JSON.stringify({
           query: this.queries.teachers,
@@ -115,7 +156,7 @@ class RateMyProfessorGraphql extends RateMyProfessorApi {
         }),
       }).then((res) => res.json());
     } catch (e) {
-      console.log("Error querying teachers", e);
+      console.log('Error querying teachers', e);
     }
   }
 
@@ -123,7 +164,7 @@ class RateMyProfessorGraphql extends RateMyProfessorApi {
     schoolName: string
   ): Promise<SchoolQueryResponse | undefined> {
     try {
-      return await fetch(this.getUrl("graphql"), {
+      return await fetch(this.getUrl('graphql'), {
         ...this.requestOptions,
         body: JSON.stringify({
           query: this.queries.school,
@@ -133,7 +174,7 @@ class RateMyProfessorGraphql extends RateMyProfessorApi {
         }),
       }).then((res) => res.json());
     } catch (e) {
-      console.error("Error querying school", e);
+      console.error('Error querying school', e);
     }
   }
 
@@ -171,24 +212,30 @@ class RateMyProfessorGraphql extends RateMyProfessorApi {
     profName: string,
     schoolId = DEFAULT_SCHOOL_ID
   ): Promise<string | undefined> {
-    const queryResult = await this.queryTeachers({
-      teacherName: profName,
-      schoolId,
-      number: 1,
-    });
-    return this.getTeachersFromQuery(queryResult)[0]?.id;
+    const queryResult = await getResult(profName, (n) =>
+      this.queryTeachers({
+        teacherName: n,
+        schoolId,
+        number: 1,
+      }).then(this.getTeachersFromQuery)
+    );
+
+    return queryResult[0]?.id;
   }
 
-  async getOverallScore(profName: string, schoolId = DEFAULT_SCHOOL_ID) {
-    const queryResult = await this.queryTeachers({
-      teacherName: profName,
-      schoolId,
-      number: 1,
-    });
-
-    return this.getTeachersFromQuery(queryResult)[0]?.avgRatingRounded.toFixed(
-      2
+  async getOverallScore(
+    profName: string,
+    schoolId = DEFAULT_SCHOOL_ID
+  ): Promise<number | undefined> {
+    const queryResult = await getResult(profName, (n) =>
+      this.queryTeachers({
+        teacherName: n,
+        schoolId,
+        number: 1,
+      }).then(this.getTeachersFromQuery)
     );
+
+    return queryResult[0]?.avgRatingRounded;
   }
 
   async getAllProfessors(schoolName = DEFAULT_SCHOOL_NAME) {
@@ -204,7 +251,23 @@ class RateMyProfessorGraphql extends RateMyProfessorApi {
 }
 
 class RateMyProfessorHtmlParse extends RateMyProfessorApi {
-  private static extractProfId(pageText) {
+  private readonly substitutions: Record<string, string> = {
+    'Crooke, Philip S.': 'Crooke',
+    'Davis, Victoria J.': 'Davis, Vicki',
+    'Hardin, Douglas P.': 'Hardin, Doug',
+    'Johnsen, Arthur': 'Johnsen, Art',
+    'Leguizamon J S.': 'Leguizamon, Sebastian',
+    'Link, Stanley': 'Link, Stan',
+    'Rizzo, Carmelo J.': 'Rizzo, M',
+    'Roth, Gerald H.': 'Roth, Jerry',
+    'Savelyev, Petr A.': 'Savelyev, Peter',
+    'Schmidt, Douglas C.': 'Schmidt, Doug',
+    'Stahl, Sandra': 'Stahl, Sandy',
+    'Tairas, Robert A.': 'Tairas, Rob',
+    'Van Schaack, Andrew J.': 'Van Schaack, Andy',
+    'White, Christopher J.': 'White, Jules',
+  };
+  private extractProfId(pageText: string) {
     // in the version of rate my professor on 05/13/2023. when requesting using fetch, we can no longer find professorId in within a tag
     // instead it is stored within a JSON data under variable __RELAY_STORE__ in a <script> tag. So here we extract it from that variabl
     let scriptDataRegex = /window\.__RELAY_STORE__ = (.*?);/;
@@ -222,25 +285,28 @@ class RateMyProfessorHtmlParse extends RateMyProfessorApi {
 
       return null;
     } else {
-      throw "error extracting the window.__RELAY_STORE__  variable when trying to find profId";
+      throw 'error extracting the window.__RELAY_STORE__  variable when trying to find profId';
     }
   }
 
-  async getProfId(profName) {
+  async getProfId(profName: string): Promise<string | undefined> {
     const regex = /\w+(, )\w+/g;
     const temp = regex.exec(profName);
-    if (temp[0].trim() in subs) {
-      temp[0] = subs[temp[0].trim()];
+    if (temp) {
+      profName = encodeURIComponent(
+        temp[0].trim() in this.substitutions
+          ? this.substitutions[temp[0].trim()]
+          : temp[0]
+      );
     }
-    profName = encodeURIComponent(temp[0]);
 
     const pageText = await fetch(
-      this.getUrl("search/professors/4002", [["q", profName]])
+      this.getUrl('search/professors/4002', [['q', profName]])
     ).then((res) => res.text());
     return this.extractProfId(pageText);
   }
 
-  async getOverallScore(profName, schoolName = DEFAULT_SCHOOL_NAME) {
+  async getOverallScore(profName: string): Promise<number | undefined> {
     const id = this.getProfId(profName);
     const pageText = await fetch(this.getUrl(`professor/${id}`)).then((res) =>
       res.text()
@@ -250,41 +316,78 @@ class RateMyProfessorHtmlParse extends RateMyProfessorApi {
       /class=["'][A-Za-z0-9\_\- ]*\bRatingValue__Numerator[A-Za-z0-9\_\- ]*\b["']>(.*?)<\//m
     );
 
-    return profRatingMatch && profRatingMatch[1];
+    if (!profRatingMatch || !profRatingMatch[1]) {
+      return undefined;
+    }
+
+    return parseFloat(profRatingMatch[1]);
   }
 
-  getAllProfessors(schoolName) {
-    throw new Error("Method not implemented.");
+  getAllProfessors(): Promise<Teacher[]> {
+    // throw new Error('Method not implemented.');
+    return Promise.resolve([]);
   }
 }
 
-const RateMyProfessorApiInterface = new Proxy(RateMyProfessorApi, {
-  get(target, methodName) {
-    if (methodName in target) {
-      return async (...args) => {
-        try {
-          return await RateMyProfessorGraphql[methodName](...args);
-        } catch (e) {}
+const rmpGraphql = new RateMyProfessorGraphql();
+const rmpHtmlParse = new RateMyProfessorHtmlParse();
 
-        try {
-          return RateMyProfessorHtmlParse[methodName](...args);
-        } catch (e) {}
-      };
-    } else {
-      throw new Error(`Method ${methodName} not found`);
-    }
-  },
-});
+const excecuteAction = async <T extends keyof IRateMyProfessor>(
+  { action, args }: MessageRequest<T>,
+  mode: 'graphql' | 'htmlParse' = 'graphql',
+  fallback = true
+): Promise<ActionReturnType<T>> => {
+  let rmp: RateMyProfessorApi = rmpGraphql,
+    fallbackRmp: RateMyProfessorApi = rmpHtmlParse;
 
-export const onMessageListener = (request, sender, sendResponse) => {
-  if (sender !== chrome.runtime.id) {
-    throw "Invalid sender";
+  if (mode !== 'graphql') {
+    rmp = rmpHtmlParse;
+    fallbackRmp = rmpGraphql;
   }
 
-  RateMyProfessorApiInterface[request.action](...request.args)
+  if (action in rmp) {
+    try {
+      return (await rmp[action](
+        ...(args as [any, any])
+      )) as ActionReturnType<T>;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  if (fallback && action in fallbackRmp) {
+    try {
+      return (await fallbackRmp[action](
+        ...(args as [any, any])
+      )) as ActionReturnType<T>;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  throw new Error(`Method ${action.toString()} not found.`);
+};
+
+export const onMessageListener: OnMessageListener = (
+  request: MessageRequest<any>,
+  sender,
+  sendResponse
+) => {
+  if (sender.id !== chrome.runtime.id) {
+    console.error('Invalid sender at onMessageListener');
+    return false;
+  }
+
+  if (!(request.action in rmpGraphql)) {
+    return false;
+  }
+
+  excecuteAction(request as MessageRequest<keyof IRateMyProfessor>)
     .then(sendResponse)
     .catch((err) => {
       console.error(`[ERROR: ${request.action}]`, err);
-      sendResponse(err);
+      sendResponse(undefined);
     });
+
+  return true;
 };

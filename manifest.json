@@ -19,7 +19,7 @@
     }
   ],
   "background": {
-    "service_worker": "dist/background.js",
+    "service_worker": "dist/service_worker/background.js",
     "type": "module"
   },
   "host_permissions": [
