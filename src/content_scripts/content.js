@@ -6,6 +6,8 @@
 // IDEA: show the number of ratings along side rateMyProf scores.
 // IDEA: make the professor's name a link that goes directly to the rmp page
 
+import $ from 'jquery';
+
 var classArr = []; // contains classes to construct schedule with
 var scheduleArr = []; // contains all the schedules
 var modal, modalChild;
@@ -20,23 +22,23 @@ createModal(); // creates modal and appends to doc
 var ready = false; // allows modal to load
 
 // creates button
-var addClassButton = document.createElement("span");
-addClassButton.setAttribute("width", "auto");
-var btn = document.createElement("button");
-btn.setAttribute("class", "myButton");
-btn.innerHTML = "Add to Schedule";
+var addClassButton = document.createElement('span');
+addClassButton.setAttribute('width', 'auto');
+var btn = document.createElement('button');
+btn.setAttribute('class', 'myButton');
+btn.innerHTML = 'Add to Schedule';
 addClassButton.appendChild(btn);
 
 // sets parent node to course titles on either class search page or class cart page
 var parent =
-  document.getElementById("classSearchResultsCarousel") !== null
+  document.getElementById('classSearchResultsCarousel') !== null
     ? document
-        .getElementById("classSearchResultsCarousel")
-        .getElementsByClassName("left")
+        .getElementById('classSearchResultsCarousel')
+        .getElementsByClassName('left')
     : null;
 var parent2 =
-  document.getElementById("studentCart") !== null
-    ? document.getElementById("studentCart").getElementsByClassName("left")
+  document.getElementById('studentCart') !== null
+    ? document.getElementById('studentCart').getElementsByClassName('left')
     : null;
 
 // necessary for timeout
@@ -44,16 +46,16 @@ var timeout = null;
 var t = null;
 
 // gets current page
-var page = "";
+var page = '';
 var focusPage = document.getElementsByClassName(
-  "yui-carousel-item yui-carousel-item-selected"
+  'yui-carousel-item yui-carousel-item-selected'
 );
 if (focusPage.length !== 0) {
-  page = focusPage[0].getElementsByTagName("h1")[0].innerHTML;
+  page = focusPage[0].getElementsByTagName('h1')[0].innerHTML;
 }
 
 // constant font
-let font = $(".classAbbreviation").css("font-family");
+let font = $('.classAbbreviation').css('font-family');
 
 // updates class and adds buttons if the DOM subtree is changed
 var observer = new MutationObserver(() => {
@@ -62,9 +64,9 @@ var observer = new MutationObserver(() => {
       if (timeout) {
         clearTimeout(timeout);
       }
-      page = focusPage[0].getElementsByTagName("h1")[0].innerHTML;
+      page = focusPage[0].getElementsByTagName('h1')[0].innerHTML;
       ready = false;
-      if (page === "Class Cart") {
+      if (page === 'Class Cart') {
         updateClassArr();
       }
 
@@ -81,48 +83,48 @@ observer.observe(document, {
  *	Creates the modal with the default to display an error message
  */
 export function createModal() {
-  modal = document.createElement("div");
-  $("body")
+  modal = document.createElement('div');
+  $('body')
     .eq(0)
     .append(
       $(modal)
         .attr({
-          class: "modal",
-          id: "scheduleView",
+          class: 'modal',
+          id: 'scheduleView',
         }) // modal
         .append(
-          $("<div></div>")
+          $('<div></div>')
             .attr({
-              class: "modal-content",
-              id: "modalChild",
+              class: 'modal-content',
+              id: 'modalChild',
             }) // modalChild
             .append(
-              $("<div></div>")
+              $('<div></div>')
                 .attr({
-                  class: "modal-header",
+                  class: 'modal-header',
                 }) // modal-header
                 .append(
-                  $("<div></div>")
-                    .html("&times;")
+                  $('<div></div>')
+                    .html('&times;')
                     .attr({
-                      class: "close",
+                      class: 'close',
                     }) // close button
                     .click(() => {
-                      modal.style.display = "none";
-                      $("#modalBody").html("");
+                      modal.style.display = 'none';
+                      $('#modalBody').html('');
                     }),
-                  $("<h2></h2>").html("<p>Error creating schedule!<p>").css({
-                    color: "red",
-                    "font-weight": "bold",
-                    "font-size": "1.5em",
-                    margin: "auto",
+                  $('<h2></h2>').html('<p>Error creating schedule!<p>').css({
+                    color: 'red',
+                    'font-weight': 'bold',
+                    'font-size': '1.5em',
+                    margin: 'auto',
                   })
                 ), // modalHeaderText
-              $("<div></div>").attr({
-                class: "modal-body",
-                id: "modalBody",
+              $('<div></div>').attr({
+                class: 'modal-body',
+                id: 'modalBody',
               }), // modal body
-              $("<div></div>").attr("class", "modal-footer")
+              $('<div></div>').attr('class', 'modal-footer')
             )
         )
     ); // modal footer
@@ -132,19 +134,19 @@ export function createModal() {
   // exit if clicked not on modal
   window.onclick = (event) => {
     if (event.target === modal) {
-      modal.style.display = "none";
-      $("#modalBody").html("");
+      modal.style.display = 'none';
+      $('#modalBody').html('');
     } else if (event.target === prefModal) {
-      prefModal.style.display = "none";
+      prefModal.style.display = 'none';
       updatePreferences();
     }
   };
 }
 
 export function createPrefModal() {
-  let prefModal = document.createElement("div");
+  let prefModal = document.createElement('div');
 
-  chrome.storage.sync.get("pref", (obj) => {
+  chrome.storage.sync.get('pref', (obj) => {
     if (obj !== undefined && obj !== null && !$.isEmptyObject(obj)) {
       preferences = obj.pref;
     } else {
@@ -157,8 +159,8 @@ export function createPrefModal() {
   });
 
   // creates preference modal
-  prefModal.className = "modal";
-  prefModal.id = "pref-modal";
+  prefModal.className = 'modal';
+  prefModal.id = 'pref-modal';
 
   let divOuter = $(`
 		<div class="modal-content preference-modal">
@@ -199,14 +201,14 @@ export function createPrefModal() {
 		</div>
 	`);
 
-  $($(divOuter).find("#remove-classes-pref-form")[0])
-    .find("input")
+  $($(divOuter).find('#remove-classes-pref-form')[0])
+    .find('input')
     .each((_, el) => {
       el.onchange = () => (includeClassesInRemoval = !JSON.parse(el.value));
     });
 
-  $($(divOuter).find("span.close")[0]).click(() => {
-    document.getElementById("pref-modal").style.display = "none";
+  $($(divOuter).find('span.close')[0]).click(() => {
+    document.getElementById('pref-modal').style.display = 'none';
     updatePreferences();
   });
 
@@ -222,80 +224,80 @@ export function getFromStorageAndCreateModal(prefModal) {
   let firstTime = preferences.breakTime === null ? true : false;
   preferences.breakTime = firstTime ? {} : preferences.breakTime;
   firstTime
-    ? $("#break-pref-text").append(
+    ? $('#break-pref-text').append(
         $(`<p class="pref-modal-text">
 			Lunch break defaults to 12 p.m. and Saturdays and Sundays are default breaks. If you do not want this click "Clear Preferences."
 		</p>`)
       )
     : null;
 
-  $("#break-pref-text").append(
+  $('#break-pref-text').append(
     $(`<p class="pref-modal-text">
 			To select a break time for all of MWF, TR, or SU, double click on that time on any of those days.
 		</p>`)
   );
 
   // settings:
-  let breakFormCont = document.createElement("div");
-  breakFormCont.className = "form-container";
+  let breakFormCont = document.createElement('div');
+  breakFormCont.className = 'form-container';
 
-  let breakForm = document.createElement("div");
-  breakForm.className = "inner-form-container";
+  let breakForm = document.createElement('div');
+  breakForm.className = 'inner-form-container';
   breakFormCont.appendChild(breakForm);
 
   let breakDay = []; // [M, T, W, R, F, Sa, Su]
   let dayVec = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
   ];
   for (let i = 0; i < 7; ++i) {
-    breakDay[i] = document.createElement("div");
-    breakDay[i].className = "break-day";
+    breakDay[i] = document.createElement('div');
+    breakDay[i].className = 'break-day';
 
-    let day = document.createElement("div");
+    let day = document.createElement('div');
     let cname;
     if (i !== 6 && i % 2 === 0) {
-      cname = "MWF";
+      cname = 'MWF';
     } else if (i !== 5 && i % 2 === 1) {
-      cname = "TR";
+      cname = 'TR';
     } else {
-      cname = "SU";
+      cname = 'SU';
     }
-    day.className = "break-day-title " + cname;
+    day.className = 'break-day-title ' + cname;
 
     day.id = dayVec[i];
     day.innerHTML = dayVec[i];
     breakDay[i].appendChild(day);
 
-    let selectAll = document.createElement("div");
-    let saspan = document.createElement("span");
-    selectAll.className = "break-select 7";
-    selectAll.id = "select-all";
+    let selectAll = document.createElement('div');
+    let saspan = document.createElement('span');
+    selectAll.className = 'break-select 7';
+    selectAll.id = 'select-all';
     selectAll.appendChild(saspan);
-    saspan.innerHTML = "Select All";
+    saspan.innerHTML = 'Select All';
     selectAll.ondblclick = (event) => {
       preferenceDblClickHandler(event.target);
     };
 
     selectAll.onclick = () => {
-      let key = $(selectAll).siblings(".break-day-title").attr("id");
+      let key = $(selectAll).siblings('.break-day-title').attr('id');
       if (preferences.breakTime[key].length < 12) {
         preferences.breakTime[key] = [
           7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
         ];
         $(selectAll)
           .parent()
-          .find(".break-select")
-          .removeClass("one-chosen")
-          .addClass("one-chosen");
+          .find('.break-select')
+          .removeClass('one-chosen')
+          .addClass('one-chosen');
       } else {
         preferences.breakTime[key] = [];
-        $(selectAll).parent().find(".break-select").removeClass("one-chosen");
+        $(selectAll).parent().find('.break-select').removeClass('one-chosen');
       }
     };
 
@@ -304,52 +306,52 @@ export function getFromStorageAndCreateModal(prefModal) {
 
     for (let j = 8; j <= 18; ++j) {
       let time = j % 12;
-      let timeStr = "";
+      let timeStr = '';
       if (time === 0) {
         time = 12;
       }
       if (time >= 8 && time < 11) {
-        timeStr = time.toString() + "am - " + (time + 1).toString() + "am";
+        timeStr = time.toString() + 'am - ' + (time + 1).toString() + 'am';
       } else if (time === 11) {
-        timeStr = time.toString() + "am - " + (time + 1).toString() + "pm";
+        timeStr = time.toString() + 'am - ' + (time + 1).toString() + 'pm';
       } else if (time === 12) {
-        timeStr = time.toString() + "pm - " + (1).toString() + "pm";
+        timeStr = time.toString() + 'pm - ' + (1).toString() + 'pm';
       } else {
-        timeStr = time.toString() + "pm - " + (time + 1).toString() + "pm";
+        timeStr = time.toString() + 'pm - ' + (time + 1).toString() + 'pm';
       }
 
-      let breakSelect = document.createElement("div");
-      let bsspan = document.createElement("span");
+      let breakSelect = document.createElement('div');
+      let bsspan = document.createElement('span');
       breakSelect.appendChild(bsspan);
-      breakSelect.className = "break-select " + j;
+      breakSelect.className = 'break-select ' + j;
       bsspan.innerHTML = timeStr;
       breakSelect.onclick = () => {
-        let k = $(breakSelect).siblings(".break-day-title").attr("id");
+        let k = $(breakSelect).siblings('.break-day-title').attr('id');
         preferences.breakTime[k].includes(j)
           ? preferences.breakTime[k].splice(
               preferences.breakTime[k].indexOf(j),
               1
             )
           : preferences.breakTime[k].push(j);
-        $(breakSelect).toggleClass("one-chosen");
+        $(breakSelect).toggleClass('one-chosen');
 
         // handles checking and unchecking of select all based on
         // if the rest of the items are full
-        if ($(selectAll).hasClass("one-chosen")) {
-          $(selectAll).removeClass("one-chosen");
+        if ($(selectAll).hasClass('one-chosen')) {
+          $(selectAll).removeClass('one-chosen');
           preferences.breakTime[k].splice(
             preferences.breakTime[k].indexOf(7),
             1
           );
-        } else if ($(selectAll).hasClass("saved-preference")) {
-          $(selectAll).removeClass("saved-preference");
+        } else if ($(selectAll).hasClass('saved-preference')) {
+          $(selectAll).removeClass('saved-preference');
           preferences.breakTime[k].splice(
             preferences.breakTime[k].indexOf(7),
             1
           );
         } else {
           if (preferences.breakTime[k].length === 11) {
-            $(selectAll).trigger("click");
+            $(selectAll).trigger('click');
           }
         }
       };
@@ -361,7 +363,7 @@ export function getFromStorageAndCreateModal(prefModal) {
 
     firstTime
       ? (preferences.breakTime[dayVec[i]] =
-          dayVec[i] === "Saturday" || dayVec[i] === "Sunday"
+          dayVec[i] === 'Saturday' || dayVec[i] === 'Sunday'
             ? [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
             : [12])
       : null;
@@ -369,7 +371,7 @@ export function getFromStorageAndCreateModal(prefModal) {
   }
 
   document.body.appendChild(prefModal);
-  $("#break-pref").append(breakFormCont);
+  $('#break-pref').append(breakFormCont);
 
   // hide / show schedules that do not meet pref option
   let checkBoxDiv = $(`
@@ -389,7 +391,7 @@ export function getFromStorageAndCreateModal(prefModal) {
 	`);
 
   $(checkBoxDiv)
-    .find("input")
+    .find('input')
     .each((_, el) => {
       el.checked = JSON.parse(el.value) !== preferences.noPrefMet;
       el.onchange = () => {
@@ -397,30 +399,30 @@ export function getFromStorageAndCreateModal(prefModal) {
       };
     });
 
-  $("#break-pref").append(checkBoxDiv);
+  $('#break-pref').append(checkBoxDiv);
 
-  $(".radio-container").each(
-    (_, el) => (el.onclick = () => $(el).find("input")[0].click())
+  $('.radio-container').each(
+    (_, el) => (el.onclick = () => $(el).find('input')[0].click())
   );
 
   for (let day in preferences.breakTime) {
     preferences.breakTime[day].map((time) => {
-      $("#" + day)
-        .siblings("." + time.toString())
-        .removeClass("one-chosen")
-        .addClass("one-chosen");
+      $('#' + day)
+        .siblings('.' + time.toString())
+        .removeClass('one-chosen')
+        .addClass('one-chosen');
     });
   }
 
-  let prefBtnCont = document.getElementById("pref-button-container");
+  let prefBtnCont = document.getElementById('pref-button-container');
 
-  let clearBtn = document.createElement("button");
-  clearBtn.className = "myButton modalButton2 pref-clear";
-  clearBtn.innerHTML = "Clear Preferences";
+  let clearBtn = document.createElement('button');
+  clearBtn.className = 'myButton modalButton2 pref-clear';
+  clearBtn.innerHTML = 'Clear Preferences';
   prefBtnCont.appendChild(clearBtn);
   clearBtn.onclick = () => {
-    $("#break-pref-input-show").trigger("click");
-    $(".break-select").removeClass("one-chosen");
+    $('#break-pref-input-show').trigger('click');
+    $('.break-select').removeClass('one-chosen');
     for (let day in preferences.breakTime) {
       preferences.breakTime[day] = [];
     }
@@ -431,16 +433,16 @@ export function getFromStorageAndCreateModal(prefModal) {
  *	handles the double click on Preferences times
  */
 export function preferenceDblClickHandler(t) {
-  $(t).attr("class") ? null : (t = $(t).parent());
+  $(t).attr('class') ? null : (t = $(t).parent());
   let time = $(t)
-    .attr("class")
+    .attr('class')
     .match(/[0-9]+/)[0];
   let day = $(t)
-    .siblings(".break-day-title")
-    .attr("class")
+    .siblings('.break-day-title')
+    .attr('class')
     .match(/\s(\w+)/)[1];
   let parent = $(t).parent().parent();
-  let click_flag = $(t).hasClass("one-chosen") ? false : true;
+  let click_flag = $(t).hasClass('one-chosen') ? false : true;
   triggerDblClick(parent, day, time, click_flag);
 }
 
@@ -449,27 +451,27 @@ export function preferenceDblClickHandler(t) {
  */
 export function triggerDblClick(parent, days, time, click) {
   if (click) {
-    $.each(parent.find("." + days), (ind, el) => {
+    $.each(parent.find('.' + days), (ind, el) => {
       if (
         !$(el)
-          .siblings("." + time)
-          .hasClass("one-chosen")
+          .siblings('.' + time)
+          .hasClass('one-chosen')
       ) {
         $(el)
-          .siblings("." + time)
-          .trigger("click");
+          .siblings('.' + time)
+          .trigger('click');
       }
     });
   } else {
-    $.each(parent.find("." + days), (ind, el) => {
+    $.each(parent.find('.' + days), (ind, el) => {
       if (
         $(el)
-          .siblings("." + time)
-          .hasClass("one-chosen")
+          .siblings('.' + time)
+          .hasClass('one-chosen')
       ) {
         $(el)
-          .siblings("." + time)
-          .trigger("click");
+          .siblings('.' + time)
+          .trigger('click');
       }
     });
   }
@@ -485,8 +487,8 @@ export function updatePreferences() {
     },
     () => {
       if (chrome.runtime.lastError) {
-        console.error("Could not save preferences");
-        window.alert("Preferences not saved. Check internet connection.");
+        console.error('Could not save preferences');
+        window.alert('Preferences not saved. Check internet connection.');
       }
     }
   );
@@ -527,17 +529,17 @@ export function updatePrefClassesToInclude() {
   if (classArr && classArr.length !== 0) {
     try {
       Array.from(
-        document.getElementById("include-pref").getElementsByTagName("ul")
+        document.getElementById('include-pref').getElementsByTagName('ul')
       ).forEach((el) => el.remove());
       $(
         `<ul class="include-pref-list">${classArr
           .map((c, j) => {
             return `<li style="padding: 10px; background-color:${
-              j % 2 === 0 ? "#eee" : "#f9f9f9"
+              j % 2 === 0 ? '#eee' : '#f9f9f9'
             }">
 					<input id="${c.classAbbr.replace(
-            " ",
-            "_"
+            ' ',
+            '_'
           )}" class="include-class-checkbox" type="checkbox"/> <label class="class-abbr-label">${
               c.classAbbr
             }: ${c.classDesc}</label>
@@ -547,8 +549,8 @@ export function updatePrefClassesToInclude() {
                 (s, i) => `<li>
 								<div class="class-details-pref">
 									<div class="grid-item"><input id="${c.classAbbr.replace(
-                    " ",
-                    "_"
+                    ' ',
+                    '_'
                   )}-${s}" class="include-section-checkbox" type="checkbox"/></div>
 									<div class="grid-item">${s}</div>
 									<div class="grid-item">${c.days[i]}</div>
@@ -557,29 +559,29 @@ export function updatePrefClassesToInclude() {
 								</div>
 							</li>`
               )
-              .join("")}
+              .join('')}
 					</ul>
 				</li>`;
           })
-          .join("")}</ul>`
-      ).insertAfter($("#include-pref-text"));
+          .join('')}</ul>`
+      ).insertAfter($('#include-pref-text'));
 
-      $(".class-abbr-label").click((ev) =>
-        $(ev.delegateTarget).prev().trigger("click")
+      $('.class-abbr-label').click((ev) =>
+        $(ev.delegateTarget).prev().trigger('click')
       );
-      $(".class-details-pref").click((ev) =>
-        $(ev.delegateTarget).find("input")[0].click()
+      $('.class-details-pref').click((ev) =>
+        $(ev.delegateTarget).find('input')[0].click()
       );
 
       let currentClasses = new Map();
 
       // this stores all the classes that we do not want to include!
-      let sStorage = sessionStorage.getItem("includePreferences");
+      let sStorage = sessionStorage.getItem('includePreferences');
       // convert the string to a map if not undefined / null
       let storedClasses = sStorage ? new Map(JSON.parse(sStorage)) : sStorage;
 
       classArr.forEach((c) =>
-        currentClasses.set(c.classAbbr.replace(" ", "_"), c.sections)
+        currentClasses.set(c.classAbbr.replace(' ', '_'), c.sections)
       );
 
       if (storedClasses) {
@@ -604,14 +606,14 @@ export function updatePrefClassesToInclude() {
         }
         // update storage
         sessionStorage.setItem(
-          "includePreferences",
+          'includePreferences',
           JSON.stringify([...storedClasses])
         );
       } else {
         // set session storage to have preferences for classes included in making schedule
         storedClasses = new Map();
         sessionStorage.setItem(
-          "includePreferences",
+          'includePreferences',
           JSON.stringify([...storedClasses])
         );
       }
@@ -619,22 +621,22 @@ export function updatePrefClassesToInclude() {
       includePreferences = new Map(storedClasses);
 
       // check everything
-      $(".include-pref-list input").each((_, el) => (el.checked = true));
+      $('.include-pref-list input').each((_, el) => (el.checked = true));
 
       // remove checks of stored classes
       storedClasses.forEach((v, k) => {
-        $(".include-class-checkbox").filter(
-          (_, el) => el.id === k.replace(" ", "_")
+        $('.include-class-checkbox').filter(
+          (_, el) => el.id === k.replace(' ', '_')
         )[0].checked = false;
         v.forEach(
           (s) =>
-            ($(".include-section-checkbox").filter(
-              (_, el) => k.replace(" ", "_") + "-" + s === el.id
+            ($('.include-section-checkbox').filter(
+              (_, el) => k.replace(' ', '_') + '-' + s === el.id
             )[0].checked = false)
         );
       });
 
-      $(".include-section-checkbox").change((ev) => {
+      $('.include-section-checkbox').change((ev) => {
         let el = ev.target;
         if (el.checked) {
           // remove from stored
@@ -649,20 +651,20 @@ export function updatePrefClassesToInclude() {
           // check if every item in this list is true
           if (
             $(el)
-              .closest("ul")
-              .find("input")
+              .closest('ul')
+              .find('input')
               .filter((_, element) => element.checked === false).length === 0
           ) {
             $(el)
-              .parents("li")
-              .find(".include-class-checkbox")
+              .parents('li')
+              .find('.include-class-checkbox')
               .get(0).checked = true;
             storedClasses.delete(k);
           }
 
           // update storage
           sessionStorage.setItem(
-            "includePreferences",
+            'includePreferences',
             JSON.stringify([...storedClasses])
           );
         } else {
@@ -674,7 +676,7 @@ export function updatePrefClassesToInclude() {
             ? storedClasses.set(k, storedClasses.get(k).concat(k2))
             : storedClasses.set(k, [k2]);
 
-          let x = $(el).parents("li").find(".include-class-checkbox").get(0);
+          let x = $(el).parents('li').find('.include-class-checkbox').get(0);
           if (x.checked) {
             x.checked = false;
           }
@@ -682,19 +684,19 @@ export function updatePrefClassesToInclude() {
 
         // update the session storage
         sessionStorage.setItem(
-          "includePreferences",
+          'includePreferences',
           JSON.stringify([...storedClasses])
         );
         includePreferences = new Map(storedClasses);
       });
 
-      $(".include-class-checkbox").change((ev) => {
+      $('.include-class-checkbox').change((ev) => {
         let el = ev.target;
         if (el.checked) {
           // remove items from storedClasses
           $(el)
             .parent()
-            .find(".include-section-checkbox")
+            .find('.include-section-checkbox')
             .filter((_, element) => !element.checked)
             .each((_, element) => {
               storedClasses.delete(element.id.match(/(.*)-.*/)[1]);
@@ -706,7 +708,7 @@ export function updatePrefClassesToInclude() {
             Array.from(
               $(el)
                 .parent()
-                .find(".include-section-checkbox")
+                .find('.include-section-checkbox')
                 .map((_, element) => {
                   element.checked = false;
                   return element.id.match(/-(.*)/)[1];
@@ -717,13 +719,13 @@ export function updatePrefClassesToInclude() {
 
         // update the session storage
         sessionStorage.setItem(
-          "includePreferences",
+          'includePreferences',
           JSON.stringify([...storedClasses])
         );
         includePreferences = new Map(storedClasses);
       });
     } catch (e) {
-      console.error("DOM not loaded.");
+      console.error('DOM not loaded.');
     }
   }
 }
@@ -732,14 +734,14 @@ export function updatePrefClassesToInclude() {
  *	Adds a button to each unique class
  */
 export function addBtn() {
-  font = $(".classAbbreviation").css("font-family");
+  font = $('.classAbbreviation').css('font-family');
 
-  if (page === "Class Cart") {
+  if (page === 'Class Cart') {
     makeScheduleButton(focusPage[0].children[0]);
   }
 
   btn.style.fontFamily = font;
-  $(".left").css("width", "100%");
+  $('.left').css('width', '100%');
 
   var clone = null;
 
@@ -750,10 +752,10 @@ export function addBtn() {
     // adds buttons to the page
     if (
       children !== null &&
-      !children[children.length - 1].id.includes("Btn")
+      !children[children.length - 1].id.includes('Btn')
     ) {
       clone = addClassButton.cloneNode(true);
-      addClassButton.setAttribute("id", "Btn" + i.toString());
+      addClassButton.setAttribute('id', 'Btn' + i.toString());
       parent[i].appendChild(addClassButton);
       var button = addClassButton.firstChild;
       addEL(addClassButton.children[0]);
@@ -768,14 +770,14 @@ export function addBtn() {
     // adds buttons to the page
     if (
       children !== null &&
-      !children[children.length - 1].id.includes("RemoveBtn")
+      !children[children.length - 1].id.includes('RemoveBtn')
     ) {
       clone = addClassButton.cloneNode(true);
-      addClassButton.id = "RemoveBtn" + j.toString();
+      addClassButton.id = 'RemoveBtn' + j.toString();
       parent2[j].appendChild(addClassButton);
       var button = addClassButton.firstChild;
-      button.className = "myButton remove";
-      button.innerHTML = "Remove Class";
+      button.className = 'myButton remove';
+      button.innerHTML = 'Remove Class';
       addEL(button);
       addClassButton = clone;
     }
@@ -789,11 +791,11 @@ export function addBtn() {
 export function addEL(button) {
   $(button).click(() => {
     $.each(
-      $(button).parents("tbody").find(".classActionButtons a"),
+      $(button).parents('tbody').find('.classActionButtons a'),
       (ind, el) => {
         if (
-          el.title === "Remove Class From Cart" ||
-          el.title === "Add this class to your cart"
+          el.title === 'Remove Class From Cart' ||
+          el.title === 'Add this class to your cart'
         ) {
           el.click();
         }
@@ -808,18 +810,18 @@ export function addEL(button) {
  */
 export function addClass(_class, classNumOnPage) {
   let classAbbr = _class.children[0].innerHTML;
-  classAbbr = classAbbr.replace(/:/g, "");
+  classAbbr = classAbbr.replace(/:/g, '');
   let classDesc = _class.children[1].innerHTML;
   let specificClass = document
-    .getElementById("cartDiv")
-    .getElementsByClassName("classTable")[classNumOnPage];
-  let sectionsList = specificClass.getElementsByClassName("classSection");
-  let profsList = specificClass.getElementsByClassName("classInstructor");
-  let typeList = specificClass.getElementsByClassName("classType");
-  let hoursList = specificClass.getElementsByClassName("classHours");
-  let daysList = specificClass.getElementsByClassName("classMeetingDays");
-  let timesList = specificClass.getElementsByClassName("classMeetingTimes");
-  let classBuildingList = specificClass.getElementsByClassName("classBuilding");
+    .getElementById('cartDiv')
+    .getElementsByClassName('classTable')[classNumOnPage];
+  let sectionsList = specificClass.getElementsByClassName('classSection');
+  let profsList = specificClass.getElementsByClassName('classInstructor');
+  let typeList = specificClass.getElementsByClassName('classType');
+  let hoursList = specificClass.getElementsByClassName('classHours');
+  let daysList = specificClass.getElementsByClassName('classMeetingDays');
+  let timesList = specificClass.getElementsByClassName('classMeetingTimes');
+  let classBuildingList = specificClass.getElementsByClassName('classBuilding');
   let sections = [];
   let profs = [];
   let types = [];
@@ -833,9 +835,9 @@ export function addClass(_class, classNumOnPage) {
     sections[num] = sectionsList[num].innerText.trim();
     profs[num] = profsList[num].innerText.trim();
     types[num] = typeList[num].innerText.trim();
-    hours[num] = hoursList[num].innerText.replace(/\s+/g, "");
+    hours[num] = hoursList[num].innerText.replace(/\s+/g, '');
     days[num] = daysList[num].innerText.trim();
-    times[num] = timesList[num].innerText.trim().replace(/ - /g, "-");
+    times[num] = timesList[num].innerText.trim().replace(/ - /g, '-');
     location[num] = classBuildingList[num].innerText.trim();
   }
 
@@ -857,10 +859,10 @@ export function addClass(_class, classNumOnPage) {
  *	Adds class added img and adds a remove button -- currently unfunctional
  */
 export function classAdded(button) {
-  button.setAttribute("class", "myButton disabled");
+  button.setAttribute('class', 'myButton disabled');
   button.disabled = true;
   setTimeout(function () {
-    button.innerHTML = "Added";
+    button.innerHTML = 'Added';
   }, 200);
 }
 
@@ -869,53 +871,53 @@ export function classAdded(button) {
  */
 export function makeScheduleButton(parent) {
   // add make schedule button if it doesn't exist
-  if (!parent.querySelector("button")) {
-    $("#yui-gen9").css("height", "auto");
-    var btnContainer = document.createElement("table");
-    var contR = document.createElement("tr");
+  if (!parent.querySelector('button')) {
+    $('#yui-gen9').css('height', 'auto');
+    var btnContainer = document.createElement('table');
+    var contR = document.createElement('tr');
     var contD = [];
     for (let i = 0; i < 3; ++i) {
-      contD[i] = document.createElement("td"); // 3 table cells
+      contD[i] = document.createElement('td'); // 3 table cells
       contR.appendChild(contD[i]);
-      contD[i].style.width = "33.333%";
+      contD[i].style.width = '33.333%';
     }
     btnContainer.appendChild(contR);
-    contR.style.width = "100%";
-    btnContainer.style.width = "97.5%";
-    var button = document.createElement("button");
+    contR.style.width = '100%';
+    btnContainer.style.width = '97.5%';
+    var button = document.createElement('button');
     contD[1].appendChild(button);
 
-    var prefBtn = document.createElement("button");
-    prefBtn.id = "preferenceBtn";
-    prefBtn.innerHTML = "Preferences";
-    prefBtn.className = "myButton myButton2";
-    prefBtn.addEventListener("click", showPreferences);
+    var prefBtn = document.createElement('button');
+    prefBtn.id = 'preferenceBtn';
+    prefBtn.innerHTML = 'Preferences';
+    prefBtn.className = 'myButton myButton2';
+    prefBtn.addEventListener('click', showPreferences);
     contD[contD.length - 1].appendChild(prefBtn);
     prefBtn.style.fontFamily = font;
 
-    button.id = "makeSchedBtn";
-    button.className = "myButton myButton2";
+    button.id = 'makeSchedBtn';
+    button.className = 'myButton myButton2';
     button.style.fontFamily = font;
-    button.innerHTML = "Make Schedule";
+    button.innerHTML = 'Make Schedule';
     parent.appendChild(btnContainer);
-    button.addEventListener("click", makeSchedClicked);
+    button.addEventListener('click', makeSchedClicked);
   }
 
   // add one click enroll if doesn't exist
-  if (!document.querySelector("#oneClickEnrollButton")) {
-    let oneClickEnrollDiv = document.createElement("div");
-    let oneClickEnroll = document.createElement("button");
+  if (!document.querySelector('#oneClickEnrollButton')) {
+    let oneClickEnrollDiv = document.createElement('div');
+    let oneClickEnroll = document.createElement('button');
     $(oneClickEnroll)
-      .attr("id", "oneClickEnrollButton")
-      .addClass("myButton")
-      .addClass("myButton2");
+      .attr('id', 'oneClickEnrollButton')
+      .addClass('myButton')
+      .addClass('myButton2');
     oneClickEnroll.style.fontFamily = font;
-    oneClickEnroll.innerHTML = "One Click Enroll";
-    oneClickEnroll.addEventListener("click", enroll);
+    oneClickEnroll.innerHTML = 'One Click Enroll';
+    oneClickEnroll.addEventListener('click', enroll);
     $(oneClickEnrollDiv).append(oneClickEnroll);
 
-    if (document.querySelector("#enrollButton-button"))
-      $("#cartDiv").append(oneClickEnrollDiv);
+    if (document.querySelector('#enrollButton-button'))
+      $('#cartDiv').append(oneClickEnrollDiv);
   }
 }
 
@@ -928,18 +930,18 @@ export function makeSchedClicked() {
   if (ready) {
     let tbaClasses = [];
     classArr = classArr.filter((c) => {
-      if (c.times.includes("TBA")) {
+      if (c.times.includes('TBA')) {
         tbaClasses.push(c);
       }
-      return !c.times.includes("TBA");
+      return !c.times.includes('TBA');
     });
     let includeClasses = classArr.map((c) => c.copy());
-    let doNotIncludeString = sessionStorage.getItem("includePreferences");
+    let doNotIncludeString = sessionStorage.getItem('includePreferences');
     if (doNotIncludeString) {
       let doNotIncludeClasses = new Map(JSON.parse(doNotIncludeString));
       includeClasses.forEach((c) => {
         // want to remove sections from what we are looking at
-        let k = c.classAbbr.replace(" ", "_");
+        let k = c.classAbbr.replace(' ', '_');
         if (doNotIncludeClasses.has(k)) {
           doNotIncludeClasses
             .get(k)
@@ -964,10 +966,10 @@ export function makeSchedClicked() {
  *	Shows the preferences for user to choose
  */
 export function showPreferences() {
-  document.getElementById("pref-modal").style.display = "block";
-  let width = $("#Wednesday.break-day-title").width();
-  $(".break-select").css({
-    "min-width": width,
+  document.getElementById('pref-modal').style.display = 'block';
+  let width = $('#Wednesday.break-day-title').width();
+  $('.break-select').css({
+    'min-width': width,
   });
 }
 
@@ -975,8 +977,8 @@ export function showPreferences() {
  * Uses code courtesy of Samuel Lijin to enroll in every class in your cart with one click
  */
 export function enroll() {
-  cart = document.getElementById("StudentCartList_div");
-  classes = cart.getElementsByClassName("classTable");
+  cart = document.getElementById('StudentCartList_div');
+  classes = cart.getElementsByClassName('classTable');
   //There are multiple classTables within the page; specifying those within the StudentCartList_div
   //restricts $classes to those tables corresponding to actual classes.
   //console.log(classes);
@@ -986,12 +988,12 @@ export function enroll() {
     //Log the iteration step.
     //console.log(i);
 
-    classInfo = classes[i].getElementsByClassName("left")[0].childNodes;
-    className = classInfo[1].innerText + " " + classInfo[3].innerText;
+    classInfo = classes[i].getElementsByClassName('left')[0].childNodes;
+    className = classInfo[1].innerText + ' ' + classInfo[3].innerText;
     //console.log(className);
     //Voodoo magic to grab the contents of the <div> containing the class name.
 
-    classSelection = classes[i].getElementsByClassName("classSelection")[0];
+    classSelection = classes[i].getElementsByClassName('classSelection')[0];
     //console.log(classSelection);
     //Grabs the classSelection <td> associated with the class.
     //Note that if registered for multiple /sections/ of the same class, this only grabs the first section.
@@ -1016,12 +1018,12 @@ export function enroll() {
     //handle waitlisting was not specifically tested.
 
     try {
-      sub[1].removeAttribute("disabled");
-      sub[3].removeAttribute("disabled");
-      sub[3].value = "true";
+      sub[1].removeAttribute('disabled');
+      sub[3].removeAttribute('disabled');
+      sub[3].value = 'true';
 
       buttonText = sub[5].firstChild.firstChild.firstChild;
-      buttonText.textContent = "W▼";
+      buttonText.textContent = 'W▼';
       //This accesses and modifies the dropdown text. While not necessary for this script to be
       //functional, that its it serves as
       //visual confirmation that the function has executed properly.
@@ -1030,7 +1032,7 @@ export function enroll() {
 
       //console.log("Trying to enrollwaitlist for: " + className);
     } catch (TypeError) {
-      console.log("Error during " + i + "-th iteration:");
+      console.log('Error during ' + i + '-th iteration:');
       console.log(TypeError);
     }
     //This enables the inputs.
@@ -1040,7 +1042,7 @@ export function enroll() {
     //console.log(buttonText);
   }
 
-  document.getElementById("enrollButton-button").click();
+  document.getElementById('enrollButton-button').click();
 }
 
 /*
@@ -1053,24 +1055,24 @@ export function sortBasedOnPreferences(arr) {
   let d;
   for (let day in preferences.breakTime) {
     d = day[0];
-    if (d === "T") {
-      d = day[1] === "h" ? (d = "R") : (d = "T");
-    } else if (d === "S") {
-      d = day[1] === "u" ? (d = "U") : (d = "S");
+    if (d === 'T') {
+      d = day[1] === 'h' ? (d = 'R') : (d = 'T');
+    } else if (d === 'S') {
+      d = day[1] === 'u' ? (d = 'U') : (d = 'S');
     }
 
     preferences.breakTime[day].forEach((time) => {
       if (time !== 7 && time < 10) {
-        t = "0" + time.toString() + ":01-0" + time.toString() + ":59";
+        t = '0' + time.toString() + ':01-0' + time.toString() + ':59';
       } else {
-        t = time.toString() + ":01-" + time.toString() + ":59";
+        t = time.toString() + ':01-' + time.toString() + ':59';
       }
-      breakArr.push(["CLASS ABBRV", "00", t, d]);
+      breakArr.push(['CLASS ABBRV', '00', t, d]);
     });
   }
   if (preferences.noPrefMet) {
     // do not show if no pref met
-    console.log("here");
+    console.log('here');
     arr = arr.filter((sched) => {
       let flag = true;
       breakArr.forEach((c) => {
@@ -1103,50 +1105,50 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
   var scheduleDiv;
   if (arr.length > 0) {
     schedArr = convertToDetailed(arr);
-    let bigSchedDiv = document.createElement("div");
+    let bigSchedDiv = document.createElement('div');
     if (tbaClasses.length > 0) {
-      let tbaClassesP = document.createElement("p");
-      let is_are = tbaClasses.length > 1 ? " are" : " is";
+      let tbaClassesP = document.createElement('p');
+      let is_are = tbaClasses.length > 1 ? ' are' : ' is';
       tbaClassesP.innerHTML =
-        "**" +
+        '**' +
         tbaClasses
           .map((c) => c.classAbbr)
           .toString()
-          .replace(/,/g, ", ") +
+          .replace(/,/g, ', ') +
         is_are +
-        " not shown because the" +
-        (tbaClasses.length > 1 ? " times" : " time") +
+        ' not shown because the' +
+        (tbaClasses.length > 1 ? ' times' : ' time') +
         is_are +
-        " TBA.";
+        ' TBA.';
       bigSchedDiv.appendChild(tbaClassesP);
-      $(tbaClassesP).addClass("tba-classes");
+      $(tbaClassesP).addClass('tba-classes');
     }
 
     // creates schedule table
     schedArr.forEach(function (schedule, idx) {
-      scheduleDiv = document.createElement("div");
+      scheduleDiv = document.createElement('div');
       idx % 2 === 0
-        ? $(scheduleDiv).addClass("schedule-div")
+        ? $(scheduleDiv).addClass('schedule-div')
         : $(scheduleDiv)
-            .addClass("schedule-div")
-            .css("background-color", "#dedede");
+            .addClass('schedule-div')
+            .css('background-color', '#dedede');
 
-      var table = document.createElement("table");
-      $(table).addClass("schedule-table");
+      var table = document.createElement('table');
+      $(table).addClass('schedule-table');
       scheduleDiv.appendChild(table);
       var caption = table.createCaption();
-      var capSpan = document.createElement("span");
-      var capButtonSpan = document.createElement("span");
-      var pickSchedBtn = document.createElement("button");
+      var capSpan = document.createElement('span');
+      var capButtonSpan = document.createElement('span');
+      var pickSchedBtn = document.createElement('button');
       caption.appendChild(capSpan);
       caption.appendChild(capButtonSpan);
       capButtonSpan.appendChild(pickSchedBtn);
-      capSpan.innerHTML = "Schedule #" + (idx + 1).toString();
-      pickSchedBtn.className = "myButton modalButton";
-      pickSchedBtn.innerHTML = "Pick Schedule";
+      capSpan.innerHTML = 'Schedule #' + (idx + 1).toString();
+      pickSchedBtn.className = 'myButton modalButton';
+      pickSchedBtn.innerHTML = 'Pick Schedule';
 
       // Remove classes not in schedule from cart
-      pickSchedBtn.addEventListener("click", () => {
+      pickSchedBtn.addEventListener('click', () => {
         var curSched =
           schedArr[
             ~~pickSchedBtn.parentNode.previousSibling.innerHTML.match(
@@ -1154,8 +1156,8 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
             ) - 1
           ];
         var classTab = document
-          .getElementById("studentCart")
-          .getElementsByClassName("classTable");
+          .getElementById('studentCart')
+          .getElementsByClassName('classTable');
 
         let inSchedule = new Map();
         curSched.forEach((c) => {
@@ -1166,10 +1168,10 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
           // gets value for key which is index of section in class
           let value = [
             Array.from(
-              classTab[key].getElementsByClassName("classRow")
+              classTab[key].getElementsByClassName('classRow')
             ).findIndex(
               (el) =>
-                el.querySelector(".classSection").innerText.trim() ===
+                el.querySelector('.classSection').innerText.trim() ===
                 c.sections[0]
             ),
           ];
@@ -1180,37 +1182,37 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
 
         // if key & value are not in inSchedule => remove
         Array.from(classTab).forEach((cl, i) =>
-          Array.from(cl.getElementsByClassName("classRow")).forEach((el, k) => {
+          Array.from(cl.getElementsByClassName('classRow')).forEach((el, k) => {
             // If not including class in schedule making via preferences, then i will not be in 'inSchedule'
             // TODO: change the following:
             // In preferences, if a certain section is not included then it will still be deleted
             if (!inSchedule.has(i)) {
               // class not in schedule -- remove or don't remove based on preference
               if (includeClassesInRemoval) {
-                el.querySelector(".classActionButtons")
+                el.querySelector('.classActionButtons')
                   .querySelector("a[title='Remove Class From Cart']")
                   .click();
               }
             } else if (!inSchedule.get(i).includes(k)) {
               let key = $(el)
                 .prevAll()
-                .find(".classHeader")[0]
-                .getElementsByClassName("classAbbreviation")[0]
+                .find('.classHeader')[0]
+                .getElementsByClassName('classAbbreviation')[0]
                 .innerText.match(/[^:]+/)[0]
-                .replace(" ", "_");
+                .replace(' ', '_');
               let value = $(el)
-                .find(".classSection")[0]
+                .find('.classSection')[0]
                 .innerText.match(/[\S]+/)[0];
               if (
                 includePreferences.has(key) &&
                 includePreferences.get(key).includes(value)
               ) {
                 if (includeClassesInRemoval)
-                  el.querySelector(".classActionButtons")
+                  el.querySelector('.classActionButtons')
                     .querySelector("a[title='Remove Class From Cart']")
                     .click();
               } else {
-                el.querySelector(".classActionButtons")
+                el.querySelector('.classActionButtons')
                   .querySelector("a[title='Remove Class From Cart']")
                   .click();
               }
@@ -1218,45 +1220,45 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
           })
         );
 
-        modal.style.display = "none";
-        $("#modalBody").html("");
+        modal.style.display = 'none';
+        $('#modalBody').html('');
 
         scheduleArr = [];
       });
 
       // creates table
-      $(capSpan).css("font-family", font).addClass("schedule-caption");
-      scheduleDiv.id = caption.querySelector("span").innerText;
+      $(capSpan).css('font-family', font).addClass('schedule-caption');
+      scheduleDiv.id = caption.querySelector('span').innerText;
       var header = table.createTHead();
       var hrow = header.insertRow(0);
       for (var i = 0; i < 8; i++) {
-        var hcell = document.createElement("th");
+        var hcell = document.createElement('th');
         hrow.appendChild(hcell);
-        $(hcell).css("font-family", font).addClass("schedule-th");
+        $(hcell).css('font-family', font).addClass('schedule-th');
         switch (i) {
           case 0:
-            hcell.innerHTML = "";
+            hcell.innerHTML = '';
             break;
           case 1:
-            hcell.innerHTML = "Mon";
+            hcell.innerHTML = 'Mon';
             break;
           case 2:
-            hcell.innerHTML = "Tues";
+            hcell.innerHTML = 'Tues';
             break;
           case 3:
-            hcell.innerHTML = "Wed";
+            hcell.innerHTML = 'Wed';
             break;
           case 4:
-            hcell.innerHTML = "Thurs";
+            hcell.innerHTML = 'Thurs';
             break;
           case 5:
-            hcell.innerHTML = "Fri";
+            hcell.innerHTML = 'Fri';
             break;
           case 6:
-            hcell.innerHTML = "Sat";
+            hcell.innerHTML = 'Sat';
             break;
           case 7:
-            hcell.innerHTML = "Sun";
+            hcell.innerHTML = 'Sun';
             break;
         }
       }
@@ -1265,61 +1267,61 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
       var tBody = table.createTBody();
       for (var i = 0; i < 13; i++) {
         var row = tBody.insertRow(i);
-        $(row).addClass("schedule-tr");
+        $(row).addClass('schedule-tr');
         for (var j = 0; j < 8; j++) {
           var cell = row.insertCell(j);
-          $(cell).addClass("schedule-td");
+          $(cell).addClass('schedule-td');
           if (j === 0) {
             var timeText =
               i + 7 <= 12
                 ? (i + 7).toString()
                 : (((i + 7) % 13) + 1).toString();
             if (i + 7 < 12) {
-              timeText += " am";
+              timeText += ' am';
             } else {
-              timeText += " pm";
+              timeText += ' pm';
             }
             cell.innerHTML = timeText;
-            $(cell).addClass("c1");
+            $(cell).addClass('c1');
           } else {
-            $(cell).append($("<div></div>").addClass("schedule-td-div"));
+            $(cell).append($('<div></div>').addClass('schedule-td-div'));
           }
         }
       }
       bigSchedDiv.appendChild(scheduleDiv);
       $(scheduleDiv).css({
-        position: "relative",
+        position: 'relative',
       });
     });
 
-    $("#modalBody").append(bigSchedDiv);
+    $('#modalBody').append(bigSchedDiv);
     document
-      .getElementsByClassName("modal-header")[0]
-      .getElementsByTagName("h2")[0].innerHTML = "Pick Schedule";
-    $(".modal-header h2").css("color", "black");
-    $(".modal-content").css("font-family", font);
-    modal.style.display = "block";
+      .getElementsByClassName('modal-header')[0]
+      .getElementsByTagName('h2')[0].innerHTML = 'Pick Schedule';
+    $('.modal-header h2').css('color', 'black');
+    $('.modal-content').css('font-family', font);
+    modal.style.display = 'block';
 
     schedArr.forEach((schedule, idx) => {
       // Places class
-      scheduleDiv = document.getElementsByClassName("schedule-div")[idx];
+      scheduleDiv = document.getElementsByClassName('schedule-div')[idx];
       schedule.forEach((c) => {
-        if (c.days[0] !== "TBA") {
+        if (c.days[0] !== 'TBA') {
           for (var k = 0; k < c.days[0].length; k++) {
-            var classDiv = document.createElement("div");
-            classDiv.className = "class";
-            $(classDiv).prop("time", c.times[0]);
-            $(classDiv).prop("location", c.location[0]);
-            classDiv.id = c.classAbbr.replace(/\s/g, "") + "_" + k;
-            var classTextDiv = document.createElement("div");
-            classTextDiv.className = "classText";
-            classTextDiv.innerHTML = c.classAbbr + "-" + c.sections[0];
+            var classDiv = document.createElement('div');
+            classDiv.className = 'class';
+            $(classDiv).prop('time', c.times[0]);
+            $(classDiv).prop('location', c.location[0]);
+            classDiv.id = c.classAbbr.replace(/\s/g, '') + '_' + k;
+            var classTextDiv = document.createElement('div');
+            classTextDiv.className = 'classText';
+            classTextDiv.innerHTML = c.classAbbr + '-' + c.sections[0];
             classDiv.appendChild(classTextDiv);
             placeClass(classDiv, scheduleDiv, c.days[0].charAt(k), c.times[0]);
             var height =
               Class_.lengthOfClass(c.times[0]) * 100 -
               200 / $(classDiv).parent().get(0).offsetHeight; // account for border
-            $(classDiv).css("height", height.toString() + "%");
+            $(classDiv).css('height', height.toString() + '%');
           }
         }
       });
@@ -1330,32 +1332,32 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
     let errorClasses = Array.from(overlappedClasses);
     let nonOverlapped = errorClasses
       .filter((item) => item[1] === 0)
-      .map((item) => item[0].substring(0, item[0].indexOf("-")));
+      .map((item) => item[0].substring(0, item[0].indexOf('-')));
 
     errorClasses = errorClasses.filter((item) => {
-      let str = item[0].substring(0, item[0].indexOf("-"));
+      let str = item[0].substring(0, item[0].indexOf('-'));
       return !nonOverlapped.includes(str);
     });
     errorClasses = errorClasses.sort((a, b) => b[1] - a[1]);
     let ec = new Set(
-      errorClasses.map((item) => item[0].substring(0, item[0].indexOf("-")))
+      errorClasses.map((item) => item[0].substring(0, item[0].indexOf('-')))
     );
     ec = Array.from(ec);
     if (ec.length !== 0) {
       errorText +=
         "<p>The following classes have conflicts:</p><br/><p style='padding-left: 10px'>" +
-        ec.toString().replace(/,/g, ", ") +
+        ec.toString().replace(/,/g, ', ') +
         '</p><br/><p>In preferences you can choose to <strong><i>not</i></strong> include the classes when creating a schedule. This will not remove the classes from your cart but will just ignore the classes when creating schedules. If a schedule is chosen, then the ignored classes will be removed from your cart.</p><p>Alternately, try clicking "show" for classes that do not meet preferences in preferences.</p></div>';
     } else {
       errorText +=
         '<p>Try clicking "show" for classes that do not meet preferences in preferences.</p></div>';
     }
-    $(".modal-header h2").html("Error creating schedule!");
+    $('.modal-header h2').html('Error creating schedule!');
 
-    $(".modal-header h2").css("color", "red");
-    $(".modal-content").css("font-family", font);
-    $("#modalBody").html(errorText);
-    modal.style.display = "block";
+    $('.modal-header h2').css('color', 'red');
+    $('.modal-content').css('font-family', font);
+    $('#modalBody').html(errorText);
+    modal.style.display = 'block';
   }
 }
 
@@ -1446,82 +1448,82 @@ export function placeClass(classDiv, scheduleDiv, day, time) {
   if (divHeight !== 0) {
     var xDisplace;
     switch (day) {
-      case "M":
+      case 'M':
         xDisplace = 0;
         break;
-      case "T":
+      case 'T':
         xDisplace = 1;
         break;
-      case "W":
+      case 'W':
         xDisplace = 2;
         break;
-      case "R":
+      case 'R':
         xDisplace = 3;
         break;
-      case "F":
+      case 'F':
         xDisplace = 4;
         break;
-      case "S":
+      case 'S':
         xDisplace = 5;
         break;
-      case "U":
+      case 'U':
         xDisplace = 6;
         break;
     }
-    time = time.substring(0, time.indexOf("-"));
+    time = time.substring(0, time.indexOf('-'));
     var h, m;
-    if (time.indexOf("p") >= 0 && time.substring(0, 2) !== "12") {
+    if (time.indexOf('p') >= 0 && time.substring(0, 2) !== '12') {
       h = ~~time.substring(0, 2) + 12;
     } else {
       h = ~~time.substring(0, 2);
     }
     h -= 7; // 7am = 0
-    m = ~~time.substring(time.indexOf(":") + 1, time.indexOf(":") + 3);
+    m = ~~time.substring(time.indexOf(':') + 1, time.indexOf(':') + 3);
     m /= 60;
-    let cell = $($(scheduleDiv).find("tbody tr").get(h))
-      .find("td .schedule-td-div")
+    let cell = $($(scheduleDiv).find('tbody tr').get(h))
+      .find('td .schedule-td-div')
       .get(xDisplace);
     cell.appendChild(classDiv);
-    $(classDiv).css("top", (m * 100).toString() + "%");
+    $(classDiv).css('top', (m * 100).toString() + '%');
 
     // adds detailed comment bubble on hover
-    var commentDiv = document.createElement("div");
-    commentDiv.className = "comment-div";
-    var commentImg = document.createElement("img");
-    var iconUrl2 = chrome.extension.getURL("png/comment-pic2.png");
-    var iconUrl3 = chrome.extension.getURL("png/comment-pic3.png");
+    var commentDiv = document.createElement('div');
+    commentDiv.className = 'comment-div';
+    var commentImg = document.createElement('img');
+    var iconUrl2 = chrome.extension.getURL('png/comment-pic2.png');
+    var iconUrl3 = chrome.extension.getURL('png/comment-pic3.png');
     if (
-      $(scheduleDiv).css("background-color").toString() === "rgb(222, 222, 222)"
+      $(scheduleDiv).css('background-color').toString() === 'rgb(222, 222, 222)'
     ) {
-      $(commentImg).attr("src", iconUrl3);
+      $(commentImg).attr('src', iconUrl3);
     } else {
-      $(commentImg).attr("src", iconUrl2);
+      $(commentImg).attr('src', iconUrl2);
     }
-    commentImg.className = "comment-img";
+    commentImg.className = 'comment-img';
     commentDiv.appendChild(commentImg);
     scheduleDiv.appendChild(commentDiv);
 
-    var upperLeftText = document.createElement("div");
-    upperLeftText.innerHTML = "Cannot display additional information.";
-    upperLeftText.className = "comment-text";
+    var upperLeftText = document.createElement('div');
+    upperLeftText.innerHTML = 'Cannot display additional information.';
+    upperLeftText.className = 'comment-text';
     commentDiv.appendChild(upperLeftText);
-    $(upperLeftText).css("font-family", font);
+    $(upperLeftText).css('font-family', font);
 
     for (var i = 0; i < schedArr.length; i++) {
       if (scheduleDiv.id.includes(i + 1)) {
         for (var j = 0; j < schedArr[i].length; j++) {
           if (
             classDiv.firstChild.innerHTML.includes(
-              schedArr[i][j].classAbbr + "-" + schedArr[i][j].sections[0]
+              schedArr[i][j].classAbbr + '-' + schedArr[i][j].sections[0]
             )
           ) {
             upperLeftText.innerHTML =
               classDiv.firstChild.innerHTML +
-              "<br/>" +
-              $(classDiv).prop("time") +
-              "&emsp;" +
-              $(classDiv).prop("location") +
-              "<br/>" +
+              '<br/>' +
+              $(classDiv).prop('time') +
+              '&emsp;' +
+              $(classDiv).prop('location') +
+              '<br/>' +
               schedArr[i][j].prof[0];
           }
         }
@@ -1530,9 +1532,9 @@ export function placeClass(classDiv, scheduleDiv, day, time) {
 
     // displays when hovered over class div
     classDiv.onmouseover = (event) => {
-      commentDiv.style.display = "block";
+      commentDiv.style.display = 'block';
       var curClassDiv;
-      if (event.target.className === "class") {
+      if (event.target.className === 'class') {
         curClassDiv = event.target;
       } else {
         curClassDiv = event.target.parentNode;
@@ -1550,7 +1552,7 @@ export function placeClass(classDiv, scheduleDiv, day, time) {
       });
     };
     classDiv.onmouseout = () => {
-      commentDiv.style.display = "none";
+      commentDiv.style.display = 'none';
     };
   }
   // scheduleDiv.appendChild(classDiv);
