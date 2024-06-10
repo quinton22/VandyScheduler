@@ -996,11 +996,6 @@ export function enroll() {
       console.log('Error during ' + i + '-th iteration:');
       console.log(TypeError);
     }
-    //This enables the inputs.
-    //console.log(sub[1]);
-    //console.log(sub[3]);
-
-    //console.log(buttonText);
   }
 
   document.getElementById('enrollButton-button').click();
