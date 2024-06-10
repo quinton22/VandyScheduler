@@ -1,11 +1,3 @@
-// IDEA: sidebar instead of preferences button
-// in manifest: sidebar_action
-// IDEA: somehow find a way to show which classes you should take
-// TODO: make this a react app :)
-
-// IDEA: show the number of ratings along side rateMyProf scores.
-// IDEA: make the professor's name a link that goes directly to the rmp page
-
 import $ from 'jquery';
 import {
   BreakTime,
@@ -30,19 +22,21 @@ var includeClassesInRemoval = false;
 var modal = await createModal(); // creates modal and appends to doc
 var ready = false; // allows modal to load
 
-// creates button
-var addClassButton = document.createElement('span');
-addClassButton.setAttribute('width', 'auto');
+/**
+ * Adds course to schedule
+ */
+var addCourseButton = document.createElement('span');
+addCourseButton.setAttribute('width', 'auto');
 var btn = document.createElement('button');
 btn.setAttribute('class', 'myButton');
 btn.innerHTML = 'Add to Schedule';
-addClassButton.appendChild(btn);
+addCourseButton.appendChild(btn);
 
 // sets parent node to course titles on either class search page or class cart page
 var parent = document
   .getElementById('classSearchResultsCarousel')
   ?.getElementsByClassName('left');
-var parent2 = document
+var cartCourseElements = document
   .getElementById('studentCart')
   ?.getElementsByClassName('left');
 
@@ -64,15 +58,15 @@ let font = $('.classAbbreviation').css('font-family');
 
 // updates class and adds buttons if the DOM subtree is changed
 var observer = new MutationObserver(() => {
-  if (parent !== undefined && parent2 !== undefined) {
-    if (parent.length !== 0 || parent2.length !== 0) {
+  if (parent !== undefined && cartCourseElements !== undefined) {
+    if (parent.length !== 0 || cartCourseElements.length !== 0) {
       if (timeout) {
         clearTimeout(timeout);
       }
       page = focusPage[0].getElementsByTagName('h1')[0].innerHTML;
       ready = false;
       if (page === 'Class Cart') {
-        updateClassArr();
+        syncCourseListWithCart();
       }
 
       timeout = setTimeout(addBtn, 100);
@@ -112,10 +106,10 @@ observer.observe(document, {
 //   }
 // }
 
-/*
- *	Clears class array and puts classes in cart in class arr
+/**
+ * Clears class array and puts classes in cart in class arr
  */
-export function updateClassArr() {
+export const syncCourseListWithCart = () => {
   oldclassArr = classArr.slice();
   classArr = [];
 
@@ -123,15 +117,12 @@ export function updateClassArr() {
   if (t) {
     clearTimeout(t);
   }
-  t = setTimeout(() => {
-    if (!parent2) return;
 
-    for (var i = 0; i < parent2.length; i++) {
-      var children = parent2[i].children;
-      if (children !== null) {
-        addClass(parent2[i] as HTMLElement, i);
-      }
-    }
+  t = setTimeout(() => {
+    if (!cartCourseElements) return;
+    Array.from(cartCourseElements).forEach((el, i) => {
+      el.children && addClass(el as HTMLElement, i);
+    });
     ready = true;
 
     // do nothing if classes array has not changed
@@ -143,7 +134,16 @@ export function updateClassArr() {
     }
     updatePrefClassesToInclude();
   }, 100);
-}
+};
+
+export const updatePrefClassesToInclude2 = () => {
+  if (!classArr || classArr.length === 0) return;
+
+  try {
+    // remove each `ul` element from `#include-pref` element --> create new preferences?
+    // TODO
+  } catch {}
+};
 
 export function updatePrefClassesToInclude() {
   if (classArr && classArr.length !== 0) {
@@ -422,36 +422,36 @@ export function addBtn() {
         children !== null &&
         !children[children.length - 1].id.includes('Btn')
       ) {
-        clone = addClassButton.cloneNode(true) as HTMLSpanElement;
-        addClassButton.setAttribute('id', 'Btn' + i.toString());
-        parent[i].appendChild(addClassButton);
-        var button = addClassButton.firstChild;
-        addEL(addClassButton.children[0] as HTMLButtonElement);
-        addClassButton = clone;
+        clone = addCourseButton.cloneNode(true) as HTMLSpanElement;
+        addCourseButton.setAttribute('id', 'Btn' + i.toString());
+        parent[i].appendChild(addCourseButton);
+        var button = addCourseButton.firstChild;
+        addEL(addCourseButton.children[0] as HTMLButtonElement);
+        addCourseButton = clone;
       }
     }
 
-  if (parent2)
+  if (cartCourseElements)
     // adds button to class cart page
-    for (var j = 0; j < parent2.length; j++) {
-      var children = parent2[j].children;
+    for (var j = 0; j < cartCourseElements.length; j++) {
+      var children = cartCourseElements[j].children;
 
       // adds buttons to the page
       if (
         children !== null &&
         !children[children.length - 1].id.includes('RemoveBtn')
       ) {
-        clone = addClassButton.cloneNode(true) as HTMLSpanElement;
-        addClassButton.id = 'RemoveBtn' + j.toString();
-        parent2[j].appendChild(addClassButton);
-        var button = addClassButton.firstChild;
+        clone = addCourseButton.cloneNode(true) as HTMLSpanElement;
+        addCourseButton.id = 'RemoveBtn' + j.toString();
+        cartCourseElements[j].appendChild(addCourseButton);
+        var button = addCourseButton.firstChild;
         if (button) {
           (button as HTMLButtonElement).className = 'myButton remove';
           (button as HTMLButtonElement).innerHTML = 'Remove Class';
           addEL(button as HTMLButtonElement);
         }
 
-        addClassButton = clone;
+        addCourseButton = clone;
       }
     }
 }
@@ -511,7 +511,7 @@ const courseConfig: Record<
   },
 };
 
-/*
+/**
  *	Makes a class "Class" and adds to an array containing all classes in the
  *	schedule
  */
@@ -903,7 +903,7 @@ export function createViewableContent(
         let inSchedule = new Map();
         curSched.forEach((c) => {
           // gets key for inSchedule which is the index of the overall class (class table)
-          let key = Array.from(parent2 ?? []).findIndex((el) =>
+          let key = Array.from(cartCourseElements ?? []).findIndex((el) =>
             (el.children[0] as HTMLElement).innerText.includes(c.classAbbr)
           );
           // gets value for key which is index of section in class

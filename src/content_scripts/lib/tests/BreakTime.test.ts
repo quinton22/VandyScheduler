@@ -1,4 +1,4 @@
-import { BreakTime, Hour } from '../BreakTime';
+import { BreakTime, Hour, isWeekend } from '../BreakTime';
 
 const generateRandomHour = () =>
   BreakTime.AVAILABLE_HOURS[
@@ -10,6 +10,16 @@ const generateRandomHour = () =>
 
 describe('BreakTime', () => {
   let breakTime: BreakTime;
+
+  const expectDefault = () => {
+    for (const day of BreakTime.AVAILABLE_DAYS) {
+      if (isWeekend(day)) {
+        expect(breakTime.get(day)).toEqual(BreakTime.AVAILABLE_HOURS);
+      } else {
+        expect(breakTime.get(day)).toEqual([12]);
+      }
+    }
+  };
 
   beforeEach(() => {
     breakTime = new BreakTime();
@@ -50,9 +60,7 @@ describe('BreakTime', () => {
   });
 
   it('should select all', () => {
-    for (const day of BreakTime.AVAILABLE_DAYS) {
-      expect(breakTime.get(day)).toEqual([]);
-    }
+    expectDefault();
 
     breakTime.selectAll('Monday');
     expect(breakTime.get('Monday')).toEqual(BreakTime.AVAILABLE_HOURS);
