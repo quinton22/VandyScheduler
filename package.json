@@ -1,5 +1,9 @@
 {
   "name": "vandy-scheduler",
+  "repository": "github:quinton22/VandyScheduler",
+  "engines": {
+    "node": ">=18"
+  },
   "targets": {
     "content_scripts": {
       "source": "src/content_scripts/index.ts",
@@ -11,7 +15,6 @@
     }
   },
   "scripts": {
-    "start": "parcel",
     "build": "parcel build",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
