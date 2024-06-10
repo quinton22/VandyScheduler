@@ -7,7 +7,7 @@ Pre-requisites:
 - `pnpm`: To install follow the installation guide [here](https://pnpm.io/installation)
 
 1. Run `pnpm install` in the root directory
-2. Run `pnpm build`. This should create a `dist/` directory with the code included.
+2. Run `pnpm start:watch`. This should create a `dist/` directory with the code included and start watching all files in `src/`.
 3. In your browser, visit your extensions
    - [Chrome](chrome://extensions/)
    - [Edge](edge://extensions/)
