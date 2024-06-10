@@ -135,6 +135,8 @@ function convertName(original) {
 	if (temp[0].trim() in subs) {
 		temp[0] = subs[temp[0].trim()];
 	}
+	// strip away of "," since it is messing up some of the search
+	temp[0] = temp[0].replace(/,/g, '');
 	return encodeURIComponent(temp[0]);
 }
 
