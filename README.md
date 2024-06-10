@@ -12,6 +12,10 @@ This extension can be downloaded at the Chrome Web Store [here](https://chrome.g
 
 Just download from the Chrome Web Store and go to [Course Registration](https://acad.app.vanderbilt.edu/more/SearchClasses.action#) from your YES page, log in, and start using!
 
+## Contributing
+
+To get started contributing please look at [CONTRIBUTING.md](./docs/CONTRIBUTING.md)
+
 ## Changelog
 
 - 2.0.6 - Fix for RMP
