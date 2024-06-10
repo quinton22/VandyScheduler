@@ -21,14 +21,14 @@ export class RateMyProfessorHtmlParse extends RateMyProfessorApi {
   private extractProfId(pageText: string) {
     // in the version of rate my professor on 05/13/2023. when requesting using fetch, we can no longer find professorId in within a tag
     // instead it is stored within a JSON data under variable __RELAY_STORE__ in a <script> tag. So here we extract it from that variabl
-    let scriptDataRegex = /window\.__RELAY_STORE__ = (.*?);/;
-    let scriptDataMatch = pageText.match(scriptDataRegex);
+    const scriptDataRegex = /window\.__RELAY_STORE__ = (.*?);/;
+    const scriptDataMatch = pageText.match(scriptDataRegex);
 
     if (scriptDataMatch) {
-      let jsonData = JSON.parse(scriptDataMatch[1]);
+      const jsonData = JSON.parse(scriptDataMatch[1]);
 
       // extract the legacyId from the JSON data
-      for (let key in jsonData) {
+      for (const key in jsonData) {
         if (jsonData[key].legacyId) {
           return jsonData[key].legacyId;
         }
@@ -64,7 +64,7 @@ export class RateMyProfessorHtmlParse extends RateMyProfessorApi {
     );
 
     const profRatingMatch = pageText.match(
-      /class=["'][A-Za-z0-9\_\- ]*\bRatingValue__Numerator[A-Za-z0-9\_\- ]*\b["']>(.*?)<\//m
+      /class=["'][A-Za-z0-9_\- ]*\bRatingValue__Numerator[A-Za-z0-9_\- ]*\b["']>(.*?)<\//m
     );
 
     if (!profRatingMatch || !profRatingMatch[1]) {

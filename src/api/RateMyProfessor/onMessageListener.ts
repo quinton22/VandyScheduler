@@ -26,8 +26,8 @@ const excecuteAction = async <T extends keyof IRateMyProfessor>(
 
   if (action in rmp) {
     try {
-      return (await rmp[action](
-        ...(args as [any, any])
+      return (await (rmp[action] as IRateMyProfessor[T])(
+        ...((args ?? []) as [string, string | undefined])
       )) as ActionReturnType<T>;
     } catch (e) {
       console.error(e);
@@ -36,8 +36,8 @@ const excecuteAction = async <T extends keyof IRateMyProfessor>(
 
   if (fallback && action in fallbackRmp) {
     try {
-      return (await fallbackRmp[action](
-        ...(args as [any, any])
+      return (await (fallbackRmp[action] as IRateMyProfessor[T])(
+        ...((args ?? []) as [string, string | undefined])
       )) as ActionReturnType<T>;
     } catch (e) {
       console.error(e);
@@ -48,7 +48,7 @@ const excecuteAction = async <T extends keyof IRateMyProfessor>(
 };
 
 export const onMessageListener: OnMessageListener = (
-  request: MessageRequest<any>,
+  request: MessageRequest<keyof IRateMyProfessor>,
   sender,
   sendResponse
 ) => {

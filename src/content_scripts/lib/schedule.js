@@ -1,3 +1,5 @@
+import { Class_ } from './class';
+
 export class Schedule {
   constructor(classesArr) {
     this.classesArr = classesArr; // all the classes to be put in schedule
@@ -121,7 +123,7 @@ export class Schedule {
     this.classesArr.forEach((_class) => {
       _class.sections.forEach((section, i) => {
         this.overlappedClasses.set(
-          _class.classAbbr + "-" + section,
+          _class.classAbbr + '-' + section,
           this.classesArr
             .map((c) => {
               let overlap = 0;
