@@ -1,1 +1,1 @@
-export * from "./RateMyProfessorApi";
+export * from './onMessageListener';
