@@ -86,7 +86,9 @@ function extractProfId(pageText){
 		if(result.length == 0){
 			throw "error extracting the legacyId from the window\.__RELAY_STORE__ when trying to find profId. Possibly no professor is found"
 		} else if(result.length > 1){
-			throw "error extracting the legacyId from the window\.__RELAY_STORE__ when trying to find profId. Multiple matches found"
+			// throw "error extracting the legacyId from the window\.__RELAY_STORE__ when trying to find profId. Multiple matches found"
+			console.warn("Multiple matches found when trying to find profId. Returning the first match")
+			return result[0];
 		} else {
 			return result[0];
 		}
