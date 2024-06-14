@@ -14,6 +14,6 @@ Pre-requisites:
 4. Turn on developer mode
 5. Select `Load unpacked` button
    ![Load unpacked button](images/chrome-extension-setup1.png)
-6. Select the `dist/` directory
+6. Select the repo root directory directory (`VandyScheduler/`)
 7. Enable the extension
 8. Visit [https://more.app.vanderbilt.edu/more/SearchClasses!input.action](https://more.app.vanderbilt.edu/more/SearchClasses!input.action) to test.
