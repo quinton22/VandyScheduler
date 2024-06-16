@@ -1,0 +1,107 @@
+<div class="modal" id="pref-modal">
+  <div class="modal-content preference-modal">
+    <div class="pref-modal-body">
+      <span
+        class="close"
+        style="position: sticky; top: 0; padding-top: 5px"
+        onclick="closePrefModal()"
+        >&times;</span
+      >
+      <h1 class="pref-title">Preferences</h1>
+      <div id="include-pref" class="pref-subcontent">
+        <div id="include-pref-text">
+          <h3 class="pref-subtitle">Include Classes</h3>
+          <p class="pref-modal-text">
+            Choose which classes are included in making the schedule.
+          </p>
+        </div>
+        <div>
+          <form id="remove-classes-pref-form" action="javascript:void(0)">
+            <fieldset class="preferences-fieldset">
+              <legend class="preferences-legend">
+                Keep unselected classes in cart if a schedule is chosen?
+              </legend>
+              <div class="radio-container">
+                <input
+                  type="radio"
+                  class="preferences-radio"
+                  id="include-classes-input-keep"
+                  name="include-pref"
+                  value="true"
+                  checked="true"
+                  onchange="() => {includeClassesInRemoval = false;}"
+                /><label for="include-classes-input-keep">Keep</label>
+              </div>
+              <div class="radio-container">
+                <input
+                  type="radio"
+                  class="preferences-radio"
+                  id="include-classes-input-remove"
+                  name="include-pref"
+                  value="false"
+                  onchange="() => {includeClassesInRemoval = true;}"
+                /><label for="include-classes-input-remove">Remove</label>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <div class="pref-divider"></div>
+      <div id="break-pref" class="pref-subcontent">
+        <div id="break-pref-text">
+          <h3 class="pref-subtitle">Breaks</h3>
+          <p class="pref-modal-text">
+            Select the time(s) you do <strong><i>not</i></strong> want class
+            below. Your schedules will be sorted based on this.
+          </p>
+          <p class="pref-modal-text pref-first-time-hint" style="display: none">
+            Lunch break defaults to 12 p.m. and Saturdays and Sundays are
+            default breaks. If you do not want this click "Clear Preferences."
+          </p>
+          <p class="pref-modal-text">
+            To select a break time for all of MWF, TR, or SU, double click on
+            that time on any of those days.
+          </p>
+        </div>
+        <div class="form-container">
+          <div class="inner-form-container">%breakDays%</div>
+        </div>
+
+        <div class="checkbox-div">
+          <form id="pref-not-met-form" action="javascript:void(0)">
+            <fieldset class="preferences-fieldset">
+              <legend class="preferences-legend">
+                Show schedules that do not meet preferences?
+              </legend>
+              <div class="radio-container">
+                <input
+                  type="radio"
+                  class="preferences-radio"
+                  id="break-pref-input-show"
+                  name="break-pref"
+                  value="true"
+                  onchange="preferences.noPreferencesMet = false;"
+                /><label for="break-pref-input-show">Show</label>
+              </div>
+              <div class="radio-container">
+                <input
+                  type="radio"
+                  class="preferences-radio"
+                  id="break-pref-input-hide"
+                  name="break-pref"
+                  value="false"
+                  onchange="preferences.noPreferencesMet = true;"
+                /><label for="break-pref-input-hide">Hide</label>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <div id="pref-button-container" class="pref-subcontent">
+        <button class="myButton modalButton2 pref-clear" onclick="clearPref()">
+          Clear Preferences
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

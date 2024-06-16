@@ -5,6 +5,7 @@
     "target": "ESNext",
     "noImplicitAny": true,
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "noEmit": true,
     "isolatedModules": true,
     "strict": true,

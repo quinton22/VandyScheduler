@@ -1,4 +1,6 @@
 export const BASE_VANDY_URL = window.location.origin;
+export const STORAGE_BUCKET = 'VandyScheduler';
+export const STORAGE_PREFERENCES_KEY = `${STORAGE_BUCKET}/v2/pref`;
 
 export const subs = {
   'Crooke, Philip S.': 'Crooke',
