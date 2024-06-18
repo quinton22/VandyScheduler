@@ -34,7 +34,31 @@ export const getResult = async <T>(
   return result.filter((r) => r && r.length > 0).reverse()[0] ?? [];
 };
 
+export function withCache(
+  originalMethod: (...args: any[]) => Promise<any>,
+  _context: ClassMethodDecoratorContext
+) {
+  async function replacementMethod(this: RateMyProfessorApi, ...args: any[]) {
+    const key = args.join('');
+
+    if (key in this.cache) {
+      console.log('found in cache', key, this.cache[key]);
+      return this.cache[key];
+    }
+    const result = await originalMethod.call(this, ...args);
+
+    console.log('not found in cache', key, result);
+
+    this.cache[key] = result;
+    return result;
+  }
+
+  return replacementMethod;
+}
+
 export abstract class RateMyProfessorApi implements IRateMyProfessor {
+  protected cache: Record<string, Teacher[]> = {};
+
   protected apiEndpoint = 'https://www.ratemyprofessors.com/';
 
   protected getUrl(
