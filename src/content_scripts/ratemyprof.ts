@@ -36,6 +36,7 @@ async function getProfessorId(profName: string) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getAllProfessors() {
   const action: keyof IRateMyProfessor = 'getAllProfessors' as const;
   return await new Promise<ActionReturnType<typeof action>>((resolve) =>

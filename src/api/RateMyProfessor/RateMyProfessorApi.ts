@@ -34,11 +34,15 @@ export const getResult = async <T>(
   return result.filter((r) => r && r.length > 0).reverse()[0] ?? [];
 };
 
-export function withCache(
-  originalMethod: (...args: any[]) => Promise<any>,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withCache<Method extends (...args: any[]) => Promise<any>>(
+  originalMethod: Method,
   _context: ClassMethodDecoratorContext
 ) {
-  async function replacementMethod(this: RateMyProfessorApi, ...args: any[]) {
+  async function replacementMethod(
+    this: RateMyProfessorApi,
+    ...args: Parameters<Method>
+  ) {
     const key = args.join('');
 
     if (key in this.cache) {
