@@ -26,13 +26,16 @@
     "start": "parcel build",
     "build": "parcel build",
     "lint": "eslint ./src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release": "chrome-webstore-upload"
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
     "@tsconfig/recommended": "^1.0.2",
     "@types/chrome": "^0.0.241",
+    "@types/chrome-webstore-upload": "^1.0.0",
     "@types/jquery": "^3.5.18",
+    "chrome-webstore-upload-cli": "^3.3.0",
     "eslint": "^9.4.0",
     "globals": "^15.4.0",
     "nodemon": "^3.1.3",
