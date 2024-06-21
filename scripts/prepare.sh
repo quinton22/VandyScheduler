@@ -1,5 +1,5 @@
 
-VS_TEMP=/tmp/VandyScheduler/
+VS_TMP=$TMP_DIR/VandyScheduler/
 
 
 validateVersion() {
@@ -35,15 +35,14 @@ getFiles() {
 
 copyFiles() {
   local files=( "$( getFiles )" )
-  mkdir /tmp/VandyScheduler
-  cp -r ./{$(IFS=,; echo "${files[*]}"),manifest.json} $VS_TEMP
+  mkdir $VS_TMP
+  cp -r ./{$(IFS=,; echo "${files[*]}"),manifest.json} $VS_TMP
 }
 
 createZip() {
-  local cwd=$( pwd )
-  cd $VS_TEMP
-  zip -rq "$cwd/VandyScheduler.zip" *
-  cd $cwd
+  cd $VS_TMP
+  zip -rq "$VS_TMP/VandyScheduler.zip" *
+  cd -
 }
 
 main() {
@@ -53,7 +52,6 @@ main() {
   build
   copyFiles
   createZip
-  echo "$( pwd )/VandyScheduler.zip"
 }
 
 main $@

@@ -26,4 +26,6 @@ jobs:
       - name: Install deps
         run: pnpm install
       - name: Semantic release
+        env:
+          TMP_DIR: ${{ runner.temp }}
         run: pnpm semantic-release
