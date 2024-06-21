@@ -1,6 +1,6 @@
 {
   "name": "vandy-scheduler",
-  "repository": "github:quinton22/VandyScheduler",
+  "repository": "https://github.com/quinton22/VandyScheduler.git",
   "engines": {
     "node": ">=20.8.1"
   },
@@ -32,7 +32,7 @@
         "@semantic-release/exec",
         {
           "prepareCmd": "./scripts/prepare.sh ${nextRelease.version}",
-          "publishCmd": "pnpm release --source ./VandyScheduler.zip --extension-id $EXTENSION_ID"
+          "publishCmd": "pnpm release --source $TMP_DIR/VandyScheduler.zip --extension-id $EXTENSION_ID"
         }
       ],
       [
@@ -40,7 +40,7 @@
         {
           "assets": [
             {
-              "path": "./VandyScheduler.zip",
+              "path": "$TMP_DIR/VandyScheduler.zip",
               "label": "VandyScheduler.zip"
             }
           ]
