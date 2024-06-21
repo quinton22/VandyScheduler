@@ -39,7 +39,7 @@
         {
           "assets": [
             {
-              "path": "$TMP_DIR/VandyScheduler.zip",
+              "path": "./VandyScheduler.zip",
               "label": "VandyScheduler.zip"
             }
           ]
@@ -48,7 +48,7 @@
       [
         "@semantic-release/exec",
         {
-          "publishCmd": "pnpm release --source $TMP_DIR/VandyScheduler.zip --extension-id $EXTENSION_ID"
+          "publishCmd": "pnpm release --source ./VandyScheduler.zip --extension-id $EXTENSION_ID"
         }
       ]
     ]

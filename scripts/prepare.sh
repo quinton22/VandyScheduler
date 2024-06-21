@@ -53,6 +53,7 @@ createZip() {
   cd $VS_TMP
   zip -rq "$TMP_DIR/VandyScheduler.zip" *
   cd -
+  mv "$TMP_DIR/VandyScheduler.zip" ./VandyScheduler.zip
 }
 
 
