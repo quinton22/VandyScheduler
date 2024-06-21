@@ -7,9 +7,9 @@ print() {
 }
 
 validateVersion() {
-  access_token=$(curl "https://oauth2.googleapis.com/token" -d "client_secret=$CLIENT_SECRET&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN&client_id=$CLIENT_ID" | jq -r '.access_token')
+  access_token=$(curl -s "https://oauth2.googleapis.com/token" -d "client_secret=$CLIENT_SECRET&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN&client_id=$CLIENT_ID" | jq -r '.access_token')
     
-  v2=$(curl --location 'https://www.googleapis.com/chromewebstore/v1.1/items/'$EXTENSION_ID'?projection=DRAFT' --header "Authorization: Bearer $access_token" | jq -r '.crxVersion')
+  v2=$(curl -s --location 'https://www.googleapis.com/chromewebstore/v1.1/items/'$EXTENSION_ID'?projection=DRAFT' --header "Authorization: Bearer $access_token" | jq -r '.crxVersion')
 
   local v1=$1
   v1=${v1#v}
