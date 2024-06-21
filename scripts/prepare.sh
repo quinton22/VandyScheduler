@@ -1,6 +1,6 @@
+#!/usr/bin/env bash
 
-VS_TMP=$TMP_DIR/VandyScheduler/
-
+VS_TMP=$TMP_DIR/VandyScheduler
 
 validateVersion() {
   access_token=$(curl "https://oauth2.googleapis.com/token" -d "client_secret=$CLIENT_SECRET&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN&client_id=$CLIENT_ID" | jq -r '.access_token')
@@ -36,7 +36,7 @@ getFiles() {
 copyFiles() {
   local files=( "$( getFiles )" )
   mkdir $VS_TMP
-  cp -r ./{$(IFS=,; echo "${files[*]}"),manifest.json} $VS_TMP
+  cp -r ./{$(IFS=,; echo "${files[*]}"),manifest.json} $VS_TMP/
 }
 
 createZip() {
