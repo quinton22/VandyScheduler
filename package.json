@@ -31,8 +31,7 @@
       [
         "@semantic-release/exec",
         {
-          "prepareCmd": "./scripts/prepare.sh ${nextRelease.version}",
-          "publishCmd": "pnpm release --source $TMP_DIR/VandyScheduler.zip --extension-id $EXTENSION_ID"
+          "prepareCmd": "./scripts/prepare.sh ${nextRelease.version}"
         }
       ],
       [
@@ -40,10 +39,16 @@
         {
           "assets": [
             {
-              "path": "$TMP_DIR/VandyScheduler.zip",
+              "path": "./VandyScheduler.zip",
               "label": "VandyScheduler.zip"
             }
           ]
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "publishCmd": "pnpm release --source ./VandyScheduler.zip --extension-id $EXTENSION_ID"
         }
       ]
     ]

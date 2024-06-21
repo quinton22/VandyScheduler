@@ -1,16 +1,23 @@
+#!/usr/bin/env bash
 
-VS_TMP=$TMP_DIR/VandyScheduler/
+VS_TMP=$TMP_DIR/VandyScheduler
 
+print() {
+  echo "$1" >&2
+}
 
 validateVersion() {
-  access_token=$(curl "https://oauth2.googleapis.com/token" -d "client_secret=$CLIENT_SECRET&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN&client_id=$CLIENT_ID" | jq -r '.access_token')
+  access_token=$(curl -s "https://oauth2.googleapis.com/token" -d "client_secret=$CLIENT_SECRET&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN&client_id=$CLIENT_ID" | jq -r '.access_token')
     
-  v2=$(curl --location 'https://www.googleapis.com/chromewebstore/v1.1/items/'$EXTENSION_ID'?projection=DRAFT' --header "Authorization: Bearer $access_token" | jq -r '.crxVersion')
+  v2=$(curl -s --location 'https://www.googleapis.com/chromewebstore/v1.1/items/'$EXTENSION_ID'?projection=DRAFT' --header "Authorization: Bearer $access_token" | jq -r '.crxVersion')
 
   local v1=$1
   v1=${v1#v}
 
-  [ "$v2" = "$(echo -e "$v2\n$v1" | sort -V | head -n1)" ] || ( echo "Current published version ($v2) is greater than next version ($v1), so cannot publish"; exit 1 )
+  if [[ "$v2" != "$(echo -e "$v2\n$v1" | sort -V | head -n1)" ]]; then
+    print "Current published version ($v2) is greater than next version ($v1), so cannot publish"
+    exit 1
+  fi
 }
 
 writeVersion() {
@@ -21,7 +28,10 @@ writeVersion() {
 }
 
 build() {
-  command -v pnpm || ( echo "pnpm not installed" >&2; exit 1 )
+  if [ ! $(command -v pnpm) ]; then
+    print "pnpm not installed"
+    exit 1
+  fi
   pnpm build
 }
 
@@ -36,21 +46,29 @@ getFiles() {
 copyFiles() {
   local files=( "$( getFiles )" )
   mkdir $VS_TMP
-  cp -r ./{$(IFS=,; echo "${files[*]}"),manifest.json} $VS_TMP
+  cp -r ./{$(IFS=,; echo "${files[*]}"),manifest.json} $VS_TMP/
 }
 
 createZip() {
   cd $VS_TMP
-  zip -rq "$VS_TMP/VandyScheduler.zip" *
+  zip -rq "$TMP_DIR/VandyScheduler.zip" *
   cd -
+  mv "$TMP_DIR/VandyScheduler.zip" ./VandyScheduler.zip
 }
 
+
+
 main() {
+  print "Validating version"
   validateVersion $1
+  print "writing version"
   writeVersion $1
 
+  print "build"
   build
+  print "copy files"
   copyFiles
+  print "create zip"
   createZip
 }
 
