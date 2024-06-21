@@ -2,8 +2,7 @@ name: Release
 
 on:
   push:
-    branches: ['master']
-  workflow_dispatch:
+    branches: ['master', 'release-action']
 
 jobs:
   release:
