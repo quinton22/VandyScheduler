@@ -5,10 +5,13 @@ on:
     branches: ['master']
 
 jobs:
-  package:
+  release:
     runs-on: ubuntu-latest
-    outputs:
-      source: ${{ steps.zip.outputs.source }}
+    env:
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+      EXTENSION_ID: ${{ vars.EXTENSION_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -19,29 +22,5 @@ jobs:
       - name: Install pnpm
         shell: sh
         run: npm install -g pnpm
-      - name: Build
-        shell: sh
-        run: pnpm build
-      - name: Copy to temp
-        shell: sh
-        run: |
-          mkdir /tmp/VandyScheduler
-          cp -r ./{css,png,dist,manifest.json} /tmp/VandyScheduler/
-      - name: Zip
-        id: zip
-        shell: sh
-        run: |
-          cd /tmp/VandyScheduler
-          zip -rq ../VandyScheduler.zip *
-          echo "source=/tmp/VandyScheduler.zip" >> "$GITHUB_OUTPUT"
-  release:
-    needs: package
-    runs-on: ubuntu-latest
-    env:
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-    steps:
-      - name: Upload & publish
-        shell: sh
-        run: pnpm release --source ${{ needs.package.outputs.source }} --extension-id ${{ vars.EXTENSION_ID }}
+      - name: Semantic release
+        run: pnpm semantic-release

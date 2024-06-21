@@ -2,7 +2,7 @@
   "name": "vandy-scheduler",
   "repository": "github:quinton22/VandyScheduler",
   "engines": {
-    "node": ">=18"
+    "node": ">=20.8.1"
   },
   "targets": {
     "content_scripts": {
@@ -21,6 +21,33 @@
     "delay": 1500,
     "ext": "ts,js,mjs,cjs,json"
   },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "./scripts/prepare.sh ${nextRelease.version}",
+          "publishCmd": "pnpm release --source ./VandyScheduler.zip --extension-id $EXTENSION_ID"
+        }
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "./VandyScheduler.zip",
+              "label": "VandyScheduler.zip"
+            }
+          ]
+        }
+      ]
+    ]
+  },
   "scripts": {
     "start:watch": "nodemon",
     "start": "parcel build",
@@ -31,6 +58,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
+    "@semantic-release/exec": "^6.0.3",
     "@tsconfig/recommended": "^1.0.2",
     "@types/chrome": "^0.0.241",
     "@types/chrome-webstore-upload": "^1.0.0",
@@ -40,6 +68,7 @@
     "globals": "^15.4.0",
     "nodemon": "^3.1.3",
     "parcel": "^2.9.0",
+    "semantic-release": "^24.0.0",
     "typescript": "^5.2.2",
     "typescript-eslint": "^7.13.0"
   },
