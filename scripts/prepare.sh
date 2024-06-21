@@ -45,12 +45,21 @@ createZip() {
   cd -
 }
 
+print() {
+  echo "$1" >&2
+}
+
 main() {
+  print "Validating version"
   validateVersion $1
+  print "writing version"
   writeVersion $1
 
+  print "build"
   build
+  print "copy files"
   copyFiles
+  print "create zip"
   createZip
 }
 
