@@ -65,6 +65,11 @@ createZip() {
 
 
 main() {
+  if [[ -z $1 ]]; then
+    print "A version must be passed in"
+    exit 1
+  fi
+
   print "Validating version"
   validateVersion $1
   print "writing version"
