@@ -20,9 +20,8 @@ writeVersion() {
   jq ".version=\"$version\"" < manifest.json > manifest.json
 }
 
-install() {
+build() {
   command -v pnpm || ( echo "pnpm not installed" >&2; exit 1 )
-  pnpm install
   pnpm build
 }
 
@@ -51,7 +50,7 @@ main() {
   validateVersion $1
   writeVersion $1
 
-  install
+  build
   copyFiles
   createZip
   echo "$( pwd )/VandyScheduler.zip"

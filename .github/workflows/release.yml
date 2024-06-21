@@ -22,5 +22,7 @@ jobs:
       - name: Install pnpm
         shell: sh
         run: npm install -g pnpm
+      - name: Install deps
+        run: pnpm install
       - name: Semantic release
         run: pnpm semantic-release
