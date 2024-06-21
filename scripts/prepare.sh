@@ -24,7 +24,8 @@ writeVersion() {
   local version=$1
   version=${version#v}
 
-  jq ".version=\"$version\"" < manifest.json > manifest.json
+  jq ".version=\"$version\"" < manifest.json > tmp-manifest
+  mv tmp-manifest manifest.json
 }
 
 build() {
@@ -44,14 +45,19 @@ getFiles() {
 }
 
 copyFiles() {
-  local files=( "$( getFiles )" )
+  local files=( $( getFiles ) )
   mkdir $VS_TMP
-  cp -r ./{$(IFS=,; echo "${files[*]}"),manifest.json} $VS_TMP/
+
+  for file in ${files[@]}; do
+    cp -r ./$file $VS_TMP/
+  done
+
+  cp ./manifest.json $VS_TMP/
 }
 
 createZip() {
   cd $VS_TMP
-  zip -rq "$TMP_DIR/VandyScheduler.zip" *
+  zip -rq "../VandyScheduler.zip" *
   cd -
   mv "$TMP_DIR/VandyScheduler.zip" ./VandyScheduler.zip
 }
