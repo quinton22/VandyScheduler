@@ -2,6 +2,10 @@
 
 VS_TMP=$TMP_DIR/VandyScheduler
 
+print() {
+  echo "$1" >&2
+}
+
 validateVersion() {
   access_token=$(curl "https://oauth2.googleapis.com/token" -d "client_secret=$CLIENT_SECRET&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN&client_id=$CLIENT_ID" | jq -r '.access_token')
     
@@ -10,7 +14,10 @@ validateVersion() {
   local v1=$1
   v1=${v1#v}
 
-  [ "$v2" = "$(echo -e "$v2\n$v1" | sort -V | head -n1)" ] || ( echo "Current published version ($v2) is greater than next version ($v1), so cannot publish"; exit 1 )
+  if [[ "$v2" != "$(echo -e "$v2\n$v1" | sort -V | head -n1)" ]]; then
+    print "Current published version ($v2) is greater than next version ($v1), so cannot publish"
+    exit 1
+  fi
 }
 
 writeVersion() {
@@ -21,7 +28,10 @@ writeVersion() {
 }
 
 build() {
-  command -v pnpm || ( echo "pnpm not installed" >&2; exit 1 )
+  if [ ! $(command -v pnpm) ]; then
+    print "pnpm not installed"
+    exit 1
+  fi
   pnpm build
 }
 
@@ -41,13 +51,11 @@ copyFiles() {
 
 createZip() {
   cd $VS_TMP
-  zip -rq "$VS_TMP/VandyScheduler.zip" *
+  zip -rq "$TMP_DIR/VandyScheduler.zip" *
   cd -
 }
 
-print() {
-  echo "$1" >&2
-}
+
 
 main() {
   print "Validating version"
