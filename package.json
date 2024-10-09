@@ -59,7 +59,7 @@
     "start": "parcel build",
     "build": "parcel build",
     "lint": "eslint ./src",
-    "typecheck": "tsc --noEmit --excludeDirectories node_modules",
+    "typecheck": "tsc --noEmit",
     "release": "chrome-webstore-upload"
   },
   "devDependencies": {
@@ -78,7 +78,7 @@
     "nodemon": "^3.1.3",
     "parcel": "^2.12.0",
     "semantic-release": "^24.0.0",
-    "typescript": "^5.2.2",
+    "typescript": "<5.5.0",
     "typescript-eslint": "^7.13.0"
   },
   "dependencies": {
