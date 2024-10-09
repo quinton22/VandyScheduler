@@ -47,6 +47,7 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
           }
           wouldTakeAgainPercentRounded
           wouldTakeAgainCount
+          legacyId
         }
       }
       didFallback
@@ -56,12 +57,12 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
 }`,
   };
   private readonly requestOptions: RequestInit = {
-    method: 'POST',
-    mode: 'cors',
+    method: "POST",
+    mode: "cors",
     headers: new Headers({
-      'Content-Type': 'application/json',
-      accept: 'application/json',
-      Authorization: 'Basic dGVzdDp0ZXN0',
+      "Content-Type": "application/json",
+      accept: "application/json",
+      Authorization: "Basic dGVzdDp0ZXN0",
     }),
   };
 
@@ -81,7 +82,7 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
     };
 
     try {
-      return await fetch(this.getUrl('graphql'), {
+      return await fetch(this.getUrl("graphql"), {
         ...this.requestOptions,
         body: JSON.stringify({
           query: this.queries.teachers,
@@ -89,7 +90,7 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
         }),
       }).then((res) => res.json());
     } catch (e) {
-      console.log('Error querying teachers', e);
+      console.log("Error querying teachers", e);
     }
   }
 
@@ -97,7 +98,7 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
     schoolName: string
   ): Promise<SchoolQueryResponse | undefined> {
     try {
-      return await fetch(this.getUrl('graphql'), {
+      return await fetch(this.getUrl("graphql"), {
         ...this.requestOptions,
         body: JSON.stringify({
           query: this.queries.school,
@@ -107,7 +108,7 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
         }),
       }).then((res) => res.json());
     } catch (e) {
-      console.error('Error querying school', e);
+      console.error("Error querying school", e);
     }
   }
 
@@ -154,6 +155,21 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
     );
 
     return queryResult[0]?.id;
+  }
+
+  async getProfLegacyId(
+    profName: string,
+    schoolId = DEFAULT_SCHOOL_ID
+  ): Promise<string | undefined> {
+    const queryResult = await getResult(profName, (n) =>
+      this.queryTeachers({
+        teacherName: n,
+        schoolId,
+        number: 1,
+      }).then(this.getTeachersFromQuery)
+    );
+
+    return queryResult[0]?.legacyId;
   }
 
   async getOverallScore(

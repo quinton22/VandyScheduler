@@ -1,8 +1,13 @@
+/**
+ * @description:
+ * The script interacts with YES(our registration page) and RateMyProfessor API to get score for each professor.
+ * and then display the score on YES
+ */
 import {
   ActionReturnType,
   IRateMyProfessor,
   MessageRequest,
-} from '../api/RateMyProfessor/types';
+} from "../api/RateMyProfessor/types";
 import {
   restricted,
   GREEN,
@@ -10,7 +15,7 @@ import {
   YELLOW,
   LOADING_INDICATOR,
   COURSE_LIST_AREAS,
-} from './constants';
+} from "./constants";
 
 // Watch each of the areas where professor names may appear for changes. When detected, rate each professor.
 export const getOverallScoresObserver = new MutationObserver(
@@ -36,6 +41,15 @@ export function rateProfessorsOnPage() {
         groupedProfessorNodes[name].forEach((node) =>
           setScore(name, node as HTMLElement, score)
         );
+
+        // turn professor name into a link
+        const profPageURL =
+          "https://www.ratemyprofessors.com/professor/" +
+          (await getProfessorId(name));
+
+        groupedProfessorNodes[name].forEach((node) =>
+          turnNodeIntoLink(node, profPageURL)
+        );
       } else if (isUnratedProfessor(name)) {
         groupedProfessorNodes[name].forEach((node) =>
           setInvalidScore(name, node)
@@ -54,15 +68,15 @@ export function rateProfessorsOnPage() {
  * Returns an array of nodes of each search result's professor field
  */
 export function getProfessorNodes() {
-  return document.getElementsByClassName('classInstructor');
+  return document.getElementsByClassName("classInstructor");
 }
 
 /**
  * Gets the part of the URL that needs to be appended to the base URL to reach the professor's page
- * Example return: '/ShowRatings.jsp?tid=2301025'
+ * example: "https://www.ratemyprofessors.com/professor/2301025"
  */
 export async function getProfessorId(profName: string) {
-  const action: keyof IRateMyProfessor = 'getProfId' as const;
+  const action: keyof IRateMyProfessor = "getProfLegacyId" as const;
   return await new Promise<ActionReturnType<typeof action>>((resolve) =>
     chrome.runtime.sendMessage<MessageRequest<typeof action>>(
       {
@@ -75,7 +89,7 @@ export async function getProfessorId(profName: string) {
 }
 
 export async function getAllProfessors() {
-  const action: keyof IRateMyProfessor = 'getAllProfessors' as const;
+  const action: keyof IRateMyProfessor = "getAllProfessors" as const;
   return await new Promise<ActionReturnType<typeof action>>((resolve) =>
     chrome.runtime.sendMessage<MessageRequest<typeof action>>(
       { action },
@@ -88,7 +102,7 @@ export async function getAllProfessors() {
  * Scrapes the RMP page for the professor at <profId> for their overall score and returns it
  */
 export async function getOverallScore(profName: string) {
-  const action: keyof IRateMyProfessor = 'getOverallScore' as const;
+  const action: keyof IRateMyProfessor = "getOverallScore" as const;
   try {
     const profRating = await new Promise<ActionReturnType<typeof action>>(
       (resolve) =>
@@ -144,9 +158,9 @@ export function groupProfessors(vals: HTMLCollectionOf<Element>) {
  */
 export function isValidProfessor(name: string) {
   return (
-    name !== '' &&
-    !name.includes('Staff') &&
-    !name.includes(' | ') &&
+    name !== "" &&
+    !name.includes("Staff") &&
+    !name.includes(" | ") &&
     !restricted.includes(name)
   );
 }
@@ -156,7 +170,7 @@ export function isValidProfessor(name: string) {
  * FALSE otherwise.
  */
 export function isUnratedProfessor(name: string) {
-  return !name.includes(' - ');
+  return !name.includes(" - ");
 }
 
 /**
@@ -170,7 +184,7 @@ export function setInvalidScore(name: string, node: Element) {
  * Appends the loading indicator next to professor names in the results list
  */
 export function setIsLoading(node: Element) {
-  node.innerHTML = node.innerHTML + ' - ' + LOADING_INDICATOR;
+  node.innerHTML = node.innerHTML + " - " + LOADING_INDICATOR;
 }
 
 /**
@@ -178,9 +192,22 @@ export function setIsLoading(node: Element) {
  */
 export function setScore(name: string, node: HTMLElement, score?: number) {
   if (score) {
-    node.textContent = name + ' - ' + score.toFixed(1);
+    node.textContent = name + " - " + score.toFixed(1);
     node.style.color = getColor(score);
   } else {
-    node.textContent = name + ' - N/A';
+    node.textContent = name + " - N/A";
   }
+}
+
+/**
+ * turn the professor name into a valid URL that leads to the professor's page on RateMyProfessor
+ */
+function turnNodeIntoLink(node: Node, url: string): Node {
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("target", "_blank");
+  link.appendChild(node.cloneNode(true));
+  node.parentNode?.replaceChild(link, node);
+
+  return node;
 }

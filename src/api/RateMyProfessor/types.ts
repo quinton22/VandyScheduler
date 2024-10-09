@@ -22,6 +22,10 @@ export type OnMessageListener = Parameters<
 
 export interface IRateMyProfessor {
   getProfId(profName: string, schoolId?: string): Promise<string | undefined>;
+  getProfLegacyId(
+    profName: string,
+    schoolId?: string
+  ): Promise<string | undefined>;
   getOverallScore(profName: string): Promise<number | undefined>;
   getOverallScore(
     profName: string,

@@ -29,6 +29,8 @@ export type Teacher = {
   avgDifficultyRounded: number;
   avgRatingRounded: number;
   id: string;
+  // the id that actually gets used in the URL
+  legacyId: string;
   firstName: string;
   lastName: string;
   numRatings: number;

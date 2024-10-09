@@ -35,10 +35,10 @@ export const getResult = async <T>(
 };
 
 export abstract class RateMyProfessorApi implements IRateMyProfessor {
-  protected apiEndpoint = 'https://www.ratemyprofessors.com/';
+  protected apiEndpoint = "https://www.ratemyprofessors.com/";
 
   protected getUrl(
-    path = '',
+    path = "",
     searchParams: Array<[name: string, value: string]> = []
   ) {
     const url = new URL(path, this.apiEndpoint);
@@ -48,10 +48,33 @@ export abstract class RateMyProfessorApi implements IRateMyProfessor {
     return url;
   }
 
+  /**
+   * Get the professor's id from the RateMyProfessor API.
+   * This id is in the form of a string like "VGVhY2hlci0yMzYxNTY4"
+   * not sure what it is used for (perhaps only in their database)
+   * The one that actually gets used in the URL is the legacyId
+   * @param profName
+   * @param schoolId
+   * @returns
+   */
   abstract getProfId(
     profName: string,
     schoolName: string
   ): Promise<string | undefined>;
+
+  /**
+   * Get the professor's legacy id from the RateMyProfessor API.
+   * This id is in the form of a string like "2301025"
+   * It is used in the URL to get the professor's page
+   * @param profName
+   * @param schoolId
+   * @returns
+   */
+  abstract getProfLegacyId(
+    profName: string,
+    schoolName: string
+  ): Promise<string | undefined>;
+
   abstract getOverallScore(profName: string): Promise<number | undefined>;
   abstract getOverallScore(
     profName: string,

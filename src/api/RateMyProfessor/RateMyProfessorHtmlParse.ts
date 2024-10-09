@@ -40,7 +40,12 @@ export class RateMyProfessorHtmlParse extends RateMyProfessorApi {
     }
   }
 
-  async getProfId(profName: string): Promise<string | undefined> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getProfId(profName: string, schoolName: string): Promise<string | undefined> {
+    throw new Error('Method not implemented.')
+  }
+
+  async getProfLegacyId(profName: string): Promise<string | undefined> {
     const regex = /\w+(, )\w+/g;
     const temp = regex.exec(profName);
     if (temp) {
@@ -58,7 +63,7 @@ export class RateMyProfessorHtmlParse extends RateMyProfessorApi {
   }
 
   async getOverallScore(profName: string): Promise<number | undefined> {
-    const id = this.getProfId(profName);
+    const id = this.getProfLegacyId(profName);
     const pageText = await fetch(this.getUrl(`professor/${id}`)).then((res) =>
       res.text()
     );
