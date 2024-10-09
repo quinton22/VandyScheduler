@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    branches: ['master']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+      EXTENSION_ID: ${{ vars.EXTENSION_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+      - name: Install pnpm
+        shell: sh
+        run: npm install -g pnpm
+      - name: Install deps
+        run: pnpm install
+      - name: Semantic release
+        env:
+          TMP_DIR: ${{ runner.temp }}
+        run: pnpm semantic-release
