@@ -59,7 +59,7 @@
     "start": "parcel build",
     "build": "parcel build",
     "lint": "eslint ./src",
-    "typecheck": "tsc --noEmit --excludeDirectories node_modules"
+    "typecheck": "tsc --noEmit --excludeDirectories node_modules",
     "release": "chrome-webstore-upload"
   },
   "devDependencies": {
