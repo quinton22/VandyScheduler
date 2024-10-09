@@ -8,6 +8,7 @@
     "noEmit": true,
     "isolatedModules": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": false
+    "forceConsistentCasingInFileNames": false,
+    "experimentalDecorators": true
   }
 }
