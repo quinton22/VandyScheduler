@@ -34,7 +34,38 @@ export const getResult = async <T>(
   return result.filter((r) => r && r.length > 0).reverse()[0] ?? [];
 };
 
+export function withCache<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Method extends (...args: any[]) => Promise<Teacher[]>
+>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  target: any,
+  propertyKey: string,
+  descriptor: PropertyDescriptor
+) {
+  const originalMethod = descriptor.value;
+  descriptor.value = async function replacementMethod(
+    this: RateMyProfessorApi,
+    ...args: Parameters<Method>
+  ) {
+    const key = args.join('');
+
+    if (key in this.cache) {
+      console.log('found in cache', key, this.cache[key]);
+      return this.cache[key];
+    }
+    const result = await originalMethod?.call(this, ...args);
+
+    console.log('not found in cache', key, result);
+
+    this.cache[key] = result;
+    return result;
+  };
+}
+
 export abstract class RateMyProfessorApi implements IRateMyProfessor {
+  protected cache: Record<string, Teacher[]> = {};
+
   protected apiEndpoint = 'https://www.ratemyprofessors.com/';
 
   protected getUrl(

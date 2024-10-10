@@ -1,5 +1,6 @@
 import { DEFAULT_SCHOOL_ID, DEFAULT_SCHOOL_NAME } from '../../constants';
-import { RateMyProfessorApi, getResult } from './RateMyProfessorApi';
+import { RateMyProfessorApi, getResult, withCache } from './RateMyProfessorApi';
+import { stringSimilarity } from 'string-similarity-js';
 import {
   TeacherQueryVariables,
   TeacherQueryResponse,
@@ -39,6 +40,7 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
           avgDifficultyRounded
           avgRatingRounded
           id
+          legacyId
           firstName
           lastName
           numRatings
@@ -141,32 +143,40 @@ export class RateMyProfessorGraphql extends RateMyProfessorApi {
     return this.parseSchoolQueryResponse(res)[0]?.id;
   }
 
-  async getProfId(
+  @withCache
+  private async getTeachers(
     profName: string,
     schoolId = DEFAULT_SCHOOL_ID
-  ): Promise<string | undefined> {
-    const queryResult = await getResult(profName, (n) =>
+  ): Promise<Teacher[]> {
+    const result = await getResult(profName, (n) =>
       this.queryTeachers({
         teacherName: n,
         schoolId,
-        number: 1,
+        number: 3,
       }).then(this.getTeachersFromQuery)
     );
 
-    return queryResult[0]?.id;
+    return result
+      .map((t) => ({
+        similarity: stringSimilarity(profName, `${t.lastName}, ${t.firstName}`),
+        teacher: t,
+      }))
+      .sort((a, b) => b.similarity - a.similarity)
+      .map(({ teacher }) => teacher);
+  }
+
+  async getProfId(
+    ...args: Parameters<typeof this.getTeachers>
+  ): Promise<string | undefined> {
+    const queryResult = await this.getTeachers(...args);
+    // TODO: if more than one result, we should allow the user to see different options
+    return queryResult[0]?.legacyId;
   }
 
   async getOverallScore(
-    profName: string,
-    schoolId = DEFAULT_SCHOOL_ID
+    ...args: Parameters<typeof this.getTeachers>
   ): Promise<number | undefined> {
-    const queryResult = await getResult(profName, (n) =>
-      this.queryTeachers({
-        teacherName: n,
-        schoolId,
-        number: 1,
-      }).then(this.getTeachersFromQuery)
-    );
+    const queryResult = await this.getTeachers(...args);
 
     return queryResult[0]?.avgRatingRounded;
   }
