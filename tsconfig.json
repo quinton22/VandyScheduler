@@ -10,7 +10,8 @@
     "strict": true,
     "forceConsistentCasingInFileNames": false,
     "experimentalDecorators": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true
   },
   "exclude": [
     "node_modules",
