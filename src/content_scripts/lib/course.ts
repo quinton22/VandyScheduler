@@ -38,8 +38,21 @@ export class CourseSection {
     return this._course;
   }
 
-  public addCourse(c: Course): void {
+  addCourse(c: Course): void {
     this._course ??= c;
+  }
+
+  toString() {
+    return JSON.stringify({
+      course: this.course?.classAbbr,
+      section: this.section,
+      type: this.type,
+      prof: this.prof,
+      hours: this.hours,
+      days: this.days,
+      time: this.time,
+      location: this.location,
+    });
   }
 }
 
@@ -85,7 +98,7 @@ export class Course {
     this.sections = sections;
   }
 
-  /*
+  /**
    *  Compares 2 times to determine if they overlap. Returns false if overlap
    */
   static compareTimes(t1: string, t2: string) {
@@ -134,20 +147,14 @@ export class Course {
     }
   }
 
-  /*
+  /**
    *  Compares days to see if days overlap. Returns false if overlap
    */
   static compareDays(d1: string, d2: string) {
-    for (let i = 0; i < d1.length; i++) {
-      if (d2.indexOf(d1[i]) !== -1) {
-        return false; // d1 and d2 overlap
-      }
-    }
-
-    return true;
+    return !d1.split('').some((d) => d2.includes(d));
   }
 
-  /*
+  /**
    *  Returns the length of a class in the form [hours].[min/60]
    */
   static lengthOfClass(t1: string) {
@@ -170,7 +177,11 @@ export class Course {
   }
 
   toString() {
-    return JSON.stringify(this);
+    return JSON.stringify({
+      classAbbr: this.classAbbr,
+      classDesc: this.classDesc,
+      sections: this.sections.map((s) => s.toString()),
+    });
   }
 
   equal(other: Course) {
@@ -182,6 +193,6 @@ export class Course {
   }
 
   removeSection(sectionString: string) {
-    this.sections = this.sections.filter((s) => s.section === sectionString);
+    this.sections = this.sections.filter((s) => s.section !== sectionString);
   }
 }
