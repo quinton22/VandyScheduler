@@ -74,7 +74,7 @@ export class BreakTime {
   }
 
   private insert(day: Day, hour: Hour, closest: number) {
-    let index = this.map[day][closest] > hour ? closest : closest + 1;
+    const index = this.map[day][closest] > hour ? closest : closest + 1;
     this.map[day].splice(index, 0, hour);
   }
 
@@ -216,31 +216,35 @@ export class BreakTime {
     return this.map[day].length === 0;
   }
 
-  static isValidDay(str: any): str is Day {
+  static isValidDay(str: unknown): str is Day {
     return (
       typeof str === 'string' &&
       (BreakTime.AVAILABLE_DAYS as string[]).includes(str)
     );
   }
 
-  static isValidHour(num: any): num is Hour {
+  static isValidHour(num: unknown): num is Hour {
     return (
       typeof num === 'number' &&
       (BreakTime.AVAILABLE_HOURS as number[]).includes(num)
     );
   }
 
-  private static isValidMap(object: any): object is Record<Day, Hour[]> {
+  private static isValidMap(object: unknown): object is Record<Day, Hour[]> {
+    if (typeof object !== 'object' || object === null) {
+      return false;
+    }
+
     for (const key in object) {
       if (!BreakTime.isValidDay(key)) {
         return false;
       }
 
-      if (!('length' in object[key])) {
+      if (!Array.isArray(object[key as keyof typeof object])) {
         return false;
       }
 
-      for (const hour of object[key]) {
+      for (const hour of object[key as keyof typeof object] as Array<unknown>) {
         if (!BreakTime.isValidHour(hour)) {
           return false;
         }
@@ -265,13 +269,13 @@ export class BreakTime {
     return JSON.stringify(map);
   }
 
-  static fromJson(json: any): BreakTime {
+  static fromJson(json: unknown): BreakTime {
     const breakTime = new BreakTime();
     breakTime.fromJson(json);
     return breakTime;
   }
 
-  fromJson(json: any) {
+  fromJson(json: unknown) {
     if (!BreakTime.isValidMap(json)) {
       throw new Error('Invalid json');
     }

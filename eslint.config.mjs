@@ -8,6 +8,6 @@ export default [
       globals: { ...globals.browser, ...globals.webextensions },
     },
   },
-  pluginJs.configs.recommended,
+  ...pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
 ];
