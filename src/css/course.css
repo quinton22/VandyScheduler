@@ -1,0 +1,48 @@
+.course {
+  margin: auto;
+  left: 10%;
+  width: 80%;
+  z-index: 2;
+  position: absolute;
+  background-color: #0514bc;
+  border: 1px solid #071cff;
+  border-radius: 4px;
+  text-align: center;
+  user-select: none;
+}
+
+.course-text {
+  position: relative;
+  top: 25%;
+  color: white;
+  font-size: 0.95vw;
+  font-family: Arial;
+}
+
+.comment-div {
+  z-index: 3;
+  display: none;
+  position: absolute;
+  height: auto;
+  width: 40%;
+  /* width: auto;*/
+}
+
+.comment-img {
+  height: 100%;
+  width: 100%;
+}
+
+.comment-text {
+  position: absolute;
+  height: auto;
+  width: auto;
+  top: 0;
+  left: 0;
+  font-size: 1.2vw;
+  text-align: left;
+  font-weight: bold;
+  padding-top: 0.5vw;
+  padding-left: 2vw;
+  padding-right: 0.5vw;
+}

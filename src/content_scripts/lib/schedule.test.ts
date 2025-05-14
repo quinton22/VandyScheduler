@@ -1,4 +1,4 @@
-import { Course } from './course';
+import { Course } from './course/course.ts';
 import { Schedule } from './schedule.ts';
 
 describe('Schedule', () => {
