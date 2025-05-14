@@ -19,6 +19,6 @@ export default [
       ],
     },
   },
-  ...pluginJs.configs.recommended,
+  pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
 ];
