@@ -10,7 +10,6 @@ var preferences = {
 };
 var includePreferences = new Map();
 var includeClassesInRemoval = false;
-let oldclassArr = [];
 let schedArr = [];
 
 createModal(); // creates modal and appends to doc
@@ -493,7 +492,7 @@ export function updatePreferences() {
  *	Clears class array and puts classes in cart in class arr
  */
 export function updateClassArr() {
-  oldclassArr = classArr.slice();
+  let oldclassArr = classArr.slice();
   classArr = [];
 
   // adds classes in cart to class arr
@@ -725,8 +724,8 @@ export function updatePrefClassesToInclude() {
   }
 }
 
-/*
- *	Adds a button to each unique class
+/**
+ *  Adds a button to each unique class
  */
 export function addBtn() {
   font = $('.classAbbreviation').css('font-family');
@@ -848,17 +847,6 @@ export function addClass(_class, classNumOnPage) {
     let newClass = new Class_(classAbbr, classDesc, ...bigArr2);
     classArr.push(newClass);
   });
-}
-
-/*
- *	Adds class added img and adds a remove button -- currently unfunctional
- */
-export function classAdded(button) {
-  button.setAttribute('class', 'myButton disabled');
-  button.disabled = true;
-  setTimeout(function () {
-    button.innerHTML = 'Added';
-  }, 200);
 }
 
 /*
@@ -1283,31 +1271,39 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
       });
     });
   } else {
-    let errorText =
-      "<div class='errorText'><p>There was no possible schedule that could be created from the classes in your cart.</p>";
-    let errorClasses = Array.from(overlappedClasses);
-    let nonOverlapped = errorClasses
-      .filter((item) => item[1] === 0)
-      .map((item) => item[0].substring(0, item[0].indexOf('-')));
+    const errorModalBody = `
+    <div class="modal-body" id="modalBody"></div>
+      <div class='errorText'>
+        <p>
+          There was no possible schedule that could be created from the classes in your cart.
+        </p>
+        <p style="display: ${(errorClasses) =>
+          errorClasses.length > 0 ? 'block' : 'none'}>
+          The following classes have conflicts:
+        </p>
+        <br style="display: ${(errorClasses) =>
+          errorClasses.length > 0 ? 'block' : 'none'}/>
+        <p style='padding-left: 10px; display: ${(errorClasses) =>
+          errorClasses.length > 0 ? 'block' : 'none'}'>
+          ${errorClasses}
+        </p>
+        <br style="display: ${(errorClasses) =>
+          errorClasses.length > 0 ? 'block' : 'none'}/>
+        <p style="display: ${(errorClasses) =>
+          errorClasses.length > 0 ? 'block' : 'none'}>
+          In preferences you can choose to <strong><i>not</i></strong> include the classes when creating a schedule. This will not remove the classes from your cart but will just ignore the classes when creating schedules. If a schedule is chosen, then the ignored classes will be removed from your cart.
+        </p>
+        <p style="display: ${(errorClasses) =>
+          errorClasses.length > 0 ? 'block' : 'none'}>
+          Alternatively, try clicking "show" for classes that do not meet preferences in preferences.
+        </p>
+        <p style="display: ${(errorClasses) =>
+          errorClasses.length > 0 ? 'none' : 'block'}>
+          Try clicking "show" for classes that do not meet preferences in preferences.
+        </p>
+      </div>
+    `;
 
-    errorClasses = errorClasses.filter((item) => {
-      let str = item[0].substring(0, item[0].indexOf('-'));
-      return !nonOverlapped.includes(str);
-    });
-    errorClasses = errorClasses.sort((a, b) => b[1] - a[1]);
-    let ec = new Set(
-      errorClasses.map((item) => item[0].substring(0, item[0].indexOf('-')))
-    );
-    ec = Array.from(ec);
-    if (ec.length !== 0) {
-      errorText +=
-        "<p>The following classes have conflicts:</p><br/><p style='padding-left: 10px'>" +
-        ec.toString().replace(/,/g, ', ') +
-        '</p><br/><p>In preferences you can choose to <strong><i>not</i></strong> include the classes when creating a schedule. This will not remove the classes from your cart but will just ignore the classes when creating schedules. If a schedule is chosen, then the ignored classes will be removed from your cart.</p><p>Alternately, try clicking "show" for classes that do not meet preferences in preferences.</p></div>';
-    } else {
-      errorText +=
-        '<p>Try clicking "show" for classes that do not meet preferences in preferences.</p></div>';
-    }
     $('.modal-header h2').html('Error creating schedule!');
 
     $('.modal-header h2').css('color', 'red');

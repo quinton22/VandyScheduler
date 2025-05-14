@@ -15,23 +15,3 @@ Just download from the Chrome Web Store and go to [Course Registration](https://
 ## Contributing
 
 To get started contributing please look at [CONTRIBUTING.md](./docs/CONTRIBUTING.md)
-
-## Changelog
-
-- 2.0.6 - Fix for RMP
-- 2.0.5 - Another update to match RateMyProfessors site update. Also add the functionality of turning the professor name into a link that leads directly to their RateMyProfessors page.
-- 2.0.4 - Another update to match RateMyProfessors site update. Thanks to @DavidHuang2002
-- 2.0.3 - Another update to match RateMyProfessors site update.
-- 2.0.2 - Update in accordance with RateMyProfessors site update.
-- 2.0.1 - Small bug fix.
-- 2.0.0 - Shows ratings from rate my professor next to professor names.
-- 1.3.0 - Allows for the user to choose which classes from the cart are included in making the schedule. Minor refactoring.
-- 1.2.2 - Counts laboratory as separate class in the case that a Lecture and Lab have the same class number. Simplified some of the code for removing classes from your cart that are not in your schedule.
-- 1.2.1 - Accounting for the change in domain name of the Class Registration Page
-- 1.2.0 - Added button to enroll in all class in the class cart with one click. Code courtesy of Samuel Lijin.
-- 1.1.1 - Fixed small issue with wrong professor displaying in detailed comment.
-- 1.1.0 - Add a preferences button where preferences for break times can be chosen. Simplify the mechanism behind adding and removing classes. Update handling of classes that have different times on different days or are TBA. Showed classes that overlap if schedule does not work.
-- 1.0.3 - Edit error message
-- 1.0.2 - Edit error message and fix uncaught time overlap
-- 1.0.1 - Update description
-- 1.0.0 - Initial version
