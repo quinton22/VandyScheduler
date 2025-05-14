@@ -1,3 +1,4 @@
+import './ratemyprof';
+
 export * from './content';
-export * from './ratemyprof';
 export * from './constants';
