@@ -1,5 +1,6 @@
 import $ from 'jquery';
-import { Schedule, Class_ } from './lib';
+import { Course } from './lib';
+// import modal from './lib/html/modal.template.html';
 
 var classArr = []; // contains classes to construct schedule with
 var scheduleArr = []; // contains all the schedules
@@ -10,8 +11,6 @@ var preferences = {
 };
 var includePreferences = new Map();
 var includeClassesInRemoval = false;
-let oldclassArr = [];
-let schedArr = [];
 
 createModal(); // creates modal and appends to doc
 var ready = false; // allows modal to load
@@ -73,6 +72,37 @@ observer.observe(document, {
   childList: true,
   subtree: true,
 });
+
+export const createModalV2 = () => {
+  const modal = $(`<div class="modal" id="scheduleView">
+  <div class="modal-content" id="modalChild">
+    <div class="modal-header">
+      <div class="close">×</div>
+      <h2 style="color: red; font-weight: bold; font-size: 1.5em; margin: auto">
+        <p>Error creating schedule!</p>
+        <p></p>
+      </h2>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer"></div>
+  </div>
+</div>`);
+
+  $('body').eq(0).append(modal);
+
+  let prefModal = createPrefModal();
+
+  // exit if clicked not on modal
+  window.onclick = (event) => {
+    if (event.target.id === modal.id) {
+      modal.style.display = 'none';
+      $('#modalBody').html('');
+    } else if (event.target === prefModal) {
+      prefModal.style.display = 'none';
+      updatePreferences();
+    }
+  };
+};
 
 /*
  *	Creates the modal with the default to display an error message
@@ -752,7 +782,7 @@ export function addBtn() {
       clone = addClassButton.cloneNode(true);
       addClassButton.setAttribute('id', 'Btn' + i.toString());
       parent[i].appendChild(addClassButton);
-      // let button = addClassButton.firstChild;
+      var button = addClassButton.firstChild;
       addEL(addClassButton.children[0]);
       addClassButton = clone;
     }
@@ -845,7 +875,7 @@ export function addClass(_class, classNumOnPage) {
     let bigArr2 = bigArr.map((littleArr) =>
       littleArr.filter((_, index) => typeIndices.includes(index))
     );
-    let newClass = new Class_(classAbbr, classDesc, ...bigArr2);
+    let newClass = new Course(classAbbr, classDesc, ...bigArr2);
     classArr.push(newClass);
   });
 }
@@ -1275,7 +1305,7 @@ export function createViewableContent(arr, tbaClasses, overlappedClasses) {
             classDiv.appendChild(classTextDiv);
             placeClass(classDiv, scheduleDiv, c.days[0].charAt(k), c.times[0]);
             var height =
-              Class_.lengthOfClass(c.times[0]) * 100 -
+              Course.lengthOfClass(c.times[0]) * 100 -
               200 / $(classDiv).parent().get(0).offsetHeight; // account for border
             $(classDiv).css('height', height.toString() + '%');
           }
@@ -1343,7 +1373,7 @@ export function convertToDetailed(arr) {
         for (let i = 0; i < times.length; ++i) {
           // TODO:: fix this
           s.push(
-            new Class_(
+            new Course(
               x.classAbbr,
               x.classDesc,
               [x.sections[y]],
@@ -1358,7 +1388,7 @@ export function convertToDetailed(arr) {
         }
       } else {
         s.push(
-          new Class_(
+          new Course(
             x.classAbbr,
             x.classDesc,
             [x.sections[y]],

@@ -1,2 +1,4 @@
-export * from "./class";
-export * from "./schedule";
+export * from './Course';
+export * from './Schedule';
+export * from './BreakTime';
+export * from './Preferences';
