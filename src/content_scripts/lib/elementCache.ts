@@ -65,7 +65,9 @@ class ElementCache {
     const r = () => {
       try {
         return refresh() || undefined;
-      } catch {}
+      } catch {
+        return undefined;
+      }
     };
 
     const element = r();

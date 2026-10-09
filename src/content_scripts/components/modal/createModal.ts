@@ -14,7 +14,7 @@ export const createModal = async () => {
   const modal = HtmlParser.parse(html);
   document.body.append(modal);
 
-  let prefModal = await createPreferencesModal();
+  const prefModal = await createPreferencesModal();
 
   // exit if clicked not on modal
   window.onclick = (event) => {

@@ -12,41 +12,50 @@ import { createModal } from './components/modal';
 // import modal from './lib/html/modal.template.html';
 
 let oldclassArr: Course[] = [];
-var classArr: Course[] = []; // contains classes to construct schedule with
-var scheduleArr = []; // contains all the schedules
-var schedArr: Course[][];
+let classArr: Course[] = []; // contains classes to construct schedule with
+let scheduleArr = []; // contains all the schedules
+let schedArr: Course[][];
 
-var includePreferences = new Map();
-var includeClassesInRemoval = false;
+let includePreferences = new Map();
+let includeClassesInRemoval = false;
 
-var modal = await createModal(); // creates modal and appends to doc
-var ready = false; // allows modal to load
+const modalPromise = createModal();
+void modalPromise.then(() => {
+  document
+    .getElementById('remove-classes-pref-form')
+    ?.addEventListener('change', (event) => {
+      if (event.target instanceof HTMLInputElement) {
+        includeClassesInRemoval = event.target.value === 'false';
+      }
+    });
+});
+let ready = false; // allows modal to load
 
 /**
  * Adds course to schedule
  */
-var addCourseButton = document.createElement('span');
+let addCourseButton = document.createElement('span');
 addCourseButton.setAttribute('width', 'auto');
-var btn = document.createElement('button');
+const btn = document.createElement('button');
 btn.setAttribute('class', 'myButton');
 btn.innerHTML = 'Add to Schedule';
 addCourseButton.appendChild(btn);
 
 // sets parent node to course titles on either class search page or class cart page
-var parent = document
+const parent = document
   .getElementById('classSearchResultsCarousel')
   ?.getElementsByClassName('left');
-var cartCourseElements = document
+const cartCourseElements = document
   .getElementById('studentCart')
   ?.getElementsByClassName('left');
 
 // necessary for timeout
-var timeout: NodeJS.Timeout | null = null;
-var t: NodeJS.Timeout | null = null;
+let timeout: NodeJS.Timeout | null = null;
+let t: NodeJS.Timeout | null = null;
 
 // gets current page
-var page = '';
-var focusPage = document.getElementsByClassName(
+let page = '';
+const focusPage = document.getElementsByClassName(
   'yui-carousel-item yui-carousel-item-selected'
 );
 if (focusPage.length !== 0) {
@@ -57,7 +66,7 @@ if (focusPage.length !== 0) {
 let font = $('.classAbbreviation').css('font-family');
 
 // updates class and adds buttons if the DOM subtree is changed
-var observer = new MutationObserver(() => {
+const observer = new MutationObserver(() => {
   if (parent !== undefined && cartCourseElements !== undefined) {
     if (parent.length !== 0 || cartCourseElements.length !== 0) {
       if (timeout) {
@@ -136,15 +145,6 @@ export const syncCourseListWithCart = () => {
   }, 100);
 };
 
-export const updatePrefClassesToInclude2 = () => {
-  if (!classArr || classArr.length === 0) return;
-
-  try {
-    // remove each `ul` element from `#include-pref` element --> create new preferences?
-    // TODO
-  } catch {}
-};
-
 export function updatePrefClassesToInclude() {
   if (classArr && classArr.length !== 0) {
     try {
@@ -194,10 +194,10 @@ export function updatePrefClassesToInclude() {
         $(ev.delegateTarget).find('input')[0].click()
       );
 
-      let currentClasses = new Map<string, string[]>();
+      const currentClasses = new Map<string, string[]>();
 
       // this stores all the classes that we do not want to include!
-      let sStorage = sessionStorage.getItem('includePreferences');
+      const sStorage = sessionStorage.getItem('includePreferences');
       // convert the string to a map if not undefined / null
       let storedClasses = sStorage
         ? new Map<string, string[]>(JSON.parse(sStorage))
@@ -209,7 +209,7 @@ export function updatePrefClassesToInclude() {
 
       if (storedClasses) {
         // set the session storage to be the intersection of the current classes and what is already in storage
-        let intersection: string[] = [];
+        const intersection: string[] = [];
         currentClasses.forEach((v, k) => {
           if (storedClasses?.has(k)) {
             intersection.push(k);
@@ -220,7 +220,7 @@ export function updatePrefClassesToInclude() {
           else
             v.forEach((sec, i) => {
               if (currentClasses && !currentClasses.get(k)?.includes(sec)) {
-                let sc = storedClasses?.get(k);
+                const sc = storedClasses?.get(k);
                 sc?.splice(i, 1);
                 storedClasses?.set(k, sc ?? []);
                 if (storedClasses?.get(k)?.length === 0) {
@@ -272,7 +272,7 @@ export function updatePrefClassesToInclude() {
         'include-section-checkbox'
       ) as HTMLCollectionOf<HTMLInputElement>;
 
-      const getOnSectionChange = (el: HTMLInputElement) => (ev: Event) => {
+      const getOnSectionChange = (el: HTMLInputElement) => () => {
         const match = el.id.match(/(.*)-(.*)/);
         if (!match) return;
 
@@ -344,7 +344,7 @@ export function updatePrefClassesToInclude() {
         'include-class-checkbox'
       ) as HTMLCollectionOf<HTMLInputElement>;
 
-      const getOnClassChange = (el: HTMLInputElement) => (ev: Event) => {
+      const getOnClassChange = (el: HTMLInputElement) => () => {
         const sectionCheckboxArray = Array.from(
           (el.parentElement?.getElementsByClassName(
             'include-section-checkbox'
@@ -410,12 +410,12 @@ export function addBtn() {
     el.style.width = '100%';
   }
 
-  var clone = null;
+  let clone = null;
 
   if (parent)
     // adds buttons to class search page
-    for (var i = 0; i < parent.length; i++) {
-      var children = parent[i].children;
+    for (let i = 0; i < parent.length; i++) {
+      const children = parent[i].children;
 
       // adds buttons to the page
       if (
@@ -425,7 +425,6 @@ export function addBtn() {
         clone = addCourseButton.cloneNode(true) as HTMLSpanElement;
         addCourseButton.setAttribute('id', 'Btn' + i.toString());
         parent[i].appendChild(addCourseButton);
-        var button = addCourseButton.firstChild;
         addEL(addCourseButton.children[0] as HTMLButtonElement);
         addCourseButton = clone;
       }
@@ -433,8 +432,8 @@ export function addBtn() {
 
   if (cartCourseElements)
     // adds button to class cart page
-    for (var j = 0; j < cartCourseElements.length; j++) {
-      var children = cartCourseElements[j].children;
+    for (let j = 0; j < cartCourseElements.length; j++) {
+      const children = cartCourseElements[j].children;
 
       // adds buttons to the page
       if (
@@ -444,7 +443,7 @@ export function addBtn() {
         clone = addCourseButton.cloneNode(true) as HTMLSpanElement;
         addCourseButton.id = 'RemoveBtn' + j.toString();
         cartCourseElements[j].appendChild(addCourseButton);
-        var button = addCourseButton.firstChild;
+        const button = addCourseButton.firstChild;
         if (button) {
           (button as HTMLButtonElement).className = 'myButton remove';
           (button as HTMLButtonElement).innerHTML = 'Remove Class';
@@ -518,21 +517,10 @@ const courseConfig: Record<
 export function addClass(_class: HTMLElement, classNumOnPage: number) {
   let classAbbr = _class.children[0].innerHTML;
   classAbbr = classAbbr.replace(/:/g, '');
-  let classDesc = _class.children[1].innerHTML;
-  let specificClass = document
+  const classDesc = _class.children[1].innerHTML;
+  const specificClass = document
     .getElementById('cartDiv')
     ?.getElementsByClassName('classTable')[classNumOnPage];
-
-  let profsList =
-    specificClass?.getElementsByClassName('classInstructor') ?? [];
-  let typeList = specificClass?.getElementsByClassName('classType') ?? [];
-  let hoursList = specificClass?.getElementsByClassName('classHours') ?? [];
-  let daysList =
-    specificClass?.getElementsByClassName('classMeetingDays') ?? [];
-  let timesList =
-    specificClass?.getElementsByClassName('classMeetingTimes') ?? [];
-  let classBuildingList =
-    specificClass?.getElementsByClassName('classBuilding') ?? [];
 
   const getCourseData = (key: string) =>
     (
@@ -599,9 +587,9 @@ export function makeScheduleButton(parent: HTMLElement) {
   // add make schedule button if it doesn't exist
   if (!parent.querySelector('button')) {
     $('#yui-gen9').css('height', 'auto');
-    var btnContainer = document.createElement('table');
-    var contR = document.createElement('tr');
-    var contD = [];
+    const btnContainer = document.createElement('table');
+    const contR = document.createElement('tr');
+    const contD = [];
     for (let i = 0; i < 3; ++i) {
       contD[i] = document.createElement('td'); // 3 table cells
       contR.appendChild(contD[i]);
@@ -610,10 +598,10 @@ export function makeScheduleButton(parent: HTMLElement) {
     btnContainer.appendChild(contR);
     contR.style.width = '100%';
     btnContainer.style.width = '97.5%';
-    var button = document.createElement('button');
+    const button = document.createElement('button');
     contD[1].appendChild(button);
 
-    var prefBtn = document.createElement('button');
+    const prefBtn = document.createElement('button');
     prefBtn.id = 'preferenceBtn';
     prefBtn.innerHTML = 'Preferences';
     prefBtn.className = 'myButton myButton2';
@@ -631,8 +619,8 @@ export function makeScheduleButton(parent: HTMLElement) {
 
   // add one click enroll if doesn't exist
   if (!document.querySelector('#oneClickEnrollButton')) {
-    let oneClickEnrollDiv = document.createElement('div');
-    let oneClickEnroll = document.createElement('button');
+    const oneClickEnrollDiv = document.createElement('div');
+    const oneClickEnroll = document.createElement('button');
     $(oneClickEnroll)
       .attr('id', 'oneClickEnrollButton')
       .addClass('myButton')
@@ -654,7 +642,7 @@ export function makeScheduleButton(parent: HTMLElement) {
  */
 export function makeSchedClicked() {
   if (ready) {
-    let tbaClasses: Course[] = [];
+    const tbaClasses: Course[] = [];
     classArr = classArr.filter((c) => {
       if (c.times.includes('TBA')) {
         tbaClasses.push(c);
@@ -662,14 +650,14 @@ export function makeSchedClicked() {
       return !c.times.includes('TBA');
     });
     let includeClasses = classArr.map((c) => c.copy());
-    let doNotIncludeString = sessionStorage.getItem('includePreferences');
+    const doNotIncludeString = sessionStorage.getItem('includePreferences');
     if (doNotIncludeString) {
-      let doNotIncludeClasses = new Map<string, string[]>(
+      const doNotIncludeClasses = new Map<string, string[]>(
         JSON.parse(doNotIncludeString)
       );
       includeClasses.forEach((c) => {
         // want to remove sections from what we are looking at
-        let k = c.classAbbr.replace(' ', '_');
+        const k = c.classAbbr.replace(' ', '_');
         if (doNotIncludeClasses.has(k)) {
           doNotIncludeClasses
             .get(k)
@@ -680,8 +668,8 @@ export function makeSchedClicked() {
       includeClasses = includeClasses.filter((c) => c.sections.length > 0);
     }
 
-    var sched = new Schedule(includeClasses);
-    let overlappedC = sched.overlappedClasses;
+    const sched = new Schedule(includeClasses);
+    const overlappedC = sched.overlappedClasses;
     scheduleArr = sched.scheduleArr;
     scheduleArr = sortBasedOnPreferences(scheduleArr);
     createViewableContent(scheduleArr, tbaClasses, overlappedC);
@@ -723,12 +711,6 @@ export function enroll() {
   for (let i = 0; i < classes.length; i++) {
     //Log the iteration step.
     //console.log(i);
-
-    const classInfo = classes[i].getElementsByClassName('left')[0]
-      .childNodes as NodeListOf<HTMLElement>;
-    const className = classInfo[1].innerText + ' ' + classInfo[3].innerText;
-    //console.log(className);
-    //Voodoo magic to grab the contents of the <div> containing the class name.
 
     const classSelection =
       classes[i].getElementsByClassName('classSelection')[0];
@@ -788,7 +770,7 @@ export function enroll() {
  */
 export function sortBasedOnPreferences(arr: ScheduleArray[]) {
   let prefNotMetCount = 0; // number of preferences broken
-  let breakArr: [
+  const breakArr: [
     courseAbbr: string,
     courseSect: string,
     t: string,
@@ -837,19 +819,20 @@ export function sortBasedOnPreferences(arr: ScheduleArray[]) {
 /*
  *	Creates modal with different schedules and tables
  */
-export function createViewableContent(
+export async function createViewableContent(
   arr: ScheduleArray[],
   tbaClasses: Course[],
   overlappedClasses: Map<string, number>
-) {
+): Promise<void> {
+  const modal = await modalPromise;
   let scheduleDiv: HTMLDivElement;
 
   if (arr.length > 0) {
     schedArr = convertToDetailed(arr);
-    let bigSchedDiv = document.createElement('div');
+    const bigSchedDiv = document.createElement('div');
     if (tbaClasses.length > 0) {
-      let tbaClassesP = document.createElement('p');
-      let is_are = tbaClasses.length > 1 ? ' are' : ' is';
+      const tbaClassesP = document.createElement('p');
+      const is_are = tbaClasses.length > 1 ? ' are' : ' is';
       tbaClassesP.innerHTML =
         '**' +
         tbaClasses
@@ -874,13 +857,13 @@ export function createViewableContent(
             .addClass('schedule-div')
             .css('background-color', '#dedede');
 
-      let table = document.createElement('table');
+      const table = document.createElement('table');
       $(table).addClass('schedule-table');
       scheduleDiv.appendChild(table);
-      let caption = table.createCaption();
-      let capSpan = document.createElement('span');
-      let capButtonSpan = document.createElement('span');
-      let pickSchedBtn = document.createElement('button');
+      const caption = table.createCaption();
+      const capSpan = document.createElement('span');
+      const capButtonSpan = document.createElement('span');
+      const pickSchedBtn = document.createElement('button');
       caption.appendChild(capSpan);
       caption.appendChild(capButtonSpan);
       capButtonSpan.appendChild(pickSchedBtn);
@@ -895,19 +878,19 @@ export function createViewableContent(
         )?.innerHTML.match(/[0-9]+/);
         if (!num) return;
 
-        let curSched = schedArr[~~num - 1];
-        let classTab = document
+        const curSched = schedArr[~~num - 1];
+        const classTab = document
           .getElementById('studentCart')
           ?.getElementsByClassName('classTable');
 
-        let inSchedule = new Map();
+        const inSchedule = new Map();
         curSched.forEach((c) => {
           // gets key for inSchedule which is the index of the overall class (class table)
-          let key = Array.from(cartCourseElements ?? []).findIndex((el) =>
+          const key = Array.from(cartCourseElements ?? []).findIndex((el) =>
             (el.children[0] as HTMLElement).innerText.includes(c.classAbbr)
           );
           // gets value for key which is index of section in class
-          let value = [
+          const value = [
             Array.from(
               classTab?.[key]?.getElementsByClassName('classRow') ?? []
             ).findIndex(
@@ -940,7 +923,7 @@ export function createViewableContent(
                 )?.click();
               }
             } else if (!inSchedule.get(i).includes(k)) {
-              let key = (
+              const key = (
                 el.parentElement
                   ?.querySelectorAll('classHeader')
                   .item(0)
@@ -950,7 +933,7 @@ export function createViewableContent(
                 ?.match(/[^:]+/)?.[0]
                 ?.replace(' ', '_');
 
-              let value = (
+              const value = (
                 el.querySelector('.classSection') as HTMLElement | null
               )?.innerText.match(/[\S]+/)?.[0];
 
@@ -987,12 +970,12 @@ export function createViewableContent(
 
       // creates table
       $(capSpan).css('font-family', font).addClass('schedule-caption');
-      let divId = caption.querySelector('span')?.innerText;
+      const divId = caption.querySelector('span')?.innerText;
       if (divId) scheduleDiv.id = divId;
-      var header = table.createTHead();
-      var hrow = header.insertRow(0);
-      for (var i = 0; i < 8; i++) {
-        var hcell = document.createElement('th');
+      const header = table.createTHead();
+      const hrow = header.insertRow(0);
+      for (let i = 0; i < 8; i++) {
+        const hcell = document.createElement('th');
         hrow.appendChild(hcell);
         $(hcell).css('font-family', font).addClass('schedule-th');
         switch (i) {
@@ -1024,15 +1007,15 @@ export function createViewableContent(
       }
 
       // creates times
-      var tBody = table.createTBody();
-      for (var i = 0; i < 13; i++) {
-        var row = tBody.insertRow(i);
+      const tBody = table.createTBody();
+      for (let i = 0; i < 13; i++) {
+        const row = tBody.insertRow(i);
         $(row).addClass('schedule-tr');
-        for (var j = 0; j < 8; j++) {
-          var cell = row.insertCell(j);
+        for (let j = 0; j < 8; j++) {
+          const cell = row.insertCell(j);
           $(cell).addClass('schedule-td');
           if (j === 0) {
-            var timeText =
+            let timeText =
               i + 7 <= 12
                 ? (i + 7).toString()
                 : (((i + 7) % 13) + 1).toString();
@@ -1069,19 +1052,19 @@ export function createViewableContent(
       ] as HTMLDivElement;
       schedule.forEach((c) => {
         if (c.days[0] !== 'TBA') {
-          for (var k = 0; k < c.days[0].length; k++) {
-            var classDiv = document.createElement('div');
+          for (let k = 0; k < c.days[0].length; k++) {
+            const classDiv = document.createElement('div');
             classDiv.className = 'class';
             $(classDiv).prop('time', c.times[0]);
             $(classDiv).prop('location', c.location[0]);
             classDiv.id = c.classAbbr.replace(/\s/g, '') + '_' + k;
-            var classTextDiv = document.createElement('div');
+            const classTextDiv = document.createElement('div');
             classTextDiv.className = 'classText';
             classTextDiv.innerHTML = c.classAbbr + '-' + c.sections[0];
             classDiv.appendChild(classTextDiv);
             placeClass(classDiv, scheduleDiv, c.days[0].charAt(k), c.times[0]);
-            let offsetHeight = $(classDiv).parent().get(0)?.offsetHeight ?? 100; // TODO: is 100 right?
-            var height =
+            const offsetHeight = $(classDiv).parent().get(0)?.offsetHeight ?? 100; // TODO: is 100 right?
+            const height =
               Course.lengthOfClass(c.times[0]) * 100 - 200 / offsetHeight; // account for border
             $(classDiv).css('height', height.toString() + '%');
           }
@@ -1092,16 +1075,16 @@ export function createViewableContent(
     let errorText =
       "<div class='errorText'><p>There was no possible schedule that could be created from the classes in your cart.</p>";
     let errorClasses = Array.from(overlappedClasses);
-    let nonOverlapped = errorClasses
+    const nonOverlapped = errorClasses
       .filter((item) => item[1] === 0)
       .map((item) => item[0].substring(0, item[0].indexOf('-')));
 
     errorClasses = errorClasses.filter((item) => {
-      let str = item[0].substring(0, item[0].indexOf('-'));
+      const str = item[0].substring(0, item[0].indexOf('-'));
       return !nonOverlapped.includes(str);
     });
     errorClasses = errorClasses.sort((a, b) => b[1] - a[1]);
-    let ec = new Set(
+    const ec = new Set(
       errorClasses.map((item) => item[0].substring(0, item[0].indexOf('-')))
     );
     if (ec.size !== 0) {
@@ -1126,7 +1109,7 @@ export function createViewableContent(
  *	Creates detailed schedule array from the less detailed array
  */
 export function convertToDetailed(arr: ScheduleArray[]) {
-  let ss: Course[][] = [];
+  const ss: Course[][] = [];
   let s: Course[] = [];
   let classAbbr: string;
   let section: string;
@@ -1143,9 +1126,9 @@ export function convertToDetailed(arr: ScheduleArray[]) {
       }
 
       if (/\n/.test(course.times[index]) && /\n/.test(course.days[index])) {
-        let times = course.times[index].split(/\n/);
-        let days = course.days[index].split(/\n/);
-        let locations = course.location[index].split(/\n/);
+        const times = course.times[index].split(/\n/);
+        const days = course.days[index].split(/\n/);
+        const locations = course.location[index].split(/\n/);
         while (locations.length < days.length) {
           locations.push(locations[locations.length - 1]);
         }
@@ -1196,9 +1179,9 @@ export function getClass(
   classAbbr: string,
   section: string
 ): [course: Course, i: number] | [] {
-  for (var i = 0; i < classArr.length; i++) {
+  for (let i = 0; i < classArr.length; i++) {
     if (classAbbr === classArr[i].classAbbr) {
-      for (var j = 0; j < classArr[i].sections.length; j++) {
+      for (let j = 0; j < classArr[i].sections.length; j++) {
         if (classArr[i].sections[j] === section) {
           return [classArr[i], j];
         }
@@ -1217,9 +1200,9 @@ export function placeClass(
   day: string,
   time: string
 ) {
-  var divHeight = scheduleDiv.offsetHeight;
+  const divHeight = scheduleDiv.offsetHeight;
   if (divHeight !== 0) {
-    var xDisplace = 0;
+    let xDisplace = 0;
     switch (day) {
       case 'M':
         xDisplace = 0;
@@ -1244,7 +1227,7 @@ export function placeClass(
         break;
     }
     time = time.substring(0, time.indexOf('-'));
-    var h, m;
+    let h, m;
     if (time.indexOf('p') >= 0 && time.substring(0, 2) !== '12') {
       h = ~~time.substring(0, 2) + 12;
     } else {
@@ -1253,20 +1236,20 @@ export function placeClass(
     h -= 7; // 7am = 0
     m = ~~time.substring(time.indexOf(':') + 1, time.indexOf(':') + 3);
     m /= 60;
-    let tr = $(scheduleDiv).find('tbody tr').get(h);
+    const tr = $(scheduleDiv).find('tbody tr').get(h);
     if (tr) {
-      let cell = $(tr).find('td .schedule-td-div').get(xDisplace);
+      const cell = $(tr).find('td .schedule-td-div').get(xDisplace);
       cell?.appendChild(classDiv);
     }
 
     $(classDiv).css('top', (m * 100).toString() + '%');
 
     // adds detailed comment bubble on hover
-    var commentDiv = document.createElement('div');
+    const commentDiv = document.createElement('div');
     commentDiv.className = 'comment-div';
-    var commentImg = document.createElement('img');
-    var iconUrl2 = chrome.extension.getURL('png/comment-pic2.png');
-    var iconUrl3 = chrome.extension.getURL('png/comment-pic3.png');
+    const commentImg = document.createElement('img');
+    const iconUrl2 = chrome.extension.getURL('png/comment-pic2.png');
+    const iconUrl3 = chrome.extension.getURL('png/comment-pic3.png');
     if (
       $(scheduleDiv).css('background-color').toString() === 'rgb(222, 222, 222)'
     ) {
@@ -1278,7 +1261,7 @@ export function placeClass(
     commentDiv.appendChild(commentImg);
     scheduleDiv.appendChild(commentDiv);
 
-    var upperLeftText = document.createElement('div');
+    const upperLeftText = document.createElement('div');
     upperLeftText.innerHTML = 'Cannot display additional information.';
     upperLeftText.className = 'comment-text';
     commentDiv.appendChild(upperLeftText);
@@ -1286,7 +1269,7 @@ export function placeClass(
 
     for (let i = 0; i < schedArr.length; i++) {
       if (scheduleDiv.id.includes(`${i + 1}`)) {
-        for (var j = 0; j < schedArr[i].length; j++) {
+        for (let j = 0; j < schedArr[i].length; j++) {
           if (
             (classDiv.firstChild as HTMLElement | null)?.innerHTML.includes(
               schedArr[i][j].classAbbr + '-' + schedArr[i][j].sections[0]
@@ -1306,20 +1289,13 @@ export function placeClass(
     }
 
     // displays when hovered over class div
-    classDiv.onmouseover = (event) => {
+    classDiv.onmouseover = () => {
       commentDiv.style.display = 'block';
-      var curClassDiv: HTMLElement;
-      if ((event.target as HTMLElement)?.className === 'class') {
-        curClassDiv = event.target as HTMLElement;
-      } else {
-        curClassDiv = (event.target as HTMLElement).parentNode as HTMLElement;
-      }
-
-      let top =
+      const top =
         ($(classDiv).offset()?.top ?? 0) -
         ($(scheduleDiv).offset()?.top ?? 0) -
         ($(commentDiv).height() ?? 0);
-      let left =
+      const left =
         ($(classDiv).offset()?.left ?? 0) -
         ($(scheduleDiv).offset()?.left ?? 0);
 

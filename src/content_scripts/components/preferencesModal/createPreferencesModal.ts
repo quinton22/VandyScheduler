@@ -50,7 +50,7 @@ export function selectAllForDay(this: Element) {
 }
 
 export function preferenceDblClickHandler(this: Element) {
-  let hour: string | null | number = this.getAttribute('data-hour');
+  const hour: string | null | number = this.getAttribute('data-hour');
   if (!hour) return;
 
   const dayGroup = this.parentElement?.getAttribute('data-day-group');
@@ -145,6 +145,22 @@ export const createPreferencesModal = async () => {
 
   showFirstTimeMessages();
   syncPreferencesWithUi();
+  prefModal.querySelector('.close')?.addEventListener('click', closePrefModal);
+  prefModal.querySelector('.pref-clear')?.addEventListener('click', clearPref);
+  prefModal.querySelectorAll('.select-all').forEach((element) => {
+    element.addEventListener('click', selectAllForDay);
+  });
+  prefModal.querySelectorAll('.break-select[data-hour]').forEach((element) => {
+    element.addEventListener('click', selectHour);
+    element.addEventListener('dblclick', preferenceDblClickHandler);
+  });
+  prefModal
+    .querySelectorAll<HTMLInputElement>('#pref-not-met-form input')
+    .forEach((input) => {
+      input.addEventListener('change', () => {
+        preferences.noPreferenceMet = input.value === 'false';
+      });
+    });
 
   return prefModal;
 };

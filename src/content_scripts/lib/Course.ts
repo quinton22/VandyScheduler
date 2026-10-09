@@ -1,3 +1,46 @@
+const parseTimeRange = (value: string): [number, number] | undefined => {
+  const match = value.match(
+    /^\s*(\d{1,2}):(\d{2})\s*(am|pm)?\s*-\s*(\d{1,2}):(\d{2})\s*(am|pm)?\s*$/i
+  );
+  if (!match) return;
+
+  const startHour = Number(match[1]);
+  const startMinute = Number(match[2]);
+  const endHour = Number(match[4]);
+  const endMinute = Number(match[5]);
+  let startPeriod = match[3]?.toLowerCase();
+  let endPeriod = match[6]?.toLowerCase();
+
+  if (startPeriod && !endPeriod) {
+    endPeriod =
+      startPeriod === 'am' && endHour < startHour ? 'pm' : startPeriod;
+  } else if (!startPeriod && endPeriod) {
+    startPeriod =
+      endPeriod === 'pm' &&
+      startHour !== 12 &&
+      (startHour > endHour || endHour === 12)
+        ? 'am'
+        : endPeriod;
+  }
+
+  const toMinutes = (hour: number, minute: number, period?: string) => {
+    if (minute > 59) return;
+    if (period) {
+      if (hour < 1 || hour > 12) return;
+      hour = (hour % 12) + (period === 'pm' ? 12 : 0);
+    } else if (hour > 23) {
+      return;
+    }
+    return hour * 60 + minute;
+  };
+
+  const start = toMinutes(startHour, startMinute, startPeriod);
+  const end = toMinutes(endHour, endMinute, endPeriod);
+  if (start === undefined || end === undefined) return;
+
+  return [start, end];
+};
+
 export class Course {
   public classAbbr: string;
   public classDesc: string;
@@ -70,57 +113,19 @@ export class Course {
    *	Compares 2 times to determine if they overlap. Returns false if overlap
    */
   static compareTimes(t1: string, t2: string): boolean {
-    while (t1.indexOf('p') !== -1) {
-      if (t1.substring(t1.indexOf('p') - 5, t1.indexOf('p') - 3) !== '12') {
-        t1 =
-          t1.substring(0, t1.indexOf('p') - 5) +
-          (
-            ~~t1.substring(t1.indexOf('p') - 5, t1.indexOf('p') - 3) + 12
-          ).toString() +
-          t1.substring(t1.indexOf('p') - 3, t1.indexOf('p')) +
-          t1.substring(t1.indexOf('p') + 1);
-      } else {
-        t1 =
-          t1.substring(0, t1.indexOf('p')) + t1.substring(t1.indexOf('p') + 1);
-      }
-    }
-    while (t2.indexOf('p') !== -1) {
-      if (t2.substring(t2.indexOf('p') - 5, t2.indexOf('p') - 3) !== '12') {
-        t2 =
-          t2.substring(0, t2.indexOf('p') - 5) +
-          (
-            ~~t2.substring(t2.indexOf('p') - 5, t2.indexOf('p') - 3) + 12
-          ).toString() +
-          t2.substring(t2.indexOf('p') - 3, t2.indexOf('p')) +
-          t2.substring(t2.indexOf('p') + 1);
-      } else {
-        t2 =
-          t2.substring(0, t2.indexOf('p')) + t2.substring(t2.indexOf('p') + 1);
-      }
-    }
+    const first = parseTimeRange(t1);
+    const second = parseTimeRange(t2);
+    if (!first || !second) return true;
 
-    var t11 = t1.substring(0, t1.indexOf('-'));
-    var t12 = t1.substring(t1.indexOf('-') + 1);
-    var t21 = t2.substring(0, t2.indexOf('-'));
-    var t22 = t2.substring(t2.indexOf('-') + 1);
-
-    if (
-      (t21 >= t11 && t21 <= t12) ||
-      (t22 >= t11 && t22 <= t12) ||
-      (t11 >= t21 && t11 <= t22)
-    ) {
-      return false;
-    } else {
-      return true;
-    }
+    return first[1] <= second[0] || second[1] <= first[0];
   }
 
   /*
    *	Compares days to see if days overlap. Returns false if overlap
    */
   static compareDays(d1: string, d2: string): boolean {
-    var d = true;
-    for (var i = 0; i < d1.length; i++) {
+    let d = true;
+    for (let i = 0; i < d1.length; i++) {
       if (d2.indexOf(d1[i]) !== -1) {
         d = false; // d1 and d2 overlap
       }
@@ -133,22 +138,22 @@ export class Course {
    *	Returns the length of a class in the form [hours].[min/60]
    */
   static lengthOfClass(t1: string): number {
-    var hour1 = ~~t1.substring(t1.indexOf(':') - 2, t1.indexOf(':'));
+    let hour1 = ~~t1.substring(t1.indexOf(':') - 2, t1.indexOf(':'));
     if (t1.indexOf('p') > 0 && t1.indexOf('p') < 7) {
       hour1 = hour1 !== 12 ? hour1 + 12 : hour1;
     }
 
-    var minute1 = ~~t1.substring(t1.indexOf(':') + 1, t1.indexOf(':') + 3);
+    let minute1 = ~~t1.substring(t1.indexOf(':') + 1, t1.indexOf(':') + 3);
     minute1 /= 60;
     t1 = t1.substring(t1.indexOf('-') + 1);
-    var hour2 = ~~t1.substring(t1.indexOf(':') - 2, t1.indexOf(':'));
+    let hour2 = ~~t1.substring(t1.indexOf(':') - 2, t1.indexOf(':'));
     if (t1.indexOf('p') !== -1) {
       hour2 = hour2 !== 12 ? hour2 + 12 : hour2;
     }
-    var minute2 = ~~t1.substring(t1.indexOf(':') + 1, t1.indexOf(':') + 3);
+    let minute2 = ~~t1.substring(t1.indexOf(':') + 1, t1.indexOf(':') + 3);
     minute2 /= 60;
 
-    var len = hour2 + minute2 - hour1 - minute1;
+    const len = hour2 + minute2 - hour1 - minute1;
     return len;
   }
 
