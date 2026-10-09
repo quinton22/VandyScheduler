@@ -13,6 +13,10 @@ export class Preferences {
     return this._noPreferenceMet;
   }
 
+  set noPreferenceMet(value: boolean) {
+    this._noPreferenceMet = value;
+  }
+
   createBreakTime() {
     this._breakTime = new BreakTime();
   }
@@ -52,7 +56,9 @@ export class Preferences {
     const { breakTime, noPreferenceMet } = JSON.parse(str);
     try {
       this._breakTime = BreakTime.fromJson(breakTime);
-    } catch {}
+    } catch {
+      this._breakTime = undefined;
+    }
 
     this._noPreferenceMet = !!noPreferenceMet;
   }

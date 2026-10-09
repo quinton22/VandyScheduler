@@ -45,7 +45,7 @@ describe('BreakTime', () => {
       ) {
         expect(hours1.length).toEqual(hours2.length);
       } else {
-        let comparator =
+        const comparator =
           action === 'select'
             ? ('toBeLessThan' as const)
             : ('toBeGreaterThan' as const);

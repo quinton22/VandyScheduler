@@ -28,7 +28,7 @@ export class Schedule {
    *  to empty
    */
   sortClasses() {
-    let schedule: ScheduleArray = [];
+    const schedule: ScheduleArray = [];
     if (this.courseList.length > 0) {
       this.sortClassesSub(this.courseList, schedule);
     }
@@ -39,7 +39,7 @@ export class Schedule {
    *	times and days to check overlap and places into a schedule
    */
   sortClassesSub(subClassArr: Course[], schedule: ScheduleArray) {
-    let newSubClassArr: Course[] = [];
+    const newSubClassArr: Course[] = [];
 
     if (subClassArr.length > 1) {
       for (let j = 1; j < subClassArr.length; j++) {
@@ -48,14 +48,14 @@ export class Schedule {
     }
 
     for (let i = 0; i < subClassArr[0].times.length; i++) {
-      let curClass: CourseTuple = [
+      const curClass: CourseTuple = [
         subClassArr[0].classAbbr,
         subClassArr[0].sections[i],
         subClassArr[0].times[i],
         subClassArr[0].days[i],
       ];
 
-      let newSched: ScheduleArray = [];
+      const newSched: ScheduleArray = [];
       for (let j = 0; j < schedule.length; j++) {
         newSched.push(schedule[j]);
       }
@@ -77,7 +77,7 @@ export class Schedule {
    *	returns true if overlap
    */
   static checkOverlap(currentCourse: CourseTuple, schedule: ScheduleArray) {
-    for (var i = 0; i < schedule.length; ++i) {
+    for (let i = 0; i < schedule.length; ++i) {
       if (schedule[i][0] !== currentCourse[0]) {
         if (
           /\n/.test(schedule[i][2]) &&
@@ -85,10 +85,10 @@ export class Schedule {
           /\n/.test(currentCourse[2]) &&
           /\n/.test(currentCourse[3])
         ) {
-          let times1 = schedule[i][2].split(/\n/);
-          let days1 = schedule[i][3].split(/\n/);
-          let times2 = currentCourse[2].split(/\n/);
-          let days2 = currentCourse[3].split(/\n/);
+          const times1 = schedule[i][2].split(/\n/);
+          const days1 = schedule[i][3].split(/\n/);
+          const times2 = currentCourse[2].split(/\n/);
+          const days2 = currentCourse[3].split(/\n/);
 
           for (let j = 0; j < days1.length; ++j) {
             for (let k = 0; k < days2.length; ++k) {
@@ -100,8 +100,8 @@ export class Schedule {
             }
           }
         } else if (/\n/.test(schedule[i][2]) && /\n/.test(schedule[i][3])) {
-          let times = schedule[i][2].split(/\n/);
-          let days = schedule[i][3].split(/\n/);
+          const times = schedule[i][2].split(/\n/);
+          const days = schedule[i][3].split(/\n/);
           for (let j = 0; j < days.length; ++j) {
             if (!Course.compareDays(days[j], currentCourse[3])) {
               if (!Course.compareTimes(times[j], currentCourse[2])) {
@@ -110,8 +110,8 @@ export class Schedule {
             }
           }
         } else if (/\n/.test(currentCourse[2]) && /\n/.test(currentCourse[3])) {
-          let times = currentCourse[2].split(/\n/);
-          let days = currentCourse[3].split(/\n/);
+          const times = currentCourse[2].split(/\n/);
+          const days = currentCourse[3].split(/\n/);
           for (let j = 0; j < days.length; ++j) {
             if (!Course.compareDays(days[j], schedule[i][3])) {
               if (!Course.compareTimes(times[j], schedule[i][2])) {

@@ -18,7 +18,7 @@ describe('elementCache', () => {
     it('should set the item in the cache properly', () => {
       const refresh = () => document.getElementById(ID);
       elementCache.set(ID, refresh);
-      // @ts-expect-error
+      // @ts-expect-error Validate invalid cache key types.
       expect(elementCache.cache).toEqual({
         [ID]: {
           element: refresh(),
@@ -110,7 +110,7 @@ describe('elementCache', () => {
     it('should delete the whole cache', () => {
       elementCache.set(ID, () => document.getElementById(ID));
       expect(elementCache.has(ID)).toEqual(true);
-      // @ts-expect-error
+      // @ts-expect-error Validate invalid element types.
       expect(elementCache.cache).toMatchInlineSnapshot(`
 {
   "my-div": {
@@ -123,7 +123,7 @@ describe('elementCache', () => {
 `);
 
       elementCache.clear();
-      // @ts-expect-error
+      // @ts-expect-error Validate invalid refresh callback types.
       expect(elementCache.cache).toEqual({});
     });
   });

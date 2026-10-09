@@ -4,7 +4,6 @@
       <span
         class="close"
         style="position: sticky; top: 0; padding-top: 5px"
-        onclick="closePrefModal()"
         >&times;</span
       >
       <h1 class="pref-title">Preferences</h1>
@@ -29,7 +28,6 @@
                   name="include-pref"
                   value="true"
                   checked="true"
-                  onchange="() => {includeClassesInRemoval = false;}"
                 /><label for="include-classes-input-keep">Keep</label>
               </div>
               <div class="radio-container">
@@ -39,7 +37,6 @@
                   id="include-classes-input-remove"
                   name="include-pref"
                   value="false"
-                  onchange="() => {includeClassesInRemoval = true;}"
                 /><label for="include-classes-input-remove">Remove</label>
               </div>
             </fieldset>
@@ -80,7 +77,6 @@
                   id="break-pref-input-show"
                   name="break-pref"
                   value="true"
-                  onchange="preferences.noPreferencesMet = false;"
                 /><label for="break-pref-input-show">Show</label>
               </div>
               <div class="radio-container">
@@ -90,7 +86,6 @@
                   id="break-pref-input-hide"
                   name="break-pref"
                   value="false"
-                  onchange="preferences.noPreferencesMet = true;"
                 /><label for="break-pref-input-hide">Hide</label>
               </div>
             </fieldset>
@@ -98,7 +93,7 @@
         </div>
       </div>
       <div id="pref-button-container" class="pref-subcontent">
-        <button class="myButton modalButton2 pref-clear" onclick="clearPref()">
+        <button class="myButton modalButton2 pref-clear">
           Clear Preferences
         </button>
       </div>
