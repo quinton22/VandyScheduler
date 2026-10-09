@@ -33,11 +33,11 @@ describe('CourseSectionTime', () => {
 
     const courseSectionTime3 = new CourseSectionTime(
       new Time(9, 30),
-      new Time(9, 45)
+      new Time(9, 45),
     );
     const courseSectionTime4 = new CourseSectionTime(
       new Time(8, 30),
-      new Time(10, 30)
+      new Time(10, 30),
     );
 
     expect(courseSectionTime1.overlapsWith(courseSectionTime3)).toBe(true);
@@ -53,7 +53,7 @@ describe('CourseSectionTime', () => {
     const courseSectionTime1 = new CourseSectionTime(startTime1, endTime1);
     const courseSectionTime2 = new CourseSectionTime(
       nonOverlappingStartTime,
-      nonOverlappingEndTime
+      nonOverlappingEndTime,
     );
     expect(courseSectionTime1.overlapsWith(courseSectionTime2)).toBe(false);
   });
@@ -64,9 +64,13 @@ describe('CourseSectionTime', () => {
     const courseSectionTime1 = new CourseSectionTime(startTime1, endTime1);
     const courseSectionTime2 = new CourseSectionTime(
       edgeCaseStartTime,
-      edgeCaseEndTime
+      edgeCaseEndTime,
     );
     expect(courseSectionTime1.overlapsWith(courseSectionTime2)).toBe(false);
+  });
+
+  it('should compute its length', () => {
+    expect(new CourseSectionTime(startTime1, endTime1).length).toBeCloseTo(1);
   });
 
   it('should correctly count the number of overlapping times', () => {
@@ -74,15 +78,15 @@ describe('CourseSectionTime', () => {
     const courseSectionTime2 = new CourseSectionTime(startTime2, endTime2);
     const courseSectionTime3 = new CourseSectionTime(
       new Time(9, 30),
-      new Time(9, 45)
+      new Time(9, 45),
     );
     const courseSectionTime4 = new CourseSectionTime(
       new Time(8, 30),
-      new Time(10, 30)
+      new Time(10, 30),
     );
     const courseSectionTime5 = new CourseSectionTime(
       new Time(11, 0),
-      new Time(12, 0)
+      new Time(12, 0),
     );
 
     const others = [
@@ -92,6 +96,8 @@ describe('CourseSectionTime', () => {
       courseSectionTime5,
     ];
 
-    expect(courseSectionTime1.getNumOverlaps(others)).toBe(3);
+    expect(
+      others.filter((o) => courseSectionTime1.overlapsWith(o)),
+    ).toHaveLength(3);
   });
 });

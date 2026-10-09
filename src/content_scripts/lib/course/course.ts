@@ -13,7 +13,7 @@ export class CourseSection {
   public professor: string;
   public hours: number;
   public days: CourseSectionDays;
-  public availability: CourseSectionAvailabilty;
+  public availability?: CourseSectionAvailabilty;
   public time: CourseSectionTime;
   public location: string;
 
@@ -28,7 +28,9 @@ export class CourseSection {
     this.days = sectionParsers.days(sectionData.days);
     this.time = sectionParsers.time(sectionData.time);
     this.location = sectionParsers.location(sectionData.location);
-    this.availability = sectionParsers.availability(sectionData.availability);
+    this.availability = sectionData.availability
+      ? sectionParsers.availability(sectionData.availability)
+      : undefined;
   }
 
   get course() {

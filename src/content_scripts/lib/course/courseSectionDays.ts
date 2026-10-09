@@ -55,6 +55,6 @@ export class CourseSectionDays {
   }
 
   getOverlappingDays(other: CourseSectionDays): Days[] {
-    return this.days.filter((d) => other.hasDay(d));
+    return this._days.filter((d) => other.hasDay(d));
   }
 }

@@ -2,7 +2,7 @@ export type RawSectionData = {
   section: string;
   hours: string;
   type: string;
-  availability: string;
+  availability?: string;
   days: string;
   time: string;
   location: string;

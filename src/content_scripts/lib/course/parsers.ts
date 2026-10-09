@@ -25,6 +25,10 @@ export const sectionParser = createParser((str: string) => str);
 export const typeParser = createParser((str: string) => str);
 
 export const hoursParser = createParser((str: string): number => {
+  // Sections such as discussions can have no credit hours listed
+  if (str === '') {
+    return 0;
+  }
   const s = str.match(/[\d.]+/)?.[0];
   if (s) {
     return parseFloat(s);
