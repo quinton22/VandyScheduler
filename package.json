@@ -58,6 +58,7 @@
     "start:watch": "nodemon",
     "start": "parcel build",
     "build": "parcel build",
+    "build:safari": "parcel build && node scripts/build-safari.mjs",
     "lint": "eslint ./src",
     "typecheck": "tsc --noEmit",
     "release": "chrome-webstore-upload"

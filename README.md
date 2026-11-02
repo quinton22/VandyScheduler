@@ -8,6 +8,10 @@ Vandy Scheduler now shows professor ratings from Rate My Professor next their na
 
 This extension can be downloaded at the Chrome Web Store [here](https://chrome.google.com/webstore/detail/vandy-scheduler/ofkamcklfkpakjddlappmemldnnapina?brand=CHBD&gclid=EAIaIQobChMI46ehtYrS1wIVirbACh19XA8iEAAYASABEgLat_D_BwE&gclsrc=aw.ds&dclid=CP6toraK0tcCFcVnAQodcRQNGA).
 
+## Safari
+
+The extension is not in the Safari Extensions Gallery, but you can build and install it yourself. See [INSTALLATION.md](./docs/INSTALLATION.md#safari).
+
 ## How to use
 
 Just download from the Chrome Web Store and go to [Course Registration](https://acad.app.vanderbilt.edu/more/SearchClasses.action#) from your YES page, log in, and start using!

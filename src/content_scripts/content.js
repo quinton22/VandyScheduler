@@ -25,16 +25,8 @@ btn.innerHTML = 'Add to Schedule';
 addClassButton.appendChild(btn);
 
 // sets parent node to course titles on either class search page or class cart page
-var parent =
-  document.getElementById('classSearchResultsCarousel') !== null
-    ? document
-        .getElementById('classSearchResultsCarousel')
-        .getElementsByClassName('left')
-    : null;
-var parent2 =
-  document.getElementById('studentCart') !== null
-    ? document.getElementById('studentCart').getElementsByClassName('left')
-    : null;
+var parent = getCourseTitles('classSearchResultsCarousel');
+var parent2 = getCourseTitles('studentCart');
 
 // necessary for timeout
 var timeout = null;
@@ -54,7 +46,11 @@ let font = $('.classAbbreviation').css('font-family');
 
 // updates class and adds buttons if the DOM subtree is changed
 var observer = new MutationObserver(() => {
-  if (parent !== null && parent2 !== null) {
+  // the page can build these after this script runs, so keep looking for them
+  parent = parent ?? getCourseTitles('classSearchResultsCarousel');
+  parent2 = parent2 ?? getCourseTitles('studentCart');
+
+  if (parent !== null && parent2 !== null && focusPage.length !== 0) {
     if (parent.length !== 0 || parent2.length !== 0) {
       if (timeout) {
         clearTimeout(timeout);
@@ -73,6 +69,14 @@ observer.observe(document, {
   childList: true,
   subtree: true,
 });
+
+/*
+ *	Gets the course title nodes inside the element with the given id, if it exists
+ */
+function getCourseTitles(id) {
+  const container = document.getElementById(id);
+  return container !== null ? container.getElementsByClassName('left') : null;
+}
 
 /*
  *	Creates the modal with the default to display an error message
@@ -1446,8 +1450,8 @@ export function placeClass(classDiv, scheduleDiv, day, time) {
     var commentDiv = document.createElement('div');
     commentDiv.className = 'comment-div';
     var commentImg = document.createElement('img');
-    var iconUrl2 = chrome.extension.getURL('png/comment-pic2.png');
-    var iconUrl3 = chrome.extension.getURL('png/comment-pic3.png');
+    var iconUrl2 = chrome.runtime.getURL('png/comment-pic2.png');
+    var iconUrl3 = chrome.runtime.getURL('png/comment-pic3.png');
     if (
       $(scheduleDiv).css('background-color').toString() === 'rgb(222, 222, 222)'
     ) {
