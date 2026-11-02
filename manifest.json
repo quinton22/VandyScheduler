@@ -24,16 +24,13 @@
   },
   "host_permissions": [
     "*://*.vanderbilt.edu/more/SearchClasses*",
-    "https://www.ratemyprofessors.com/**"
+    "https://www.ratemyprofessors.com/*"
   ],
   "permissions": ["storage"],
   "web_accessible_resources": [
     {
       "resources": ["png/comment-pic2.png", "png/comment-pic3.png"],
-      "extension_ids": [
-        "ofkamcklfkpakjddlappmemldnnapina",
-        "bbgdeeaaalopmnonoppapmgkimnickoa"
-      ]
+      "matches": ["*://*.vanderbilt.edu/*"]
     }
   ]
 }

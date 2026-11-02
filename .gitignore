@@ -3,5 +3,7 @@ png/.DS_Store
 .vscode
 node_modules
 dist
+dist-safari
+safari-xcode
 .parcel-cache
 *.zip
